@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { HomePage } = require('../pages/HomePage');
 const { AuthPage } = require('../pages/AuthPage');
-const { generateUser } = require('../utils/userData');
+const { generateUser, invalidLoginScenarios } = require('../utils/userData');
 
 test('Auth — Successful user registration', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -26,4 +26,31 @@ test('Auth — Successful login', async ({ page }) => {
 
   await expect(authPage.loggedInUsername).toBeVisible();
   await expect(authPage.loggedInUsername).toContainText(username);
+});
+
+test.describe('Auth — Login with invalid credentials', () => {
+  let registeredUser;
+
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    registeredUser = generateUser();
+    await homePage.goto();
+    await authPage.register(registeredUser.username, registeredUser.password);
+    await page.close();
+  });
+
+  for (const scenario of invalidLoginScenarios) {
+    test(`fails with ${scenario.description}`, async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const username = scenario.username ?? registeredUser.username;
+
+      await homePage.goto();
+      await authPage.loginExpectingError(username, scenario.password);
+
+      await expect(authPage.loggedInUsername).not.toBeVisible();
+    });
+  }
 });

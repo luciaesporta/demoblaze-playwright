@@ -37,6 +37,19 @@ class AuthPage {
     await this.logInPassword.fill(password);
     await this.logInSubmit.click();
   }
+
+  async loginExpectingError(username, password) {
+    await this.logInNavButton.click();
+    await this.logInModal.waitFor({ state: 'visible' });
+    await this.logInUsername.fill(username);
+    await this.logInPassword.fill(password);
+    const dialogPromise = this.page.waitForEvent('dialog');
+    await this.logInSubmit.click();
+    const dialog = await dialogPromise;
+    const message = dialog.message();
+    await dialog.accept();
+    return message;
+  }
 }
 
 module.exports = { AuthPage };
