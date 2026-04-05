@@ -2,21 +2,17 @@ class AuthPage {
   constructor(page) {
     this.page = page;
 
-    // Sign up modal
     this.signUpNavButton = page.locator('#signin2');
     this.signUpModal = page.locator('#signInModal');
     this.signUpUsername = page.locator('#sign-username');
     this.signUpPassword = page.locator('#sign-password');
     this.signUpSubmit = page.locator('#signInModal .btn-primary');
 
-    // Log in modal
     this.logInNavButton = page.locator('#login2');
     this.logInModal = page.locator('#logInModal');
     this.logInUsername = page.locator('#loginusername');
     this.logInPassword = page.locator('#loginpassword');
     this.logInSubmit = page.locator('#logInModal .btn-primary');
-
-    // Post-login navbar element
     this.loggedInUsername = page.locator('#nameofuser');
   }
 
