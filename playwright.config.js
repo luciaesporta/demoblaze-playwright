@@ -4,7 +4,7 @@ module.exports = defineConfig({
   testDir: './tests',
   use: {
     baseURL: 'https://www.demoblaze.com',
-    headless: false,
+    headless: process.env.CI ? true : false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
