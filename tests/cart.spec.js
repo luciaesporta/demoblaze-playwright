@@ -3,6 +3,7 @@ const { expect } = require('@playwright/test');
 const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
+const { PAGE_TITLE, PRODUCT_PAGE_URL } = require('../utils/constants');
 
 test('Cart — Guest user can add a product to cart', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -10,17 +11,19 @@ test('Cart — Guest user can add a product to cart', async ({ page }) => {
   const cartPage = new CartPage(page);
 
   await homePage.goto();
-  await expect(page).toHaveTitle(/STORE/);
+  await expect(page).toHaveTitle(PAGE_TITLE);
 
   await homePage.openFirstProduct();
-  await expect(page).toHaveURL(/prod\.html/);
+  await expect(page).toHaveURL(PRODUCT_PAGE_URL);
   await expect(productPage.productName).toBeVisible();
+
+  const expectedName = await productPage.getProductName();
 
   await productPage.addToCart();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
-  await expect(cartPage.getRowCell(0, 1)).toContainText('Samsung');
+  await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
 });
 
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
@@ -30,7 +33,7 @@ test('Cart — Authenticated user can add a product to cart', async ({ authentic
   const cartPage = new CartPage(page);
 
   await homePage.openFirstProduct();
-  await expect(page).toHaveURL(/prod\.html/);
+  await expect(page).toHaveURL(PRODUCT_PAGE_URL);
   await expect(productPage.productName).toBeVisible();
   await expect(productPage.productPrice).toBeVisible();
 
