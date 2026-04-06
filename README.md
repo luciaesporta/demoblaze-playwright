@@ -14,20 +14,26 @@ Supporting features include user authentication (sign up and log in), which enab
 
 | Area | Cases |
 |------|-------|
-| Cart | Add product to cart as guest |
+| Cart | Guest user can add a product to cart |
+| Cart | Authenticated user can add a product to cart |
 | Auth | Successful user registration |
 | Auth | Successful login |
+| Auth | Login fails with non-existent user |
+| Auth | Login fails with wrong password |
 
 ## Tech stack
 
 - [Playwright](https://playwright.dev/) — test framework
 - Page Object Model (POM) — test architecture
+- Playwright Fixtures — reusable authenticated session setup
+- Data-driven testing — parameterized negative scenarios
 - GitHub Actions — CI/CD
 
 ## Project structure
 
 ```
 pages/          # Page Object classes
+fixtures/       # Playwright fixtures (e.g. authenticated session)
 tests/          # Test specs
 utils/          # Test data utilities
 .github/        # CI workflow
