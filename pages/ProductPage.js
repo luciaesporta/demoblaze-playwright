@@ -16,10 +16,10 @@ class ProductPage {
   }
 
   async addToCart() {
-    this.page.once('dialog', async (dialog) => {
-      await dialog.accept();
-    });
+    const dialogPromise = this.page.waitForEvent('dialog');
     await this.addToCartButton.click();
+    const dialog = await dialogPromise;
+    await dialog.accept();
   }
 }
 
