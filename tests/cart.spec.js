@@ -16,11 +16,13 @@ test('Cart — Guest user can add a product to cart', async ({ page }) => {
   await expect(page).toHaveURL(/prod\.html/);
   await expect(productPage.productName).toBeVisible();
 
+  const expectedName = await productPage.getProductName();
+
   await productPage.addToCart();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
-  await expect(cartPage.getRowCell(0, 1)).toContainText('Samsung');
+  await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
 });
 
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
