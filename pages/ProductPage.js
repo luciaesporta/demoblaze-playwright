@@ -3,7 +3,7 @@ class ProductPage {
     this.page = page;
     this.productName = page.locator('h2.name');
     this.productPrice = page.locator('h3.price-container');
-    this.addToCartButton = page.locator('.btn-success');
+    this.addToCartButton = page.getByRole('link', { name: 'Add to cart' });
   }
 
   async getProductName() {
@@ -16,10 +16,14 @@ class ProductPage {
   }
 
   async addToCart() {
+    const responsePromise = this.page.waitForResponse(
+      (res) => res.url().includes('addtocart') && res.status() === 200
+    );
     this.page.once('dialog', async (dialog) => {
       await dialog.accept();
     });
     await this.addToCartButton.click();
+    await responsePromise;
   }
 }
 
