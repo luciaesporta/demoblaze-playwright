@@ -28,6 +28,33 @@ test('Auth — Successful login', async ({ page }) => {
   await expect(authPage.loggedInUsername).toContainText(username);
 });
 
+test('Auth — Login and sign up forms reject empty submission', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+
+  await homePage.goto();
+
+  const loginMessage = await authPage.loginExpectingError('', '');
+  expect(loginMessage).toBeTruthy();
+  await expect(authPage.loggedInUsername).not.toBeVisible();
+
+  const signUpMessage = await authPage.register('', '');
+  expect(signUpMessage).toBeTruthy();
+});
+
+test('Auth — Password field masks input', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+
+  await homePage.goto();
+
+  await authPage.openLoginModal();
+  await expect(authPage.logInPassword).toHaveAttribute('type', 'password');
+
+  await authPage.openSignUpModal();
+  await expect(authPage.signUpPassword).toHaveAttribute('type', 'password');
+});
+
 test.describe('Auth — Login with invalid credentials', () => {
   let registeredUser;
 
