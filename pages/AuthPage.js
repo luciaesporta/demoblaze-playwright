@@ -16,6 +16,16 @@ class AuthPage {
     this.loggedInUsername = page.locator('#nameofuser');
   }
 
+  async openLoginModal() {
+    await this.logInNavButton.click();
+    await this.logInModal.waitFor({ state: 'visible' });
+  }
+
+  async openSignUpModal() {
+    await this.signUpNavButton.click();
+    await this.signUpModal.waitFor({ state: 'visible' });
+  }
+
   async register(username, password) {
     await this.signUpNavButton.click();
     await this.signUpModal.waitFor({ state: 'visible' });

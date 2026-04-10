@@ -28,6 +28,36 @@ test('Auth — Successful login', async ({ page }) => {
   await expect(authPage.loggedInUsername).toContainText(username);
 });
 
+test('Auth — Login and sign up forms reject empty submission', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+
+  page.on('dialog', dialog => dialog.accept());
+
+  await homePage.goto();
+
+  await authPage.openLoginModal();
+  await authPage.logInSubmit.click();
+  await expect(authPage.logInModal).toBeVisible();
+  await expect(authPage.loggedInUsername).not.toBeVisible();
+
+  await homePage.goto();
+
+  await authPage.openSignUpModal();
+  await authPage.signUpSubmit.click();
+  await expect(authPage.signUpModal).toBeVisible();
+});
+
+test('Auth — Password field masks input', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+
+  await homePage.goto();
+
+  await expect(authPage.logInPassword).toHaveAttribute('type', 'password');
+  await expect(authPage.signUpPassword).toHaveAttribute('type', 'password');
+});
+
 test.describe('Auth — Login with invalid credentials', () => {
   let registeredUser;
 
