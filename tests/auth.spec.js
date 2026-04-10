@@ -41,8 +41,7 @@ test('Auth — Login and sign up forms reject empty submission', async ({ page }
   await expect(authPage.logInModal).toBeVisible();
   await expect(authPage.loggedInUsername).not.toBeVisible();
 
-  await page.keyboard.press('Escape');
-  await authPage.logInModal.waitFor({ state: 'hidden' });
+  await homePage.goto();
 
   await authPage.openSignUpModal();
   await authPage.signUpSubmit.click();
