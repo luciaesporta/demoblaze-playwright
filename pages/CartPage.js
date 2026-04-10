@@ -7,6 +7,7 @@ class CartPage {
 
   async goto() {
     await this.page.goto('/cart.html');
+    await this.page.waitForLoadState('networkidle');
   }
 
   getRowCell(rowIndex, cellIndex) {
