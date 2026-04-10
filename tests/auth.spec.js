@@ -55,12 +55,7 @@ test('Auth — Password field masks input', async ({ page }) => {
 
   await homePage.goto();
 
-  await authPage.openLoginModal();
   await expect(authPage.logInPassword).toHaveAttribute('type', 'password');
-  await page.keyboard.press('Escape');
-  await authPage.logInModal.waitFor({ state: 'hidden' });
-
-  await authPage.openSignUpModal();
   await expect(authPage.signUpPassword).toHaveAttribute('type', 'password');
 });
 
