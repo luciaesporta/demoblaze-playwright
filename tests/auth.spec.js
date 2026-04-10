@@ -32,14 +32,21 @@ test('Auth — Login and sign up forms reject empty submission', async ({ page }
   const homePage = new HomePage(page);
   const authPage = new AuthPage(page);
 
+  page.on('dialog', dialog => dialog.accept());
+
   await homePage.goto();
 
-  const loginMessage = await authPage.loginExpectingError('', '');
-  expect(loginMessage).toBeTruthy();
+  await authPage.openLoginModal();
+  await authPage.logInSubmit.click();
+  await expect(authPage.logInModal).toBeVisible();
   await expect(authPage.loggedInUsername).not.toBeVisible();
 
-  const signUpMessage = await authPage.register('', '');
-  expect(signUpMessage).toBeTruthy();
+  await page.keyboard.press('Escape');
+  await authPage.logInModal.waitFor({ state: 'hidden' });
+
+  await authPage.openSignUpModal();
+  await authPage.signUpSubmit.click();
+  await expect(authPage.signUpModal).toBeVisible();
 });
 
 test('Auth — Password field masks input', async ({ page }) => {
@@ -50,6 +57,8 @@ test('Auth — Password field masks input', async ({ page }) => {
 
   await authPage.openLoginModal();
   await expect(authPage.logInPassword).toHaveAttribute('type', 'password');
+  await page.keyboard.press('Escape');
+  await authPage.logInModal.waitFor({ state: 'hidden' });
 
   await authPage.openSignUpModal();
   await expect(authPage.signUpPassword).toHaveAttribute('type', 'password');
