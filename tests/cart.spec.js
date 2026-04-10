@@ -33,7 +33,7 @@ test('Cart — Authenticated user can add a product to cart', async ({ authentic
   const cartPage = new CartPage(page);
 
   await homePage.openFirstProduct();
-  await expect(page).toHaveURL(/prod\.html/);
+  await expect(page).toHaveURL(PRODUCT_PAGE_URL);
   await expect(productPage.productName).toBeVisible();
   await expect(productPage.productPrice).toBeVisible();
 
