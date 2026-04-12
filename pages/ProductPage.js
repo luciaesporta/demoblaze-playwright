@@ -16,19 +16,14 @@ class ProductPage {
   }
 
   async addToCart() {
-
-  async addToCart() {
-  const responsePromise = this.page.waitForResponse(
-    (res) => res.url().includes('addtocart') && res.status() === 200
-  );
-  const dialogPromise = this.page.waitForEvent('dialog');
-
-  await this.addToCartButton.click();
-
-  const dialog = await dialogPromise;
-  await dialog.accept();
-  await responsePromise;
-}
+    const responsePromise = this.page.waitForResponse(
+      (res) => res.url().includes('addtocart') && res.status() === 200
+    );
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept();
+    });
+    await this.addToCartButton.click();
+    await responsePromise;
   }
 }
 
