@@ -16,6 +16,10 @@ class CartPage {
   async getTotal() {
     return (await this.cartTotal.textContent()).trim();
   }
+
+  async deleteRow(rowIndex) {
+    await this.cartRows.nth(rowIndex).locator('td a').click();
+  }
 }
 
 module.exports = { CartPage };

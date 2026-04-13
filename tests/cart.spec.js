@@ -87,6 +87,46 @@ test('Cart — Total reflects all added items', async ({ authenticatedPage }) =>
   await expect(cartPage.cartTotal).toHaveText(expectedTotal);
 });
 
+test('Cart — Deleting an item updates the cart correctly', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const firstName = await productPage.getProductName();
+  const firstPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openProduct(1);
+  await expect(productPage.productName).toBeVisible();
+  const secondName = await productPage.getProductName();
+  const secondPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(2);
+
+  const names = [
+    await cartPage.getRowCell(0, 1).textContent(),
+    await cartPage.getRowCell(1, 1).textContent(),
+  ];
+  const deleteIndex = names.indexOf(firstName) !== -1 ? names.indexOf(firstName) : 0;
+  const deletedName = await cartPage.getRowCell(deleteIndex, 1).textContent();
+  const deletedPrice = Number(await cartPage.getRowCell(deleteIndex, 2).textContent());
+
+  await cartPage.deleteRow(deleteIndex);
+  await expect(cartPage.cartRows).toHaveCount(1);
+
+  const remainingName = await cartPage.getRowCell(0, 1).textContent();
+  expect(remainingName).not.toBe(deletedName);
+
+  const expectedTotal = String(Number(firstPrice) + Number(secondPrice) - deletedPrice);
+  await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+});
+
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const homePage = new HomePage(page);
