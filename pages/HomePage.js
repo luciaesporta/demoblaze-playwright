@@ -17,6 +17,12 @@ class HomePage {
     await link.waitFor({ state: 'visible' });
     await link.click();
   }
+
+  async openCategory(name) {
+    const link = this.page.locator('#itemc').getByText(name, { exact: true });
+    await link.click();
+    await this.page.locator('.card-title a').first().waitFor({ state: 'visible' });
+  }
 }
 
 module.exports = { HomePage };

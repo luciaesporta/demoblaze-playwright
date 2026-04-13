@@ -5,6 +5,27 @@ const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL } = require('../utils/constants');
 
+test('Cart — Cart persists across page navigation', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const expectedName = await productPage.getProductName();
+  const expectedPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openCategory('Laptops');
+  await cartPage.goto();
+
+  await expect(cartPage.cartRows).toHaveCount(1);
+  await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
+  await expect(cartPage.cartTotal).toHaveText(expectedPrice);
+});
+
 test('Cart — Empty cart shows no items and blank total', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const cartPage = new CartPage(page);
