@@ -5,6 +5,16 @@ const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL } = require('../utils/constants');
 
+test('Cart — Empty cart shows no items and blank total', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const cartPage = new CartPage(page);
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(0);
+  const total = await cartPage.getTotal();
+  expect(total === '' || total === '0').toBeTruthy();
+});
+
 test('Cart — Guest user can add a product to cart', async ({ page }) => {
   const homePage = new HomePage(page);
   const productPage = new ProductPage(page);

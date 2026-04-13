@@ -37,7 +37,14 @@ class AuthPage {
     const dialog = await dialogPromise;
     const message = dialog.message();
     await dialog.accept();
-    await this.signUpModal.waitFor({ state: 'hidden' });
+    const alreadyClosed = await this.signUpModal
+      .waitFor({ state: 'hidden', timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!alreadyClosed) {
+      await this.page.locator('#signInModal .close').click();
+      await this.signUpModal.waitFor({ state: 'hidden' });
+    }
     return message;
   }
 
