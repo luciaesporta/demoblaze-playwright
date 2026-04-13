@@ -153,6 +153,35 @@ test('Cart — Cart state is preserved after interrupting the purchase flow', as
   await expect(cartPage.cartTotal).toHaveText(totalBefore);
 });
 
+test('Cart — Adding the same product twice results in two rows', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const productName = await productPage.getProductName();
+  const productPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(2);
+
+  const row0Name = await cartPage.getRowCell(0, 1).textContent();
+  const row1Name = await cartPage.getRowCell(1, 1).textContent();
+  expect(row0Name).toBe(productName);
+  expect(row1Name).toBe(productName);
+
+  const expectedTotal = String(Number(productPrice) * 2);
+  await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+});
+
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const homePage = new HomePage(page);
