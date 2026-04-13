@@ -3,6 +3,9 @@ class CartPage {
     this.page = page;
     this.cartRows = page.locator('#tbodyid tr');
     this.cartTotal = page.locator('#totalp');
+    this.placeOrderButton = page.locator('button.btn-success');
+    this.orderModal = page.locator('#orderModal');
+    this.orderModalCloseButton = page.locator('#orderModal .btn-secondary[data-dismiss="modal"]');
   }
 
   async goto() {
@@ -19,6 +22,16 @@ class CartPage {
 
   async deleteRow(rowIndex) {
     await this.cartRows.nth(rowIndex).locator('td a').click();
+  }
+
+  async openPlaceOrderModal() {
+    await this.placeOrderButton.click();
+    await this.orderModal.waitFor({ state: 'visible' });
+  }
+
+  async closePlaceOrderModal() {
+    await this.orderModalCloseButton.click();
+    await this.orderModal.waitFor({ state: 'hidden' });
   }
 }
 

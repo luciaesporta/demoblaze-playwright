@@ -127,6 +127,32 @@ test('Cart — Deleting an item updates the cart correctly', async ({ authentica
   await expect(cartPage.cartTotal).toHaveText(expectedTotal);
 });
 
+test('Cart — Cart state is preserved after interrupting the purchase flow', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const expectedName = await productPage.getProductName();
+  const expectedPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(1);
+  const totalBefore = await cartPage.getTotal();
+
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+  await cartPage.closePlaceOrderModal();
+
+  await expect(cartPage.cartRows).toHaveCount(1);
+  await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
+  await expect(cartPage.getRowCell(0, 2)).toContainText(expectedPrice);
+  await expect(cartPage.cartTotal).toHaveText(totalBefore);
+});
+
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const homePage = new HomePage(page);
