@@ -37,6 +37,7 @@ class AuthPage {
     const dialog = await dialogPromise;
     const message = dialog.message();
     await dialog.accept();
+    await this.signUpModal.waitFor({ state: 'hidden' });
     return message;
   }
 
