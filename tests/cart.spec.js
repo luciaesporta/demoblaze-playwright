@@ -26,6 +26,43 @@ test('Cart — Guest user can add a product to cart', async ({ page }) => {
   await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
 });
 
+test('Cart — Cart displays full list when multiple products are added', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const firstName = await productPage.getProductName();
+  const firstPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openProduct(1);
+  await expect(productPage.productName).toBeVisible();
+  const secondName = await productPage.getProductName();
+  const secondPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(2);
+
+  const names = [
+    await cartPage.getRowCell(0, 1).textContent(),
+    await cartPage.getRowCell(1, 1).textContent(),
+  ];
+  const prices = [
+    await cartPage.getRowCell(0, 2).textContent(),
+    await cartPage.getRowCell(1, 2).textContent(),
+  ];
+
+  expect(names).toContain(firstName);
+  expect(names).toContain(secondName);
+  expect(prices).toContain(firstPrice);
+  expect(prices).toContain(secondPrice);
+});
+
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const homePage = new HomePage(page);
