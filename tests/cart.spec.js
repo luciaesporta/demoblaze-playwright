@@ -63,6 +63,30 @@ test('Cart — Cart displays full list when multiple products are added', async 
   expect(prices).toContain(secondPrice);
 });
 
+test('Cart — Total reflects all added items', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const firstPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openProduct(1);
+  await expect(productPage.productName).toBeVisible();
+  const secondPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(2);
+
+  const expectedTotal = String(Number(firstPrice) + Number(secondPrice));
+  await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+});
+
 test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   const homePage = new HomePage(page);
