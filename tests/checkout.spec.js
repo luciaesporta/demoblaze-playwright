@@ -130,3 +130,30 @@ test('Checkout — Total in modal matches cart total', async ({ authenticatedPag
 
   expect(modalTotal).toBe(cartTotal);
 });
+
+test('Checkout — Modal can be dismissed without placing an order', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  const expectedName = await productPage.getProductName();
+  const expectedPrice = await productPage.getProductPrice();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(1);
+  const totalBefore = await cartPage.getTotal();
+
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+  await cartPage.closePlaceOrderModal();
+
+  await expect(cartPage.orderModal).not.toBeVisible();
+  await expect(cartPage.cartRows).toHaveCount(1);
+  await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
+  await expect(cartPage.getRowCell(0, 2)).toContainText(expectedPrice);
+  await expect(cartPage.cartTotal).toHaveText(totalBefore);
+});
