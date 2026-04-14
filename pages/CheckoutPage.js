@@ -30,6 +30,10 @@ class CheckoutPage {
     await this.confirmationModal.waitFor({ state: 'visible' });
   }
 
+  async clickPurchase() {
+    await this.purchaseButton.click();
+  }
+
   async getConfirmationText() {
     return (await this.confirmationBody.textContent()).trim();
   }
