@@ -62,3 +62,43 @@ test('Checkout — Purchase cannot be submitted with mandatory fields empty', as
   await expect(checkoutPage.confirmationModal).not.toBeVisible();
   await expect(cartPage.orderModal).toBeVisible();
 });
+
+test('Checkout — Credit card field rejects non-numeric characters', async ({ authenticatedPage }) => {
+  // BUG: demoblaze accepts any value in the credit card field and processes
+  // the purchase without validation. This test is marked as expected to fail
+  // and should be removed once proper numeric validation is implemented.
+  test.fail();
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+  const checkoutPage = new CheckoutPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+
+  await checkoutPage.fillOrderForm({
+    name: 'Test User',
+    country: 'Spain',
+    city: 'Madrid',
+    creditCard: 'abcd',
+    month: 'April',
+    year: '2026',
+  });
+
+  await checkoutPage.clickPurchase();
+
+  await expect(checkoutPage.confirmationModal).not.toBeVisible();
+  await expect(cartPage.orderModal).toBeVisible();
+
+  await checkoutPage.fillCreditCard('@@##');
+  await checkoutPage.clickPurchase();
+
+  await expect(checkoutPage.confirmationModal).not.toBeVisible();
+  await expect(cartPage.orderModal).toBeVisible();
+});

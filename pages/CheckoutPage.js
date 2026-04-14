@@ -34,6 +34,11 @@ class CheckoutPage {
     await this.purchaseButton.click();
   }
 
+  async fillCreditCard(value) {
+    await this.creditCardInput.clear();
+    await this.creditCardInput.fill(value);
+  }
+
   async getConfirmationText() {
     return (await this.confirmationBody.textContent()).trim();
   }

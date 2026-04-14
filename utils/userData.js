@@ -1,6 +1,7 @@
 function generateUser() {
+  const uid = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
   return {
-    username: `luciaesporta_${Date.now()}`,
+    username: `luciaesporta_${uid}`,
     password: 'Test1234!',
   };
 }
