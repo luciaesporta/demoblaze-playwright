@@ -102,3 +102,31 @@ test('Checkout — Credit card field rejects non-numeric characters', async ({ a
   await expect(checkoutPage.confirmationModal).not.toBeVisible();
   await expect(cartPage.orderModal).toBeVisible();
 });
+
+test('Checkout — Total in modal matches cart total', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+  const checkoutPage = new CheckoutPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  await productPage.addToCart();
+
+  await homePage.goto();
+  await homePage.openProduct(1);
+  await expect(productPage.productName).toBeVisible();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(2);
+  const cartTotal = await cartPage.getTotal();
+
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+
+  const modalTotal = await checkoutPage.getModalTotal();
+
+  expect(modalTotal).toBe(cartTotal);
+});

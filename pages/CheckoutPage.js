@@ -9,6 +9,7 @@ class CheckoutPage {
     this.monthInput = page.locator('#month');
     this.yearInput = page.locator('#year');
     this.purchaseButton = page.locator('button[onclick="purchaseOrder()"]');
+    this.modalTotal = page.locator('#totalm');
 
     this.confirmationModal = page.locator('.sweet-alert');
     this.confirmationTitle = page.locator('.sweet-alert h2');
@@ -37,6 +38,11 @@ class CheckoutPage {
   async fillCreditCard(value) {
     await this.creditCardInput.clear();
     await this.creditCardInput.fill(value);
+  }
+
+  async getModalTotal() {
+    const text = (await this.modalTotal.textContent()).trim();
+    return text.replace(/\D/g, '');
   }
 
   async getConfirmationText() {

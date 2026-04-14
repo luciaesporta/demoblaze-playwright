@@ -9,6 +9,7 @@ class HomePage {
   }
 
   async openFirstProduct() {
+    await this.firstProductLink.waitFor({ state: 'visible' });
     await this.firstProductLink.click();
   }
 

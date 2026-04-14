@@ -55,6 +55,7 @@ class AuthPage {
     await this.logInPassword.fill(password);
     await this.logInSubmit.click();
     await this.logInModal.waitFor({ state: 'hidden' });
+    await this.loggedInUsername.waitFor({ state: 'visible' });
   }
 
   async loginExpectingError(username, password) {
