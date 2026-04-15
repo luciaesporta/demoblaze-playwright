@@ -14,6 +14,7 @@ class AuthPage {
     this.logInPassword = page.locator('#loginpassword');
     this.logInSubmit = page.locator('#logInModal .btn-primary');
     this.loggedInUsername = page.locator('#nameofuser');
+    this.logoutButton = page.locator('#logout2');
   }
 
   async openLoginModal() {

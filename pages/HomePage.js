@@ -2,6 +2,8 @@ class HomePage {
   constructor(page) {
     this.page = page;
     this.firstProductLink = page.locator('.card-title a').first();
+    this.navbarBrand = page.locator('a.navbar-brand');
+    this.cartNavLink = page.locator('#cartur');
   }
 
   async goto() {
