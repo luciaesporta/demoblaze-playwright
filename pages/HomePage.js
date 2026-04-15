@@ -23,8 +23,17 @@ class HomePage {
 
   async openCategory(name) {
     const link = this.page.locator('#itemc').getByText(name, { exact: true });
+    const responsePromise = this.page.waitForResponse(
+      (res) => res.url().includes('bycat') && res.status() === 200
+    );
     await link.click();
+    await responsePromise;
     await this.page.locator('.card-title a').first().waitFor({ state: 'visible' });
+  }
+
+  async getProductNames() {
+    const names = await this.page.locator('.card-title a').allTextContents();
+    return names.map((name) => name.trim());
   }
 }
 

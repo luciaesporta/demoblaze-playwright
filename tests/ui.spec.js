@@ -3,7 +3,7 @@ const { test: authTest } = require('../fixtures/authFixtures');
 const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { AuthPage } = require('../pages/AuthPage');
-const { PAGE_TITLE, PRODUCT_PAGE_URL } = require('../utils/constants');
+const { PAGE_TITLE, PRODUCT_PAGE_URL, CATEGORY_PRODUCTS } = require('../utils/constants');
 
 test('UI — Home page displays the store title', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -57,6 +57,21 @@ test('UI — Cart link in navbar navigates to the cart page', async ({ page }) =
   await homePage.goto();
   await homePage.cartNavLink.click();
   await expect(page).toHaveURL(/cart\.html/);
+});
+
+test('UI — Category filters return correct products', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  for (const [category, expectedProducts] of Object.entries(CATEGORY_PRODUCTS)) {
+    await homePage.openCategory(category);
+    await expect(async () => {
+      const shown = await homePage.getProductNames();
+      for (const name of shown) {
+        expect(expectedProducts).toContain(name);
+      }
+    }).toPass();
+  }
 });
 
 authTest('UI — Logged-in user can log out', async ({ authenticatedPage }) => {
