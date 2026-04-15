@@ -4,6 +4,7 @@ module.exports = defineConfig({
   testDir: './tests',
   timeout: 60000,
   retries: 1,
+  expect: { timeout: 15000 },
   use: {
     baseURL: 'https://www.demoblaze.com',
     headless: true,

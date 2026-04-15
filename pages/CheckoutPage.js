@@ -1,3 +1,5 @@
+const { expect } = require('@playwright/test');
+
 class CheckoutPage {
   constructor(page) {
     this.page = page;
@@ -49,12 +51,23 @@ class CheckoutPage {
   }
 
   async getModalTotal() {
+    await expect(this.modalTotal).not.toHaveText('');
     const text = (await this.modalTotal.textContent()).trim();
     return text.replace(/\D/g, '');
   }
 
   async getConfirmationText() {
     return (await this.confirmationBody.textContent()).trim();
+  }
+
+  async getConfirmationDetails() {
+    const text = await this.getConfirmationText();
+    const idMatch = text.match(/Id:\s*(\S+)/);
+    const amountMatch = text.match(/Amount:\s*(\d+)/);
+    return {
+      id: idMatch ? idMatch[1] : null,
+      amount: amountMatch ? amountMatch[1] : null,
+    };
   }
 
   async dismissConfirmation() {

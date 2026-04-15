@@ -131,6 +131,41 @@ test('Checkout — Total in modal matches cart total', async ({ authenticatedPag
   expect(modalTotal).toBe(cartTotal);
 });
 
+test('Checkout — Order confirmation message contains purchase details', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+  const checkoutPage = new CheckoutPage(page);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await expect(cartPage.cartRows).toHaveCount(1);
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+
+  const modalTotal = await checkoutPage.getModalTotal();
+
+  await checkoutPage.fillOrderForm({
+    name: 'Test User',
+    country: 'Spain',
+    city: 'Madrid',
+    creditCard: '1234567890123456',
+    month: 'April',
+    year: '2026',
+  });
+
+  await checkoutPage.submitPurchase();
+
+  const { id, amount } = await checkoutPage.getConfirmationDetails();
+
+  expect(id).toBeTruthy();
+  expect(amount).toBe(modalTotal);
+});
+
 test('Checkout — Credit card field validates length', async ({ authenticatedPage }) => {
   // BUG: demoblaze accepts any credit card value regardless of digit count and
   // processes the purchase without length validation. This test is marked as
