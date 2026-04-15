@@ -9,7 +9,7 @@ class CartPage {
   }
 
   async goto() {
-    await this.page.goto('/cart.html');
+    await this.page.goto('/cart.html', { waitUntil: 'domcontentloaded' });
   }
 
   getRowCell(rowIndex, cellIndex) {

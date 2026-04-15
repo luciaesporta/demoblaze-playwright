@@ -40,6 +40,14 @@ class CheckoutPage {
     await this.creditCardInput.fill(value);
   }
 
+  async fillOrderFormWithShortCard({ name, country, city, month, year }) {
+    await this.fillOrderForm({ name, country, city, creditCard: '1234', month, year });
+  }
+
+  async fillOrderFormWithLongCard(value = '12345678901234567') {
+    await this.fillCreditCard(value);
+  }
+
   async getModalTotal() {
     const text = (await this.modalTotal.textContent()).trim();
     return text.replace(/\D/g, '');
