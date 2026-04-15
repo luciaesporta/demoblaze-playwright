@@ -27,6 +27,7 @@ class AuthPage {
   }
 
   async register(username, password) {
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
     await this.signUpNavButton.click();
     await this.signUpModal.waitFor({ state: 'visible' });
     await this.signUpUsername.fill(username);
