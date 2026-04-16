@@ -4,8 +4,9 @@ class HomePage {
     this.firstProductLink = page.locator('.card-title a').first();
     this.navbarBrand = page.locator('a.navbar-brand');
     this.cartNavLink = page.locator('#cartur');
+    this.nextButton = page.locator('#next2');
+    this.prevButton = page.locator('#prev2');
   }
-
   async goto() {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
   }

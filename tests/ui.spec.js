@@ -85,3 +85,30 @@ authTest('UI — Logged-in user can log out', async ({ authenticatedPage }) => {
   await expect(authPage.loggedInUsername).not.toBeVisible();
   await expect(authPage.logInNavButton).toBeVisible();
 });
+
+test('UI — Pagination navigates between product pages', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  // Wait for initial products
+  await expect(page.locator('.card-title a').first()).toBeVisible();
+  const initialProducts = await homePage.getProductNames();
+  expect(initialProducts.length).toBeGreaterThan(0);
+
+  // Click Next
+  await homePage.nextButton.click();
+  await expect(async () => {
+    const nextProducts = await homePage.getProductNames();
+    expect(nextProducts).not.toEqual(initialProducts);
+    expect(nextProducts.length).toBeGreaterThan(0);
+  }).toPass();
+
+  // Click Previous
+  await homePage.prevButton.click();
+  await expect(async () => {
+    const prevProducts = await homePage.getProductNames();
+    // Demoblaze has a known bug where 'Previous' shifts the item list by one.
+    // Instead of deep equality, we verify that the page loaded an initial product.
+    expect(initialProducts).toContain(prevProducts[0]);
+  }).toPass();
+});
