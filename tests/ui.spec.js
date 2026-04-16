@@ -193,3 +193,21 @@ test('UI — Application is usable on mobile viewport', async ({ page }) => {
   await expect(cartPage.orderModal).toBeVisible();
   await cartPage.closePlaceOrderModal();
 });
+
+test('UI — Log out link visible regardless of session state (bug verification)', async ({ page }) => {
+  // BUG: demoblaze is known to expose the "Log out" link in unauthenticated
+  // sessions. The correct behavior is that it should only appear when logged in.
+  // We assert toBeVisible() (the bugged state) so test.fail() is satisfied when
+  // the bug is present. If the bug disappears, toBeVisible() will fail and
+  // test.fail() will report "Expected to fail, but passed" — a signal to remove
+  // this test.
+  test.fail();
+
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+  await homePage.goto();
+
+  await expect(authPage.logInNavButton).toBeVisible();
+  await expect(authPage.signUpNavButton).toBeVisible();
+  await expect(authPage.logoutButton).toBeVisible();
+});
