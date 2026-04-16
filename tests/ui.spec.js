@@ -47,7 +47,7 @@ test('UI — Navbar logo navigates back to home from a product page', async ({ p
   await homePage.openProduct(0);
   await expect(page).toHaveURL(PRODUCT_PAGE_URL);
 
-  await homePage.navbarBrand.click();
+  await homePage.clickNavBrand();
 
   await expect(page).toHaveTitle(PAGE_TITLE);
   await expect(homePage.firstProductLink).toBeVisible();
@@ -56,7 +56,7 @@ test('UI — Navbar logo navigates back to home from a product page', async ({ p
 test('UI — Cart link in navbar navigates to the cart page', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
-  await homePage.cartNavLink.click();
+  await homePage.clickCart();
   await expect(page).toHaveURL(/cart\.html/);
 });
 
@@ -95,14 +95,14 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
   const initialProducts = await homePage.getProductNames();
   expect(initialProducts.length).toBeGreaterThan(0);
 
-  await homePage.nextButton.click();
+  await homePage.clickNext();
   await expect(async () => {
     const nextProducts = await homePage.getProductNames();
     expect(nextProducts).not.toEqual(initialProducts);
     expect(nextProducts.length).toBeGreaterThan(0);
   }).toPass();
 
-  await homePage.prevButton.click();
+  await homePage.clickPrev();
   await expect(async () => {
     const prevProducts = await homePage.getProductNames();
     expect(initialProducts).toContain(prevProducts[0]);
@@ -115,36 +115,51 @@ test('UI — Hero banner auto-advances and responds to manual controls', async (
 
   await expect(homePage.activeCarouselItem).toBeVisible();
 
-  const initialSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  const initialSlideSrc = await homePage.getActiveCarouselSrc();
   const seenSlides = new Set([initialSlideSrc]);
 
   await expect(async () => {
-    const nextSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    const nextSlideSrc = await homePage.getActiveCarouselSrc();
     expect(nextSlideSrc).not.toEqual(initialSlideSrc);
   }).toPass({ timeout: 10000 });
 
-  let currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  let currentSlideSrc = await homePage.getActiveCarouselSrc();
   seenSlides.add(currentSlideSrc);
 
-  await homePage.carouselNext.click();
+  await homePage.clickCarouselNext();
   await expect(async () => {
-    const newSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    const newSlideSrc = await homePage.getActiveCarouselSrc();
     expect(newSlideSrc).not.toEqual(currentSlideSrc);
   }).toPass();
 
-  currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  currentSlideSrc = await homePage.getActiveCarouselSrc();
   seenSlides.add(currentSlideSrc);
 
-  await homePage.carouselPrev.click();
+  await homePage.clickCarouselPrev();
   await expect(async () => {
-    const prevSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    const prevSlideSrc = await homePage.getActiveCarouselSrc();
     expect(prevSlideSrc).not.toEqual(currentSlideSrc);
   }).toPass();
 
-  currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  currentSlideSrc = await homePage.getActiveCarouselSrc();
   seenSlides.add(currentSlideSrc);
 
   expect(seenSlides.size).toBeGreaterThanOrEqual(3);
+});
+
+test('UI — Contact form can be submitted with valid data', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  await homePage.openContactModal();
+  await homePage.fillContactForm({
+    email: 'test@example.com',
+    name: 'Test User',
+    message: 'This is a test message.',
+  });
+  const message = await homePage.submitContactForm();
+
+  expect(message).toContain('Thanks');
 });
 
 test('UI — Application is usable on mobile viewport', async ({ page }) => {
@@ -153,12 +168,10 @@ test('UI — Application is usable on mobile viewport', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
 
-  const hamburger = homePage.hamburger;
-  await expect(hamburger).toBeVisible();
+  await expect(homePage.hamburger).toBeVisible();
 
-  await hamburger.click();
-  const navbarCollapsible = homePage.navbarCollapsible;
-  await expect(navbarCollapsible).toBeVisible();
+  await homePage.clickHamburger();
+  await expect(homePage.navbarCollapsible).toBeVisible();
   await expect(homePage.cartNavLink).toBeVisible();
 
   await expect(homePage.firstProductLink).toBeVisible();
@@ -168,11 +181,11 @@ test('UI — Application is usable on mobile viewport', async ({ page }) => {
   const productPage = new ProductPage(page);
   await productPage.addToCart();
 
-  await expect(hamburger).toBeVisible();
-  await hamburger.click({ force: true });
+  await expect(homePage.hamburger).toBeVisible();
+  await homePage.clickHamburger({ force: true });
   await expect(homePage.cartNavLink).toBeVisible();
 
-  await homePage.cartNavLink.click({ force: true });
+  await homePage.clickCart({ force: true });
 
   const cartPage = new CartPage(page);
   await expect(cartPage.placeOrderButton).toBeVisible();

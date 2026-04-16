@@ -22,9 +22,17 @@ class AuthPage {
     await this.logInModal.waitFor({ state: 'visible' });
   }
 
+  async submitEmptyLogin() {
+    await this.logInSubmit.click();
+  }
+
   async openSignUpModal() {
     await this.signUpNavButton.click();
     await this.signUpModal.waitFor({ state: 'visible' });
+  }
+
+  async submitEmptySignUp() {
+    await this.signUpSubmit.click();
   }
 
   async register(username, password) {

@@ -16,6 +16,14 @@ class CartPage {
     return this.cartRows.nth(rowIndex).locator('td').nth(cellIndex);
   }
 
+  async getItemName(rowIndex) {
+    return (await this.getRowCell(rowIndex, 1).textContent()).trim();
+  }
+
+  async getItemPrice(rowIndex) {
+    return (await this.getRowCell(rowIndex, 2).textContent()).trim();
+  }
+
   async getTotal() {
     return (await this.cartTotal.textContent()).trim();
   }

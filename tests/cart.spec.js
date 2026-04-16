@@ -80,12 +80,12 @@ test('Cart — Cart displays full list when multiple products are added', async 
   await expect(cartPage.cartRows).toHaveCount(2);
 
   const names = [
-    await cartPage.getRowCell(0, 1).textContent(),
-    await cartPage.getRowCell(1, 1).textContent(),
+    await cartPage.getItemName(0),
+    await cartPage.getItemName(1),
   ];
   const prices = [
-    await cartPage.getRowCell(0, 2).textContent(),
-    await cartPage.getRowCell(1, 2).textContent(),
+    await cartPage.getItemPrice(0),
+    await cartPage.getItemPrice(1),
   ];
 
   expect(names).toContain(firstName);
@@ -141,17 +141,17 @@ test('Cart — Deleting an item updates the cart correctly', async ({ authentica
   await expect(cartPage.cartRows).toHaveCount(2);
 
   const names = [
-    await cartPage.getRowCell(0, 1).textContent(),
-    await cartPage.getRowCell(1, 1).textContent(),
+    await cartPage.getItemName(0),
+    await cartPage.getItemName(1),
   ];
   const deleteIndex = names.indexOf(firstName) !== -1 ? names.indexOf(firstName) : 0;
-  const deletedName = await cartPage.getRowCell(deleteIndex, 1).textContent();
-  const deletedPrice = Number(await cartPage.getRowCell(deleteIndex, 2).textContent());
+  const deletedName = await cartPage.getItemName(deleteIndex);
+  const deletedPrice = Number(await cartPage.getItemPrice(deleteIndex));
 
   await cartPage.deleteRow(deleteIndex);
   await expect(cartPage.cartRows).toHaveCount(1);
 
-  const remainingName = await cartPage.getRowCell(0, 1).textContent();
+  const remainingName = await cartPage.getItemName(0);
   expect(remainingName).not.toBe(deletedName);
 
   const expectedTotal = String(Number(firstPrice) + Number(secondPrice) - deletedPrice);
@@ -204,8 +204,8 @@ test('Cart — Adding the same product twice results in two rows', async ({ auth
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
 
-  const row0Name = await cartPage.getRowCell(0, 1).textContent();
-  const row1Name = await cartPage.getRowCell(1, 1).textContent();
+  const row0Name = await cartPage.getItemName(0);
+  const row1Name = await cartPage.getItemName(1);
   expect(row0Name).toBe(productName);
   expect(row1Name).toBe(productName);
 

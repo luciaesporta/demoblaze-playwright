@@ -1,5 +1,3 @@
-const { expect } = require('@playwright/test');
-
 class CheckoutPage {
   constructor(page) {
     this.page = page;
@@ -51,7 +49,9 @@ class CheckoutPage {
   }
 
   async getModalTotal() {
-    await expect(this.modalTotal).not.toHaveText('');
+    await this.page.waitForFunction(
+      () => document.querySelector('#totalm')?.textContent.trim() !== ''
+    );
     const text = (await this.modalTotal.textContent()).trim();
     return text.replace(/\D/g, '');
   }

@@ -12,9 +12,71 @@ class HomePage {
     this.hamburger = page.locator('button.navbar-toggler');
     this.navbarCollapsible = page.locator('#navbarExample');
     this.productCards = page.locator('.card-title a');
+    this._contactNavLink = page.locator('a[data-target="#exampleModal"]');
+    this._contactModal = page.locator('#exampleModal');
+    this._contactEmail = page.locator('#recipient-email');
+    this._contactName = page.locator('#recipient-name');
+    this._contactMessage = page.locator('#message-text');
+    this._contactSendButton = page.locator('#exampleModal .btn-primary');
   }
+
   async goto() {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+  }
+
+  async clickNavBrand() {
+    await this.navbarBrand.click();
+  }
+
+  async clickCart(options = {}) {
+    await this.cartNavLink.click(options);
+  }
+
+  async clickNext() {
+    await this.nextButton.click();
+  }
+
+  async clickPrev() {
+    await this.prevButton.click();
+  }
+
+  async clickCarouselNext() {
+    await this.carouselNext.click();
+  }
+
+  async clickCarouselPrev() {
+    await this.carouselPrev.click();
+  }
+
+  async getActiveCarouselSrc() {
+    return this.activeCarouselItem.getAttribute('src');
+  }
+
+  async clickHamburger(options = {}) {
+    await this.hamburger.click(options);
+  }
+
+  async openContactModal() {
+    await this._contactNavLink.click();
+    await this._contactModal.waitFor({ state: 'visible' });
+  }
+
+  async fillContactForm({ email, name, message }) {
+    await this._contactEmail.fill(email);
+    await this._contactName.fill(name);
+    await this._contactMessage.fill(message);
+  }
+
+  async submitContactForm() {
+    const dialogPromise = new Promise((resolve) => {
+      this.page.once('dialog', async (dialog) => {
+        const message = dialog.message();
+        await dialog.accept();
+        resolve(message);
+      });
+    });
+    await this._contactSendButton.click({ force: true });
+    return dialogPromise;
   }
 
   async openFirstProduct() {

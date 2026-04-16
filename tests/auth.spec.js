@@ -37,14 +37,14 @@ test('Auth — Login and sign up forms reject empty submission', async ({ page }
   await homePage.goto();
 
   await authPage.openLoginModal();
-  await authPage.logInSubmit.click();
+  await authPage.submitEmptyLogin();
   await expect(authPage.logInModal).toBeVisible();
   await expect(authPage.loggedInUsername).not.toBeVisible();
 
   await homePage.goto();
 
   await authPage.openSignUpModal();
-  await authPage.signUpSubmit.click();
+  await authPage.submitEmptySignUp();
   await expect(authPage.signUpModal).toBeVisible();
 });
 
