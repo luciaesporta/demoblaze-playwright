@@ -90,12 +90,10 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
 
-  // Wait for initial products
   await expect(page.locator('.card-title a').first()).toBeVisible();
   const initialProducts = await homePage.getProductNames();
   expect(initialProducts.length).toBeGreaterThan(0);
 
-  // Click Next
   await homePage.nextButton.click();
   await expect(async () => {
     const nextProducts = await homePage.getProductNames();
@@ -103,7 +101,6 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
     expect(nextProducts.length).toBeGreaterThan(0);
   }).toPass();
 
-  // Click Previous
   await homePage.prevButton.click();
   await expect(async () => {
     const prevProducts = await homePage.getProductNames();
@@ -111,4 +108,42 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
     // Instead of deep equality, we verify that the page loaded an initial product.
     expect(initialProducts).toContain(prevProducts[0]);
   }).toPass();
+});
+
+test('UI — Hero banner auto-advances and responds to manual controls', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  await expect(homePage.activeCarouselItem).toBeVisible();
+
+  const initialSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  const seenSlides = new Set([initialSlideSrc]);
+
+  await expect(async () => {
+    const nextSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    expect(nextSlideSrc).not.toEqual(initialSlideSrc);
+  }).toPass({ timeout: 10000 });
+
+  let currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  seenSlides.add(currentSlideSrc);
+
+  await homePage.carouselNext.click();
+  await expect(async () => {
+    const newSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    expect(newSlideSrc).not.toEqual(currentSlideSrc);
+  }).toPass();
+
+  currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  seenSlides.add(currentSlideSrc);
+
+  await homePage.carouselPrev.click();
+  await expect(async () => {
+    const prevSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+    expect(prevSlideSrc).not.toEqual(currentSlideSrc);
+  }).toPass();
+
+  currentSlideSrc = await homePage.activeCarouselItem.getAttribute('src');
+  seenSlides.add(currentSlideSrc);
+
+  expect(seenSlides.size).toBeGreaterThanOrEqual(3);
 });

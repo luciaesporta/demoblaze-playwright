@@ -6,6 +6,9 @@ class HomePage {
     this.cartNavLink = page.locator('#cartur');
     this.nextButton = page.locator('#next2');
     this.prevButton = page.locator('#prev2');
+    this.carouselNext = page.locator('.carousel-control-next');
+    this.carouselPrev = page.locator('.carousel-control-prev');
+    this.activeCarouselItem = page.locator('.carousel-item.active img');
   }
   async goto() {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
