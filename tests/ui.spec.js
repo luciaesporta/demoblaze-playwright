@@ -41,6 +41,30 @@ test('UI — Clicking a product card navigates to its detail page', async ({ pag
   await expect(productPage.productPrice).toBeVisible();
 });
 
+test('UI — Product detail page loads correctly from catalog', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  await homePage.goto();
+
+  const expectedName = await homePage.getProductNameAt(0);
+
+  await homePage.openProduct(0);
+
+  await expect(page).toHaveURL(PRODUCT_PAGE_URL);
+
+  await expect(productPage.productName).toBeVisible();
+  expect(await productPage.getProductName()).toBe(expectedName);
+
+  await expect(productPage.productPrice).toBeVisible();
+  expect(await productPage.getProductPrice()).toMatch(/^\d+$/);
+
+  await expect(productPage.productImage).toBeVisible();
+  expect(await productPage.isImageLoaded()).toBe(true);
+
+  await expect(productPage.productDescription).toBeVisible();
+  expect((await productPage.getProductDescription()).length).toBeGreaterThan(0);
+});
+
 test('UI — Navbar logo navigates back to home from a product page', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();

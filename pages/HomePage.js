@@ -100,6 +100,12 @@ class HomePage {
     await this.page.locator('.card-title a').first().waitFor({ state: 'visible' });
   }
 
+  async getProductNameAt(index) {
+    const link = this.page.locator('.card-title a').nth(index);
+    await link.waitFor({ state: 'visible' });
+    return (await link.textContent()).trim();
+  }
+
   async getProductNames() {
     const names = await this.page.locator('.card-title a').allTextContents();
     return names.map((name) => name.trim());
