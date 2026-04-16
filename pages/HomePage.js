@@ -9,6 +9,9 @@ class HomePage {
     this.carouselNext = page.locator('.carousel-control-next');
     this.carouselPrev = page.locator('.carousel-control-prev');
     this.activeCarouselItem = page.locator('.carousel-item.active img');
+    this.hamburger = page.locator('button.navbar-toggler');
+    this.navbarCollapsible = page.locator('#navbarExample');
+    this.productCards = page.locator('.card-title a');
   }
   async goto() {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });

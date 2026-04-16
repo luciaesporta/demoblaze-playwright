@@ -3,6 +3,7 @@ const { test: authTest } = require('../fixtures/authFixtures');
 const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { AuthPage } = require('../pages/AuthPage');
+const { CartPage } = require('../pages/CartPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL, CATEGORY_PRODUCTS } = require('../utils/constants');
 
 test('UI — Home page displays the store title', async ({ page }) => {
@@ -14,7 +15,7 @@ test('UI — Home page displays the store title', async ({ page }) => {
 test('UI — Home page loads product cards', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
-  const cards = page.locator('.card-title a');
+  const cards = homePage.productCards;
   await expect(cards.first()).toBeVisible();
   expect(await cards.count()).toBeGreaterThan(0);
 });
@@ -24,10 +25,10 @@ test('UI — Filtering by category updates the product list', async ({ page }) =
   await homePage.goto();
 
   await homePage.openCategory('Phones');
-  await expect(page.locator('.card-title a').first()).toBeVisible();
+  await expect(homePage.firstProductLink).toBeVisible();
 
   await homePage.openCategory('Monitors');
-  await expect(page.locator('.card-title a').first()).toBeVisible();
+  await expect(homePage.firstProductLink).toBeVisible();
 });
 
 test('UI — Clicking a product card navigates to its detail page', async ({ page }) => {
@@ -49,7 +50,7 @@ test('UI — Navbar logo navigates back to home from a product page', async ({ p
   await homePage.navbarBrand.click();
 
   await expect(page).toHaveTitle(PAGE_TITLE);
-  await expect(page.locator('.card-title a').first()).toBeVisible();
+  await expect(homePage.firstProductLink).toBeVisible();
 });
 
 test('UI — Cart link in navbar navigates to the cart page', async ({ page }) => {
@@ -90,7 +91,7 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
 
-  await expect(page.locator('.card-title a').first()).toBeVisible();
+  await expect(homePage.firstProductLink).toBeVisible();
   const initialProducts = await homePage.getProductNames();
   expect(initialProducts.length).toBeGreaterThan(0);
 
@@ -104,8 +105,6 @@ test('UI — Pagination navigates between product pages', async ({ page }) => {
   await homePage.prevButton.click();
   await expect(async () => {
     const prevProducts = await homePage.getProductNames();
-    // Demoblaze has a known bug where 'Previous' shifts the item list by one.
-    // Instead of deep equality, we verify that the page loaded an initial product.
     expect(initialProducts).toContain(prevProducts[0]);
   }).toPass();
 });
@@ -146,4 +145,38 @@ test('UI — Hero banner auto-advances and responds to manual controls', async (
   seenSlides.add(currentSlideSrc);
 
   expect(seenSlides.size).toBeGreaterThanOrEqual(3);
+});
+
+test('UI — Application is usable on mobile viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  const hamburger = homePage.hamburger;
+  await expect(hamburger).toBeVisible();
+
+  await hamburger.click();
+  const navbarCollapsible = homePage.navbarCollapsible;
+  await expect(navbarCollapsible).toBeVisible();
+  await expect(homePage.cartNavLink).toBeVisible();
+
+  await expect(homePage.firstProductLink).toBeVisible();
+
+  await homePage.openFirstProduct();
+
+  const productPage = new ProductPage(page);
+  await productPage.addToCart();
+
+  await expect(hamburger).toBeVisible();
+  await hamburger.click({ force: true });
+  await expect(homePage.cartNavLink).toBeVisible();
+
+  await homePage.cartNavLink.click({ force: true });
+
+  const cartPage = new CartPage(page);
+  await expect(cartPage.placeOrderButton).toBeVisible();
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+  await cartPage.closePlaceOrderModal();
 });
