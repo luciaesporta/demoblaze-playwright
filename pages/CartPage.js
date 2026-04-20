@@ -8,6 +8,10 @@ class CartPage {
     this.orderModalCloseButton = page.locator('#orderModal .btn-secondary[data-dismiss="modal"]');
   }
 
+  async getFaviconHref() {
+    return this.page.evaluate(() => document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '');
+  }
+
   async goto() {
     await this.page.goto('/cart.html', { waitUntil: 'domcontentloaded' });
   }

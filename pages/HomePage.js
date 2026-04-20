@@ -60,6 +60,10 @@ class HomePage {
     await this.hamburger.click(options);
   }
 
+  async getFaviconHref() {
+    return this.page.evaluate(() => document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '');
+  }
+
   async openAboutUsModal() {
     await this._aboutUsNavLink.click();
     await this.videoModal.waitFor({ state: 'visible' });

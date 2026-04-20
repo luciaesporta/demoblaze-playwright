@@ -21,6 +21,10 @@ class ProductPage {
     return (await this.productDescription.textContent()).trim();
   }
 
+  async getFaviconHref() {
+    return this.page.evaluate(() => document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '');
+  }
+
   async isImageLoaded() {
     return this.productImage.evaluate((img) => img.naturalWidth > 0);
   }

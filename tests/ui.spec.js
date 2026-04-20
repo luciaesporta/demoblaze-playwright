@@ -4,7 +4,7 @@ const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { AuthPage } = require('../pages/AuthPage');
 const { CartPage } = require('../pages/CartPage');
-const { PAGE_TITLE, PRODUCT_PAGE_URL, CATEGORY_PRODUCTS } = require('../utils/constants');
+const { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS } = require('../utils/constants');
 
 test('UI — Home page displays the store title', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -176,21 +176,18 @@ test('UI — Page title and favicon are present and correct', async ({ page }) =
   const productPage = new ProductPage(page);
   const cartPage = new CartPage(page);
 
-  const getFaviconHref = () =>
-    page.evaluate(() => document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '');
-
   await homePage.goto();
   await expect(page).toHaveTitle(PAGE_TITLE);
-  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+  expect(await homePage.getFaviconHref()).toMatch(FAVICON_HREF);
 
   await homePage.openProduct(0);
   await expect(productPage.productName).toBeVisible();
   await expect(page).toHaveTitle(PAGE_TITLE);
-  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+  expect(await productPage.getFaviconHref()).toMatch(FAVICON_HREF);
 
   await cartPage.goto();
   await expect(page).toHaveTitle(PAGE_TITLE);
-  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+  expect(await cartPage.getFaviconHref()).toMatch(FAVICON_HREF);
 });
 
 test('UI — About us modal loads video content', async ({ page }) => {

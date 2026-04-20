@@ -1,5 +1,6 @@
 const PAGE_TITLE = /STORE/;
 const PRODUCT_PAGE_URL = /prod\.html/;
+const FAVICON_HREF = /blazemeter-favicon/;
 
 const CATEGORY_PRODUCTS = {
   Phones: [
@@ -25,4 +26,4 @@ const CATEGORY_PRODUCTS = {
   ],
 };
 
-module.exports = { PAGE_TITLE, PRODUCT_PAGE_URL, CATEGORY_PRODUCTS };
+module.exports = { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS };
