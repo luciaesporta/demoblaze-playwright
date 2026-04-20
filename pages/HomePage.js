@@ -12,6 +12,10 @@ class HomePage {
     this.hamburger = page.locator('button.navbar-toggler');
     this.navbarCollapsible = page.locator('#navbarExample');
     this.productCards = page.locator('.card-title a');
+    this.videoModal = page.locator('#videoModal');
+    this.videoModalTitle = page.locator('#videoModalLabel');
+    this.videoElement = page.locator('#example-video');
+    this._aboutUsNavLink = page.locator('a[data-target="#videoModal"]');
     this._contactNavLink = page.locator('a[data-target="#exampleModal"]');
     this._contactModal = page.locator('#exampleModal');
     this._contactEmail = page.locator('#recipient-email');
@@ -54,6 +58,11 @@ class HomePage {
 
   async clickHamburger(options = {}) {
     await this.hamburger.click(options);
+  }
+
+  async openAboutUsModal() {
+    await this._aboutUsNavLink.click();
+    await this.videoModal.waitFor({ state: 'visible' });
   }
 
   async openContactModal() {

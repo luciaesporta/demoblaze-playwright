@@ -171,6 +171,20 @@ test('UI — Hero banner auto-advances and responds to manual controls', async (
   expect(seenSlides.size).toBeGreaterThanOrEqual(3);
 });
 
+test('UI — About us modal loads video content', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.goto();
+
+  await homePage.openAboutUsModal();
+
+  await expect(homePage.videoModal).toBeVisible();
+  await expect(homePage.videoModalTitle).toHaveText('About us');
+  await expect(homePage.videoElement).toBeVisible();
+
+  const poster = await homePage.videoElement.getAttribute('poster');
+  expect(poster).toBeTruthy();
+});
+
 test('UI — Contact form can be submitted with valid data', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
