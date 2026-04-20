@@ -1,6 +1,7 @@
 const PAGE_TITLE = /STORE/;
 const PRODUCT_PAGE_URL = /prod\.html/;
 const FAVICON_HREF = /blazemeter-favicon/;
+const MOBILE_VIEWPORT = { width: 390, height: 844 };
 
 const CATEGORY_PRODUCTS = {
   Phones: [
@@ -26,4 +27,4 @@ const CATEGORY_PRODUCTS = {
   ],
 };
 
-module.exports = { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS };
+module.exports = { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS, MOBILE_VIEWPORT };

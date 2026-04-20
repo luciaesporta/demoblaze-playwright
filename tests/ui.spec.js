@@ -4,7 +4,8 @@ const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { AuthPage } = require('../pages/AuthPage');
 const { CartPage } = require('../pages/CartPage');
-const { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS } = require('../utils/constants');
+const { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS, MOBILE_VIEWPORT } = require('../utils/constants');
+const { generateUser } = require('../utils/userData');
 
 test('UI — Home page displays the store title', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -249,7 +250,7 @@ test('UI — Contact form can be submitted with valid data', async ({ page }) =>
 });
 
 test('UI — Application is usable on mobile viewport', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(MOBILE_VIEWPORT);
 
   const homePage = new HomePage(page);
   await homePage.goto();
@@ -278,6 +279,42 @@ test('UI — Application is usable on mobile viewport', async ({ page }) => {
   await cartPage.openPlaceOrderModal();
   await expect(cartPage.orderModal).toBeVisible();
   await cartPage.closePlaceOrderModal();
+});
+
+test('Mobile — Login and signup modals are usable', async ({ page }) => {
+  await page.setViewportSize(MOBILE_VIEWPORT);
+
+  const homePage = new HomePage(page);
+  const authPage = new AuthPage(page);
+  const { username, password } = generateUser();
+
+  await homePage.goto();
+
+  await authPage.openSignUpModalMobile();
+  await expect(authPage.signUpModal).toBeVisible();
+  await expect(authPage.signUpUsername).toBeVisible();
+  await expect(authPage.signUpPassword).toBeVisible();
+
+  await authPage.signUpUsername.fill(username);
+  await authPage.signUpPassword.fill(password);
+
+  const signUpDialogPromise = page.waitForEvent('dialog');
+  await authPage.signUpSubmit.click();
+  const signUpDialog = await signUpDialogPromise;
+  expect(signUpDialog.message()).toBeTruthy();
+  await signUpDialog.accept();
+  await authPage.dismissSignUpModal();
+
+  await authPage.openLoginModalMobile();
+  await expect(authPage.logInModal).toBeVisible();
+  await expect(authPage.logInUsername).toBeVisible();
+  await expect(authPage.logInPassword).toBeVisible();
+
+  await authPage.logInUsername.fill(username);
+  await authPage.logInPassword.fill(password);
+  await authPage.logInSubmit.click();
+  await authPage.logInModal.waitFor({ state: 'hidden' });
+  await expect(authPage.loggedInUsername).toBeVisible();
 });
 
 test('UI — Log out link visible regardless of session state (bug verification)', async ({ page }) => {

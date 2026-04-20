@@ -15,6 +15,40 @@ class AuthPage {
     this.logInSubmit = page.locator('#logInModal .btn-primary');
     this.loggedInUsername = page.locator('#nameofuser');
     this.logoutButton = page.locator('#logout2');
+    this.signUpModalClose = page.locator('#signInModal .close');
+    this.navbarCollapsible = page.locator('#navbarExample');
+    this.hamburger = page.locator('button.navbar-toggler');
+  }
+
+  async _expandNavbarIfCollapsed() {
+    const isVisible = await this.navbarCollapsible.isVisible();
+    if (!isVisible) {
+      await this.hamburger.click();
+      await this.navbarCollapsible.waitFor({ state: 'visible' });
+    }
+  }
+
+  async openLoginModalMobile() {
+    await this._expandNavbarIfCollapsed();
+    await this.logInNavButton.click();
+    await this.logInModal.waitFor({ state: 'visible' });
+  }
+
+  async openSignUpModalMobile() {
+    await this._expandNavbarIfCollapsed();
+    await this.signUpNavButton.click();
+    await this.signUpModal.waitFor({ state: 'visible' });
+  }
+
+  async dismissSignUpModal() {
+    const alreadyClosed = await this.signUpModal
+      .waitFor({ state: 'hidden', timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!alreadyClosed) {
+      await this.signUpModalClose.click();
+      await this.signUpModal.waitFor({ state: 'hidden' });
+    }
   }
 
   async openLoginModal() {
