@@ -171,6 +171,35 @@ test('UI — Hero banner auto-advances and responds to manual controls', async (
   expect(seenSlides.size).toBeGreaterThanOrEqual(3);
 });
 
+test('UI — Broken or missing product images', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+
+  await homePage.goto();
+  await expect(homePage.firstProductLink).toBeVisible();
+  await expect(async () => {
+    expect(await homePage.areCardImagesLoaded()).toBe(true);
+  }).toPass();
+
+  for (const category of Object.keys(CATEGORY_PRODUCTS)) {
+    await homePage.openCategory(category);
+    await expect(async () => {
+      expect(await homePage.areCardImagesLoaded()).toBe(true);
+    }).toPass();
+  }
+
+  await homePage.goto();
+  await expect(homePage.firstProductLink).toBeVisible();
+
+  for (let i = 0; i < 3; i++) {
+    await homePage.openProduct(i);
+    await expect(productPage.productImage).toBeVisible();
+    expect(await productPage.isImageLoaded()).toBe(true);
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+  }
+});
+
 test('UI — Page title and favicon are present and correct', async ({ page }) => {
   const homePage = new HomePage(page);
   const productPage = new ProductPage(page);

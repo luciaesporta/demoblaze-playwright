@@ -12,6 +12,7 @@ class HomePage {
     this.hamburger = page.locator('button.navbar-toggler');
     this.navbarCollapsible = page.locator('#navbarExample');
     this.productCards = page.locator('.card-title a');
+    this.productCardImages = page.locator('.card-img-top');
     this.videoModal = page.locator('#videoModal');
     this.videoModalTitle = page.locator('#videoModalLabel');
     this.videoElement = page.locator('#example-video');
@@ -58,6 +59,10 @@ class HomePage {
 
   async clickHamburger(options = {}) {
     await this.hamburger.click(options);
+  }
+
+  async areCardImagesLoaded() {
+    return this.productCardImages.evaluateAll((imgs) => imgs.every((img) => img.naturalWidth > 0));
   }
 
   async getFaviconHref() {
