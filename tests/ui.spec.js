@@ -171,6 +171,28 @@ test('UI — Hero banner auto-advances and responds to manual controls', async (
   expect(seenSlides.size).toBeGreaterThanOrEqual(3);
 });
 
+test('UI — Page title and favicon are present and correct', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+
+  const getFaviconHref = () =>
+    page.evaluate(() => document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '');
+
+  await homePage.goto();
+  await expect(page).toHaveTitle(PAGE_TITLE);
+  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+
+  await homePage.openProduct(0);
+  await expect(productPage.productName).toBeVisible();
+  await expect(page).toHaveTitle(PAGE_TITLE);
+  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+
+  await cartPage.goto();
+  await expect(page).toHaveTitle(PAGE_TITLE);
+  expect(await getFaviconHref()).toMatch(/blazemeter-favicon/);
+});
+
 test('UI — About us modal loads video content', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
