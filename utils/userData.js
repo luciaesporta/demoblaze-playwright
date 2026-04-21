@@ -8,7 +8,16 @@ function generateUser() {
 
 const invalidLoginScenarios = [
   { description: 'non-existent user', username: 'ghost_user_00000', password: 'Test1234!' },
-  { description: 'wrong password',    username: null,               password: 'WrongPass!' },
+  { description: 'wrong password', username: null, password: 'WrongPass!' },
 ];
 
-module.exports = { generateUser, invalidLoginScenarios };
+const DEFAULT_ORDER = {
+  name: 'Lucía Esporta',
+  country: 'Argentina',
+  city: 'Buenos Aires',
+  creditCard: '1234567890123456',
+  month: 'Noviembre',
+  year: '2026',
+};
+
+module.exports = { generateUser, invalidLoginScenarios, DEFAULT_ORDER };

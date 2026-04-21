@@ -6,7 +6,7 @@ const { AuthPage } = require('../pages/AuthPage');
 const { CartPage } = require('../pages/CartPage');
 const { CheckoutPage } = require('../pages/CheckoutPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS, MOBILE_VIEWPORT } = require('../utils/constants');
-const { generateUser } = require('../utils/userData');
+const { generateUser, DEFAULT_ORDER } = require('../utils/userData');
 
 test('UI — Home page displays the store title', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -335,14 +335,7 @@ authTest('Mobile — Full purchase flow completes on mobile viewport', async ({ 
   await cartPage.openPlaceOrderModal();
   await expect(cartPage.orderModal).toBeVisible();
 
-  await checkoutPage.fillOrderForm({
-    name: 'Test User',
-    country: 'Spain',
-    city: 'Madrid',
-    creditCard: '1234567890123456',
-    month: 'April',
-    year: '2026',
-  });
+  await checkoutPage.fillOrderForm(DEFAULT_ORDER);
 
   await checkoutPage.submitPurchase();
 
