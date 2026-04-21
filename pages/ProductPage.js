@@ -31,6 +31,13 @@ class ProductPage {
     return this.productImage.evaluate((img) => img.naturalWidth > 0);
   }
 
+  async addToCartAndCapture() {
+    const name = await this.getProductName();
+    const price = await this.getProductPrice();
+    await this.addToCart();
+    return { name, price };
+  }
+
   async addToCart() {
     const responsePromise = this.page.waitForResponse(
       (res) => res.url().includes('addtocart') && res.status() === 200
