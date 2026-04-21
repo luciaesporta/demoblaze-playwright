@@ -318,6 +318,19 @@ test('Mobile — Login and signup modals are usable', async ({ page }) => {
   await expect(authPage.loggedInUsername).toBeVisible();
 });
 
+test('Mobile — Category filtering works through collapsed navbar', async ({ page }) => {
+  await page.setViewportSize(MOBILE_VIEWPORT);
+
+  const homePage = new HomePage(page);
+  await homePage.goto();
+  await expect(homePage.firstProductLink).toBeVisible();
+
+  for (const category of Object.keys(CATEGORY_PRODUCTS)) {
+    await homePage.openCategory(category);
+    await expect(homePage.firstProductLink).toBeVisible();
+  }
+});
+
 authTest('Mobile — Full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
   await page.setViewportSize(MOBILE_VIEWPORT);
