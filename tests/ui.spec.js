@@ -4,6 +4,7 @@ const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { AuthPage } = require('../pages/AuthPage');
 const { CartPage } = require('../pages/CartPage');
+const { CheckoutPage } = require('../pages/CheckoutPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL, FAVICON_HREF, CATEGORY_PRODUCTS, MOBILE_VIEWPORT } = require('../utils/constants');
 const { generateUser } = require('../utils/userData');
 
@@ -315,6 +316,40 @@ test('Mobile — Login and signup modals are usable', async ({ page }) => {
   await authPage.logInSubmit.click();
   await authPage.logInModal.waitFor({ state: 'hidden' });
   await expect(authPage.loggedInUsername).toBeVisible();
+});
+
+authTest('Mobile — Full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
+  const { page } = authenticatedPage;
+  await page.setViewportSize(MOBILE_VIEWPORT);
+
+  const homePage = new HomePage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
+  const checkoutPage = new CheckoutPage(page);
+
+  await homePage.goto();
+  await homePage.openFirstProduct();
+  await productPage.addToCart();
+
+  await cartPage.goto();
+  await cartPage.openPlaceOrderModal();
+  await expect(cartPage.orderModal).toBeVisible();
+
+  await checkoutPage.fillOrderForm({
+    name: 'Test User',
+    country: 'Spain',
+    city: 'Madrid',
+    creditCard: '1234567890123456',
+    month: 'April',
+    year: '2026',
+  });
+
+  await checkoutPage.submitPurchase();
+
+  await expect(checkoutPage.confirmationTitle).toHaveText('Thank you for your purchase!');
+  await expect(checkoutPage.confirmationBody).toContainText('1234567890123456');
+
+  await checkoutPage.dismissConfirmation();
 });
 
 test('UI — Log out link visible regardless of session state (bug verification)', async ({ page }) => {
