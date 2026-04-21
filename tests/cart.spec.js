@@ -12,10 +12,7 @@ test('Cart — Cart persists across page navigation', async ({ authenticatedPage
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const expectedName = await productPage.getProductName();
-  const expectedPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openCategory('Laptops');
@@ -46,11 +43,7 @@ test('Cart — Guest user can add a product to cart', async ({ page }) => {
 
   await homePage.openFirstProduct();
   await expect(page).toHaveURL(PRODUCT_PAGE_URL);
-  await expect(productPage.productName).toBeVisible();
-
-  const expectedName = await productPage.getProductName();
-
-  await productPage.addToCart();
+  const { name: expectedName } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
@@ -165,10 +158,7 @@ test('Cart — Cart state is preserved after interrupting the purchase flow', as
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const expectedName = await productPage.getProductName();
-  const expectedPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
@@ -191,15 +181,11 @@ test('Cart — Adding the same product twice results in two rows', async ({ auth
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const productName = await productPage.getProductName();
-  const productPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: productName, price: productPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  await productPage.addToCart();
+  await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
@@ -221,13 +207,7 @@ test('Cart — Authenticated user can add a product to cart', async ({ authentic
 
   await homePage.openFirstProduct();
   await expect(page).toHaveURL(PRODUCT_PAGE_URL);
-  await expect(productPage.productName).toBeVisible();
-  await expect(productPage.productPrice).toBeVisible();
-
-  const expectedName = await productPage.getProductName();
-  const expectedPrice = await productPage.getProductPrice();
-
-  await productPage.addToCart();
+  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
