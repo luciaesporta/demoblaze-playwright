@@ -9,10 +9,12 @@ class ProductPage {
   }
 
   async getProductName() {
+    await this.productName.waitFor({ state: 'visible' });
     return (await this.productName.textContent()).trim();
   }
 
   async getProductPrice() {
+    await this.productPrice.waitFor({ state: 'visible' });
     const text = await this.productPrice.textContent();
     return text.match(/\d+/)[0];
   }
