@@ -13,7 +13,6 @@ test('Checkout — Successful purchase with all fields completed', async ({ auth
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
   await productPage.addToCart();
 
   await cartPage.goto();
@@ -50,7 +49,6 @@ test('Checkout — Purchase cannot be submitted with mandatory fields empty', as
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
   await productPage.addToCart();
 
   await cartPage.goto();
@@ -75,7 +73,6 @@ test('Checkout — Credit card field rejects non-numeric characters', async ({ a
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
   await productPage.addToCart();
 
   await cartPage.goto();
@@ -139,7 +136,6 @@ test('Checkout — Order confirmation message contains purchase details', async 
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
   await productPage.addToCart();
 
   await cartPage.goto();
@@ -179,7 +175,6 @@ test('Checkout — Credit card field validates length', async ({ authenticatedPa
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
   await productPage.addToCart();
 
   await cartPage.goto();
@@ -212,10 +207,7 @@ test('Checkout — Modal can be dismissed without placing an order', async ({ au
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const expectedName = await productPage.getProductName();
-  const expectedPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
