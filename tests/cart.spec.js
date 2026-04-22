@@ -57,17 +57,11 @@ test('Cart — Cart displays full list when multiple products are added', async 
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const firstName = await productPage.getProductName();
-  const firstPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: firstName, price: firstPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openProduct(1);
-  await expect(productPage.productName).toBeVisible();
-  const secondName = await productPage.getProductName();
-  const secondPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: secondName, price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
@@ -94,15 +88,11 @@ test('Cart — Total reflects all added items', async ({ authenticatedPage }) =>
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const firstPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { price: firstPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openProduct(1);
-  await expect(productPage.productName).toBeVisible();
-  const secondPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
@@ -118,17 +108,11 @@ test('Cart — Deleting an item updates the cart correctly', async ({ authentica
   const cartPage = new CartPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  const firstName = await productPage.getProductName();
-  const firstPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: firstName, price: firstPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openProduct(1);
-  await expect(productPage.productName).toBeVisible();
-  const secondName = await productPage.getProductName();
-  const secondPrice = await productPage.getProductPrice();
-  await productPage.addToCart();
+  const { name: secondName, price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
