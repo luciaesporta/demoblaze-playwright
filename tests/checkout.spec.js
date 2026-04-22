@@ -4,6 +4,7 @@ const { HomePage } = require('../pages/HomePage');
 const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
 const { CheckoutPage } = require('../pages/CheckoutPage');
+const { DEFAULT_ORDER } = require('../utils/userData');
 
 test('Checkout — Successful purchase with all fields completed', async ({ authenticatedPage }) => {
   const { page } = authenticatedPage;
@@ -21,14 +22,7 @@ test('Checkout — Successful purchase with all fields completed', async ({ auth
   await cartPage.openPlaceOrderModal();
   await expect(cartPage.orderModal).toBeVisible();
 
-  await checkoutPage.fillOrderForm({
-    name: 'Test User',
-    country: 'Spain',
-    city: 'Madrid',
-    creditCard: '1234567890123456',
-    month: 'April',
-    year: '2026',
-  });
+  await checkoutPage.fillOrderForm(DEFAULT_ORDER);
 
   await checkoutPage.submitPurchase();
 
@@ -79,14 +73,7 @@ test('Checkout — Credit card field rejects non-numeric characters', async ({ a
   await cartPage.openPlaceOrderModal();
   await expect(cartPage.orderModal).toBeVisible();
 
-  await checkoutPage.fillOrderForm({
-    name: 'Test User',
-    country: 'Spain',
-    city: 'Madrid',
-    creditCard: 'abcd',
-    month: 'April',
-    year: '2026',
-  });
+  await checkoutPage.fillOrderForm({ ...DEFAULT_ORDER, creditCard: 'abcd' });
 
   await checkoutPage.clickPurchase();
 
@@ -145,14 +132,7 @@ test('Checkout — Order confirmation message contains purchase details', async 
 
   const modalTotal = await checkoutPage.getModalTotal();
 
-  await checkoutPage.fillOrderForm({
-    name: 'Test User',
-    country: 'Spain',
-    city: 'Madrid',
-    creditCard: '1234567890123456',
-    month: 'April',
-    year: '2026',
-  });
+  await checkoutPage.fillOrderForm(DEFAULT_ORDER);
 
   await checkoutPage.submitPurchase();
 
@@ -181,13 +161,7 @@ test('Checkout — Credit card field validates length', async ({ authenticatedPa
   await cartPage.openPlaceOrderModal();
   await expect(cartPage.orderModal).toBeVisible();
 
-  await checkoutPage.fillOrderFormWithShortCard({
-    name: 'Test User',
-    country: 'Spain',
-    city: 'Madrid',
-    month: 'April',
-    year: '2026',
-  });
+  await checkoutPage.fillOrderFormWithShortCard(DEFAULT_ORDER);
 
   await checkoutPage.clickPurchase();
 
