@@ -95,13 +95,11 @@ test('Checkout — Total in modal matches cart total', async ({ authenticatedPag
   const checkoutPage = new CheckoutPage(page);
 
   await homePage.openProduct(0);
-  await expect(productPage.productName).toBeVisible();
-  await productPage.addToCart();
+  await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openProduct(1);
-  await expect(productPage.productName).toBeVisible();
-  await productPage.addToCart();
+  await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
