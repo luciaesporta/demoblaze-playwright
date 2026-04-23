@@ -9,20 +9,20 @@ class HomePage {
     this.carouselNext = page.locator('.carousel-control-next');
     this.carouselPrev = page.locator('.carousel-control-prev');
     this.activeCarouselItem = page.locator('.carousel-item.active img');
-    this.hamburger = page.locator('button.navbar-toggler');
+    this.hamburger = page.getByRole('button', { name: 'Toggle navigation' });
     this.navbarCollapsible = page.locator('#navbarExample');
     this.productCards = page.locator('.card-title a');
     this.productCardImages = page.locator('.card-img-top');
     this.videoModal = page.locator('#videoModal');
     this.videoModalTitle = page.locator('#videoModalLabel');
     this.videoElement = page.locator('#example-video');
-    this._aboutUsNavLink = page.locator('a[data-target="#videoModal"]');
-    this._contactNavLink = page.locator('a[data-target="#exampleModal"]');
+    this._aboutUsNavLink = page.getByRole('link', { name: 'About us' });
+    this._contactNavLink = page.getByRole('link', { name: 'Contact' });
     this._contactModal = page.locator('#exampleModal');
     this._contactEmail = page.locator('#recipient-email');
-    this._contactName = page.locator('#recipient-name');
-    this._contactMessage = page.locator('#message-text');
-    this._contactSendButton = page.locator('#exampleModal .btn-primary');
+    this._contactName = this._contactModal.getByLabel('Contact Name:');
+    this._contactMessage = this._contactModal.getByLabel('Message:');
+    this._contactSendButton = this._contactModal.getByRole('button', { name: 'Send message' });
   }
 
   async goto() {
