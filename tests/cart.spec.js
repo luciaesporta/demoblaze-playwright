@@ -46,18 +46,9 @@ test('Cart — Guest user can add a product to cart', async ({ page }) => {
   await expect(cartPage.getRowCell(0, 1)).toContainText(expectedName);
 });
 
-test('Cart — Cart displays full list when multiple products are added', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Cart — Cart displays full list when multiple products are added', async ({ cartWithTwoProducts }) => {
+  const { page, first: { name: firstName, price: firstPrice }, second: { name: secondName, price: secondPrice } } = cartWithTwoProducts;
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { name: firstName, price: firstPrice } = await productPage.addToCartAndCapture();
-
-  await homePage.goto();
-  await homePage.openProduct(1);
-  const { name: secondName, price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
@@ -77,18 +68,9 @@ test('Cart — Cart displays full list when multiple products are added', async 
   expect(prices).toContain(secondPrice);
 });
 
-test('Cart — Total reflects all added items', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Cart — Total reflects all added items', async ({ cartWithTwoProducts }) => {
+  const { page, first: { price: firstPrice }, second: { price: secondPrice } } = cartWithTwoProducts;
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { price: firstPrice } = await productPage.addToCartAndCapture();
-
-  await homePage.goto();
-  await homePage.openProduct(1);
-  const { price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
@@ -97,18 +79,9 @@ test('Cart — Total reflects all added items', async ({ authenticatedPage }) =>
   await expect(cartPage.cartTotal).toHaveText(expectedTotal);
 });
 
-test('Cart — Deleting an item updates the cart correctly', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Cart — Deleting an item updates the cart correctly', async ({ cartWithTwoProducts }) => {
+  const { page, first: { name: firstName, price: firstPrice }, second: { name: secondName, price: secondPrice } } = cartWithTwoProducts;
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { name: firstName, price: firstPrice } = await productPage.addToCartAndCapture();
-
-  await homePage.goto();
-  await homePage.openProduct(1);
-  const { name: secondName, price: secondPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);

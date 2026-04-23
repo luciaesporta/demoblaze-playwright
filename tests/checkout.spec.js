@@ -1,7 +1,5 @@
 const { test } = require('../fixtures/authFixtures');
 const { expect } = require('@playwright/test');
-const { HomePage } = require('../pages/HomePage');
-const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
 const { CheckoutPage } = require('../pages/CheckoutPage');
 const { DEFAULT_ORDER } = require('../utils/userData');
@@ -72,19 +70,10 @@ test('Checkout — Credit card field rejects non-numeric characters', async ({ c
   await expect(cartPage.orderModal).toBeVisible();
 });
 
-test('Checkout — Total in modal matches cart total', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Checkout — Total in modal matches cart total', async ({ cartWithTwoProducts }) => {
+  const { page } = cartWithTwoProducts;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCartAndCapture();
-
-  await homePage.goto();
-  await homePage.openProduct(1);
-  await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(2);
