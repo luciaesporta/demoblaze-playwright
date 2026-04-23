@@ -6,15 +6,10 @@ const { CartPage } = require('../pages/CartPage');
 const { CheckoutPage } = require('../pages/CheckoutPage');
 const { DEFAULT_ORDER } = require('../utils/userData');
 
-test('Checkout — Successful purchase with all fields completed', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Checkout — Successful purchase with all fields completed', async ({ cartWithOneProduct }) => {
+  const { page } = cartWithOneProduct;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCart();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
@@ -35,15 +30,10 @@ test('Checkout — Successful purchase with all fields completed', async ({ auth
   await expect(cartPage.cartRows).toHaveCount(0);
 });
 
-test('Checkout — Purchase cannot be submitted with mandatory fields empty', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Checkout — Purchase cannot be submitted with mandatory fields empty', async ({ cartWithOneProduct }) => {
+  const { page } = cartWithOneProduct;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCart();
 
   await cartPage.goto();
   await cartPage.openPlaceOrderModal();
@@ -55,19 +45,14 @@ test('Checkout — Purchase cannot be submitted with mandatory fields empty', as
   await expect(cartPage.orderModal).toBeVisible();
 });
 
-test('Checkout — Credit card field rejects non-numeric characters', async ({ authenticatedPage }) => {
+test('Checkout — Credit card field rejects non-numeric characters', async ({ cartWithOneProduct }) => {
   // BUG: demoblaze accepts any value in the credit card field and processes
   // the purchase without validation. This test is marked as expected to fail
   // and should be removed once proper numeric validation is implemented.
   test.fail();
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+  const { page } = cartWithOneProduct;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCart();
 
   await cartPage.goto();
   await cartPage.openPlaceOrderModal();
@@ -113,15 +98,10 @@ test('Checkout — Total in modal matches cart total', async ({ authenticatedPag
   expect(modalTotal).toBe(cartTotal);
 });
 
-test('Checkout — Order confirmation message contains purchase details', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Checkout — Order confirmation message contains purchase details', async ({ cartWithOneProduct }) => {
+  const { page } = cartWithOneProduct;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCart();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
@@ -140,20 +120,15 @@ test('Checkout — Order confirmation message contains purchase details', async 
   expect(amount).toBe(modalTotal);
 });
 
-test('Checkout — Credit card field validates length', async ({ authenticatedPage }) => {
+test('Checkout — Credit card field validates length', async ({ cartWithOneProduct }) => {
   // BUG: demoblaze accepts any credit card value regardless of digit count and
   // processes the purchase without length validation. This test is marked as
   // expected to fail and should be removed once proper 16-digit validation is
   // implemented.
   test.fail();
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+  const { page } = cartWithOneProduct;
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-
-  await homePage.openProduct(0);
-  await productPage.addToCart();
 
   await cartPage.goto();
   await cartPage.openPlaceOrderModal();
@@ -172,14 +147,9 @@ test('Checkout — Credit card field validates length', async ({ authenticatedPa
   await expect(cartPage.orderModal).toBeVisible();
 });
 
-test('Checkout — Modal can be dismissed without placing an order', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Checkout — Modal can be dismissed without placing an order', async ({ cartWithOneProduct }) => {
+  const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
