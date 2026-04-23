@@ -5,14 +5,10 @@ const { ProductPage } = require('../pages/ProductPage');
 const { CartPage } = require('../pages/CartPage');
 const { PAGE_TITLE, PRODUCT_PAGE_URL } = require('../utils/constants');
 
-test('Cart — Cart persists across page navigation', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
+test('Cart — Cart persists across page navigation', async ({ cartWithOneProduct }) => {
+  const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
   const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await homePage.goto();
   await homePage.openCategory('Laptops');
@@ -135,14 +131,9 @@ test('Cart — Deleting an item updates the cart correctly', async ({ authentica
   await expect(cartPage.cartTotal).toHaveText(expectedTotal);
 });
 
-test('Cart — Cart state is preserved after interrupting the purchase flow', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Cart — Cart state is preserved after interrupting the purchase flow', async ({ cartWithOneProduct }) => {
+  const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
   const cartPage = new CartPage(page);
-
-  await homePage.openProduct(0);
-  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
@@ -158,17 +149,14 @@ test('Cart — Cart state is preserved after interrupting the purchase flow', as
   await expect(cartPage.cartTotal).toHaveText(totalBefore);
 });
 
-test('Cart — Adding the same product twice results in two rows', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
+test('Cart — Adding the same product twice results in two rows', async ({ cartWithOneProduct }) => {
+  const { page, name: productName, price: productPrice } = cartWithOneProduct;
   const homePage = new HomePage(page);
   const productPage = new ProductPage(page);
   const cartPage = new CartPage(page);
 
-  await homePage.openProduct(0);
-  const { name: productName, price: productPrice } = await productPage.addToCartAndCapture();
-
   await homePage.goto();
-  await homePage.openProduct(0);
+  await homePage.openFirstProduct();
   await productPage.addToCartAndCapture();
 
   await cartPage.goto();
@@ -183,15 +171,9 @@ test('Cart — Adding the same product twice results in two rows', async ({ auth
   await expect(cartPage.cartTotal).toHaveText(expectedTotal);
 });
 
-test('Cart — Authenticated user can add a product to cart', async ({ authenticatedPage }) => {
-  const { page } = authenticatedPage;
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+test('Cart — Authenticated user can add a product to cart', async ({ cartWithOneProduct }) => {
+  const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
   const cartPage = new CartPage(page);
-
-  await homePage.openFirstProduct();
-  await expect(page).toHaveURL(PRODUCT_PAGE_URL);
-  const { name: expectedName, price: expectedPrice } = await productPage.addToCartAndCapture();
 
   await cartPage.goto();
   await expect(cartPage.cartRows).toHaveCount(1);
