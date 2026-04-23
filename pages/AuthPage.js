@@ -2,22 +2,22 @@ class AuthPage {
   constructor(page) {
     this.page = page;
 
-    this.signUpNavButton = page.locator('#signin2');
+    this.signUpNavButton = page.getByRole('link', { name: 'Sign up' });
     this.signUpModal = page.locator('#signInModal');
-    this.signUpUsername = page.locator('#sign-username');
-    this.signUpPassword = page.locator('#sign-password');
-    this.signUpSubmit = page.locator('#signInModal .btn-primary');
+    this.signUpUsername = this.signUpModal.getByLabel('Username:');
+    this.signUpPassword = this.signUpModal.getByLabel('Password:');
+    this.signUpSubmit = this.signUpModal.getByRole('button', { name: 'Sign up' });
 
-    this.logInNavButton = page.locator('#login2');
+    this.logInNavButton = page.getByRole('link', { name: 'Log in' });
     this.logInModal = page.locator('#logInModal');
     this.logInUsername = page.locator('#loginusername');
     this.logInPassword = page.locator('#loginpassword');
-    this.logInSubmit = page.locator('#logInModal .btn-primary');
+    this.logInSubmit = this.logInModal.getByRole('button', { name: 'Log in' });
     this.loggedInUsername = page.locator('#nameofuser');
-    this.logoutButton = page.locator('#logout2');
-    this.signUpModalClose = page.locator('#signInModal .close');
+    this.logoutButton = page.getByRole('link', { name: 'Log out' });
+    this.signUpModalClose = this.signUpModal.getByRole('button', { name: 'Close' });
     this.navbarCollapsible = page.locator('#navbarExample');
-    this.hamburger = page.locator('button.navbar-toggler');
+    this.hamburger = page.getByRole('button', { name: 'Toggle navigation' });
   }
 
   async _expandNavbarIfCollapsed() {
