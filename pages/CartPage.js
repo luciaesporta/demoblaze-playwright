@@ -37,7 +37,6 @@ class CartPage {
   }
 
   async openPlaceOrderModal() {
-    await this.placeOrderButton.scrollIntoViewIfNeeded();
     await this.placeOrderButton.click();
     await this.orderModal.waitFor({ state: 'visible' });
   }

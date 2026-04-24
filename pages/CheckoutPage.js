@@ -2,19 +2,20 @@ class CheckoutPage {
   constructor(page) {
     this.page = page;
 
-    this.nameInput = page.locator('#name');
-    this.countryInput = page.locator('#country');
-    this.cityInput = page.locator('#city');
-    this.creditCardInput = page.locator('#card');
-    this.monthInput = page.locator('#month');
-    this.yearInput = page.locator('#year');
-    this.purchaseButton = page.locator('button[onclick="purchaseOrder()"]');
+    this.orderModal = page.locator('#orderModal');
+    this.nameInput = this.orderModal.getByLabel('Name:');
+    this.countryInput = this.orderModal.getByLabel('Country:');
+    this.cityInput = this.orderModal.getByLabel('City:');
+    this.creditCardInput = this.orderModal.getByLabel('Credit card:');
+    this.monthInput = this.orderModal.getByLabel('Month:');
+    this.yearInput = this.orderModal.getByLabel('Year:');
+    this.purchaseButton = this.orderModal.getByRole('button', { name: 'Purchase' });
     this.modalTotal = page.locator('#totalm');
 
     this.confirmationModal = page.locator('.sweet-alert');
     this.confirmationTitle = page.locator('.sweet-alert h2');
     this.confirmationBody = page.locator('.sweet-alert p.lead');
-    this.confirmationOkButton = page.locator('.sweet-alert .confirm');
+    this.confirmationOkButton = this.confirmationModal.getByRole('button', { name: 'OK' });
   }
 
   async fillOrderForm({ name, country, city, creditCard, month, year }) {
