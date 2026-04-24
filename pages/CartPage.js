@@ -3,9 +3,9 @@ class CartPage {
     this.page = page;
     this.cartRows = page.locator('#tbodyid tr');
     this.cartTotal = page.locator('#totalp');
-    this.placeOrderButton = page.locator('button.btn-success');
+    this.placeOrderButton = page.getByRole('button', { name: 'Place Order' });
     this.orderModal = page.locator('#orderModal');
-    this.orderModalCloseButton = page.locator('#orderModal .btn-secondary[data-dismiss="modal"]');
+    this.orderModalCloseButton = this.orderModal.getByRole('button').filter({ hasText: 'Close' });
   }
 
   async getFaviconHref() {
