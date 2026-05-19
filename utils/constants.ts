@@ -34,6 +34,7 @@ export const MESSAGES = {
   signUpSuccess: 'Sign up successful',
   signUpExists: 'This user already exist.',
   signUpMissingFields: 'Please fill out Username and Password.',
+  loginUserNotFound: 'User does not exist.',
   contactSuccess: 'Thanks',
   purchaseConfirmation: 'Thank you for your purchase!',
   aboutUsTitle: 'About us',

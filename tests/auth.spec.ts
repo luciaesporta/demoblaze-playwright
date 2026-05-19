@@ -33,6 +33,19 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
+  test('login does not trim leading or trailing whitespace from username', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    const message = await authPage.loginExpectingError(`  ${username}  `, password);
+
+    expect(message).toContain(MESSAGES.loginUserNotFound);
+    await expect(authPage.loggedInUsername).not.toBeVisible();
+  });
+
   test('successful login after registration', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
