@@ -30,7 +30,7 @@ export class AuthPage {
     this._signUpUsername = this._signUpModal.getByLabel('Username:');
     this._signUpPassword = this._signUpModal.getByLabel('Password:');
     this._signUpSubmit = this._signUpModal.getByRole('button', { name: 'Sign up' });
-    this._signUpModalClose = this._signUpModal.getByRole('button', { name: 'Close' });
+    this._signUpModalClose = this._signUpModal.getByRole('button').filter({ hasText: 'Close' });
 
     this._logInNavButton = page.getByRole('link', { name: 'Log in' });
     this._logInModal = page.locator('#logInModal');

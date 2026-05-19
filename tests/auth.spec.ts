@@ -20,6 +20,18 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpSuccess);
   });
 
+  test('sign up rejects duplicate username', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    const message = await authPage.register(username, password);
+
+    expect(message).toContain(MESSAGES.signUpExists);
+  });
+
   test('successful login after registration', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);

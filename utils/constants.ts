@@ -32,6 +32,7 @@ export type CategoryName = keyof typeof CATEGORY_PRODUCTS;
 
 export const MESSAGES = {
   signUpSuccess: 'Sign up successful',
+  signUpExists: 'This user already exist.',
   contactSuccess: 'Thanks',
   purchaseConfirmation: 'Thank you for your purchase!',
   aboutUsTitle: 'About us',
