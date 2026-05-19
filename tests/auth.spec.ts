@@ -33,6 +33,19 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
+  test('login username is case-sensitive', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    const message = await authPage.loginExpectingError(username.toUpperCase(), password);
+
+    expect(message).toContain(MESSAGES.loginUserNotFound);
+    await expect(authPage.loggedInUsername).not.toBeVisible();
+  });
+
   test('login does not trim leading or trailing whitespace from username', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
