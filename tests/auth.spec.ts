@@ -4,6 +4,7 @@ import { AuthPage } from '../pages/AuthPage';
 import {
   generateUser,
   INVALID_LOGIN_SCENARIOS,
+  INVALID_SIGNUP_SCENARIOS,
   type TestUser,
 } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
@@ -96,6 +97,25 @@ test.describe('Auth — login with invalid credentials', () => {
       await homePage.goto();
       await authPage.loginExpectingError(username, scenario.password);
 
+      await expect(authPage.loggedInUsername).not.toBeVisible();
+    });
+  }
+});
+
+test.describe('Auth — sign up field validation', () => {
+  for (const scenario of INVALID_SIGNUP_SCENARIOS) {
+    test(`sign up fails with ${scenario.description}`, async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+
+      await homePage.goto();
+      const message = await authPage.submitSignUpAndCaptureMessage(
+        scenario.username,
+        scenario.password,
+      );
+
+      expect(message).toContain(MESSAGES.signUpMissingFields);
+      await expect(authPage.signUpModal).toBeVisible();
       await expect(authPage.loggedInUsername).not.toBeVisible();
     });
   }

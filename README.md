@@ -25,6 +25,8 @@ Supporting features include user authentication (sign up and log in), which enab
 |------|----------|
 | Auth | Successful user registration |
 | Auth | Sign up rejects duplicate username |
+| Auth | Sign up fails with only username (missing password) |
+| Auth | Sign up fails with only password (missing username) |
 | Auth | Successful login after registration |
 | Auth | Login and sign up forms reject empty submission |
 | Auth | Password fields mask their input |

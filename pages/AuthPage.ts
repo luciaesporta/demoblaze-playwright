@@ -137,6 +137,25 @@ export class AuthPage {
     await dialogPromise;
   }
 
+  async submitSignUpAndCaptureMessage(username: string, password: string): Promise<string> {
+    await this._signUpNavButton.click();
+    await this._signUpModal.waitFor({ state: 'visible' });
+    await this._signUpUsername.fill(username);
+    await this._signUpPassword.fill(password);
+
+    let dialogMessage = '';
+    const dialogPromise = new Promise<void>((resolve) => {
+      this.page.once('dialog', async (dialog) => {
+        dialogMessage = dialog.message();
+        await dialog.accept();
+        resolve();
+      });
+    });
+    await this._signUpSubmit.click();
+    await dialogPromise;
+    return dialogMessage;
+  }
+
   async dismissSignUpModal(): Promise<void> {
     const alreadyClosed = await this._signUpModal
       .waitFor({ state: 'hidden', timeout: 3_000 })
