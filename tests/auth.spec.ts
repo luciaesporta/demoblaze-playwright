@@ -5,6 +5,7 @@ import {
   generateUser,
   INVALID_LOGIN_SCENARIOS,
   INVALID_SIGNUP_SCENARIOS,
+  SPECIAL_CHAR_SIGNUP_SCENARIOS,
   type TestUser,
 } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
@@ -143,6 +144,23 @@ test.describe('Auth — sign up field validation', () => {
       expect(message).toContain(MESSAGES.signUpMissingFields);
       await expect(authPage.signUpModal).toBeVisible();
       await expect(authPage.loggedInUsername).not.toBeVisible();
+    });
+  }
+});
+
+test.describe('Auth — sign up with special characters in username', () => {
+  for (const scenario of SPECIAL_CHAR_SIGNUP_SCENARIOS) {
+    test(`accepts username with ${scenario.description}`, async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const { password } = generateUser();
+      const uniqueSuffix = Date.now().toString(36);
+      const username = `qa${scenario.usernameChars}user_${uniqueSuffix}`;
+
+      await homePage.goto();
+      const message = await authPage.register(username, password);
+
+      expect(message).toContain(MESSAGES.signUpSuccess);
     });
   }
 });

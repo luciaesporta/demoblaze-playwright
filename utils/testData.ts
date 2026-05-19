@@ -24,6 +24,11 @@ export interface InvalidSignUpScenario {
   password: string;
 }
 
+export interface SpecialCharSignUpScenario {
+  description: string;
+  usernameChars: string;
+}
+
 export function generateUser(): TestUser {
   const uid = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
   return {
@@ -40,6 +45,12 @@ export const INVALID_LOGIN_SCENARIOS: readonly InvalidLoginScenario[] = [
 export const INVALID_SIGNUP_SCENARIOS: readonly InvalidSignUpScenario[] = [
   { description: 'only username (missing password)', username: 'lucia_partial_signup', password: '' },
   { description: 'only password (missing username)', username: '', password: 'Test1234!' },
+];
+
+export const SPECIAL_CHAR_SIGNUP_SCENARIOS: readonly SpecialCharSignUpScenario[] = [
+  { description: 'punctuation symbols (!@#$)', usernameChars: '!@#$' },
+  { description: 'emoji', usernameChars: '🎉' },
+  { description: 'whitespace in the middle', usernameChars: ' mid ' },
 ];
 
 export const DEFAULT_ORDER: OrderDetails = {
