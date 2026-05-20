@@ -230,6 +230,10 @@ export class AuthPage {
     await this._loggedInUsername.waitFor({ state: 'visible' });
   }
 
+  async loggedInUsernameInnerHTML(): Promise<string> {
+    return this._loggedInUsername.evaluate((el) => el.innerHTML);
+  }
+
   async logout(): Promise<void> {
     await this._logoutButton.click();
     await this._loggedInUsername.waitFor({ state: 'hidden' });

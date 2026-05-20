@@ -30,6 +30,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Auth | Sign up accepts username with special characters (parametrized: punctuation, emoji, whitespace) |
 | Auth | Sign up accepts username longer than 100 characters |
 | Auth | Sign up safely handles basic SQL injection payload in username (security smoke test) |
+| Auth | Sign up safely handles XSS payload in username — no script execution (security smoke test) |
 | Auth | Successful login after registration |
 | Auth | Login and sign up forms reject empty submission |
 | Auth | Password fields mask their input |

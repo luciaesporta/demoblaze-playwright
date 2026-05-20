@@ -34,6 +34,29 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
+  test('sign up safely handles XSS payload in username (no script execution)', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { password } = generateUser();
+    const uniqueSuffix = Date.now().toString(36);
+    const xssUsername = `<script>alert(1)</script>_${uniqueSuffix}`;
+
+    await homePage.goto();
+    await authPage.register(xssUsername, password);
+
+    const unexpectedDialogs: string[] = [];
+    page.on('dialog', async (dialog) => {
+      unexpectedDialogs.push(dialog.message());
+      await dialog.dismiss();
+    });
+
+    await authPage.login(xssUsername, password);
+
+    expect(unexpectedDialogs).toEqual([]);
+    expect(await authPage.loggedInUsernameInnerHTML()).toContain('&lt;script&gt;');
+    await expect(authPage.loggedInUsername).toContainText(xssUsername);
+  });
+
   test('sign up safely handles basic SQL injection payload in username', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
