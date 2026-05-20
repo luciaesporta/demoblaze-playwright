@@ -34,6 +34,19 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
+  test('sign up safely handles basic SQL injection payload in username', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { password } = generateUser();
+    const uniqueSuffix = Date.now().toString(36);
+    const sqlInjectionUsername = `' OR '1'='1_${uniqueSuffix}`;
+
+    await homePage.goto();
+    const message = await authPage.register(sqlInjectionUsername, password);
+
+    expect(message).toContain(MESSAGES.signUpSuccess);
+  });
+
   test('sign up accepts username longer than 100 characters', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
