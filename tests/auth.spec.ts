@@ -34,6 +34,19 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
+  test('sign up accepts username longer than 100 characters', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { password } = generateUser();
+    const uniqueSuffix = Date.now().toString(36);
+    const longUsername = `${'qa'.repeat(100)}_${uniqueSuffix}`;
+
+    await homePage.goto();
+    const message = await authPage.register(longUsername, password);
+
+    expect(message).toContain(MESSAGES.signUpSuccess);
+  });
+
   test('login username is case-sensitive', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
