@@ -133,6 +133,14 @@ export class AuthPage {
     await this.page.keyboard.press('Escape');
   }
 
+  async clickOutsideLoginModal(): Promise<void> {
+    await this.page.mouse.click(1, 1);
+  }
+
+  async clickOutsideSignUpModal(): Promise<void> {
+    await this.page.mouse.click(1, 1);
+  }
+
   async loginFieldValues(): Promise<{ username: string; password: string }> {
     return {
       username: await this._logInUsername.inputValue(),

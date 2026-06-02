@@ -176,6 +176,30 @@ test.describe('Auth', () => {
     await expect(authPage.signUpModal).not.toBeVisible({ timeout: 3_000 });
   });
 
+  test('clicking outside closes login modal', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openLoginModal();
+    await authPage.clickOutsideLoginModal();
+
+    await expect(authPage.logInModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('clicking outside closes sign up modal', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openSignUpModal();
+    await authPage.clickOutsideSignUpModal();
+
+    await expect(authPage.signUpModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
   test('password fields mask their input', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
