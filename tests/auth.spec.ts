@@ -140,6 +140,20 @@ test.describe('Auth', () => {
     await expect(authPage.signUpModal).toBeVisible();
   });
 
+  test('login modal fields are cleared after closing with X and reopening', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openLoginModal();
+    await authPage.fillLoginCredentials('testuser', 'testpass');
+    await authPage.closeLoginModalWithX();
+    await authPage.openLoginModal();
+
+    expect(await authPage.loginUsernameValue()).toBe('');
+    expect(await authPage.loginPasswordValue()).toBe('');
+  });
+
   test('password fields mask their input', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);

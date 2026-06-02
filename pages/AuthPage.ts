@@ -15,6 +15,7 @@ export class AuthPage {
   private readonly _logInUsername: Locator;
   private readonly _logInPassword: Locator;
   private readonly _logInSubmit: Locator;
+  private readonly _logInModalCloseX: Locator;
 
   private readonly _loggedInUsername: Locator;
   private readonly _logoutButton: Locator;
@@ -37,6 +38,7 @@ export class AuthPage {
     this._logInUsername = page.locator('#loginusername');
     this._logInPassword = page.locator('#loginpassword');
     this._logInSubmit = this._logInModal.getByRole('button', { name: 'Log in' });
+    this._logInModalCloseX = this._logInModal.locator('.close');
 
     this._loggedInUsername = page.locator('#nameofuser');
     this._logoutButton = page.getByRole('link', { name: 'Log out' });
@@ -113,6 +115,24 @@ export class AuthPage {
   async openSignUpModal(): Promise<void> {
     await this._signUpNavButton.click();
     await this._signUpModal.waitFor({ state: 'visible' });
+  }
+
+  async fillLoginCredentials(username: string, password: string): Promise<void> {
+    await this._logInUsername.fill(username);
+    await this._logInPassword.fill(password);
+  }
+
+  async closeLoginModalWithX(): Promise<void> {
+    await this._logInModalCloseX.click();
+    await this._logInModal.waitFor({ state: 'hidden' });
+  }
+
+  async loginUsernameValue(): Promise<string> {
+    return this._logInUsername.inputValue();
+  }
+
+  async loginPasswordValue(): Promise<string> {
+    return this._logInPassword.inputValue();
   }
 
   async submitEmptyLogin(): Promise<void> {
