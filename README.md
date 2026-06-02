@@ -33,6 +33,11 @@ Supporting features include user authentication (sign up and log in), which enab
 | Auth | Sign up safely handles XSS payload in username — no script execution (security smoke test) |
 | Auth | Successful login after registration |
 | Auth | Login and sign up forms reject empty submission |
+| Auth | Login modal fields are cleared after closing with X and reopening (known bug — `test.fail`) |
+| Auth | ESC key closes login modal (known bug — `test.fail`) |
+| Auth | ESC key closes sign up modal (known bug — `test.fail`) |
+| Auth | Clicking outside closes login modal (known bug — `test.fail`) |
+| Auth | Clicking outside closes sign up modal (known bug — `test.fail`) |
 | Auth | Password fields mask their input |
 | Auth | Login fails with non-existent user |
 | Auth | Login fails with wrong password |
@@ -47,6 +52,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Cart | Cart persists across page navigation |
 | Cart | Cart state is preserved after interrupting the purchase flow |
 | Cart | Adding the same product twice results in two rows |
+| Cart | Adding 10+ products sums total correctly |
 | Checkout | Successful purchase with all fields completed |
 | Checkout | Purchase cannot be submitted with mandatory fields empty |
 | Checkout | Total in modal matches cart total |

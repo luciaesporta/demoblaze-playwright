@@ -146,3 +146,29 @@ test.describe('Cart', () => {
     await expect(cartPage.cartTotal).toHaveText(expectedPrice);
   });
 });
+
+test.describe('Cart — advanced operations', () => {
+  test('adding 10+ products sums total correctly', async ({ authenticatedPage }) => {
+    const { page } = authenticatedPage;
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+    const itemCount = 10;
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    const { price } = await productPage.addToCartAndCapture();
+
+    for (let i = 1; i < itemCount; i++) {
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
+    }
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(itemCount);
+
+    const expectedTotal = String(Number(price) * itemCount);
+    await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+  });
+});
