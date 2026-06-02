@@ -152,6 +152,30 @@ test.describe('Auth', () => {
     expect(await authPage.loginFieldValues()).toEqual({ username: '', password: '' });
   });
 
+  test('ESC key closes login modal', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openLoginModal();
+    await authPage.pressEscOnLoginModal();
+
+    await expect(authPage.logInModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('ESC key closes sign up modal', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openSignUpModal();
+    await authPage.pressEscOnSignUpModal();
+
+    await expect(authPage.signUpModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
   test('password fields mask their input', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);

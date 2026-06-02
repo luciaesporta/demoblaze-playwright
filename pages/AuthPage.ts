@@ -125,6 +125,14 @@ export class AuthPage {
     await this._logInModal.waitFor({ state: 'hidden' });
   }
 
+  async pressEscOnLoginModal(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async pressEscOnSignUpModal(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
   async loginFieldValues(): Promise<{ username: string; password: string }> {
     return {
       username: await this._logInUsername.inputValue(),
