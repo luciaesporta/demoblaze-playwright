@@ -117,22 +117,19 @@ export class AuthPage {
     await this._signUpModal.waitFor({ state: 'visible' });
   }
 
-  async fillLoginCredentials(username: string, password: string): Promise<void> {
+  async fillLoginAndCloseWithX(username: string, password: string): Promise<void> {
+    await this.openLoginModal();
     await this._logInUsername.fill(username);
     await this._logInPassword.fill(password);
-  }
-
-  async closeLoginModalWithX(): Promise<void> {
     await this._logInModalCloseX.click();
     await this._logInModal.waitFor({ state: 'hidden' });
   }
 
-  async loginUsernameValue(): Promise<string> {
-    return this._logInUsername.inputValue();
-  }
-
-  async loginPasswordValue(): Promise<string> {
-    return this._logInPassword.inputValue();
+  async loginFieldValues(): Promise<{ username: string; password: string }> {
+    return {
+      username: await this._logInUsername.inputValue(),
+      password: await this._logInPassword.inputValue(),
+    };
   }
 
   async submitEmptyLogin(): Promise<void> {
