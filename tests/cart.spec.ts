@@ -175,4 +175,21 @@ test.describe('Cart — advanced operations', () => {
     const expectedTotal = String(Number(price) * itemCount);
     await expect(cartPage.cartTotal).toHaveText(expectedTotal);
   });
+
+  test('deleting all items one by one empties the cart', async ({ cartWithTwoProducts }) => {
+    const { page } = cartWithTwoProducts;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(2);
+
+    await cartPage.deleteRow(0);
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    await cartPage.deleteRow(0);
+    await expect(cartPage.cartRows).toHaveCount(0);
+
+    const total = await cartPage.getTotal();
+    expect(total === '' || total === '0').toBeTruthy();
+  });
 });
