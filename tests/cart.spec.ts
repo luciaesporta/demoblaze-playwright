@@ -155,14 +155,18 @@ test.describe('Cart — advanced operations', () => {
     const cartPage = new CartPage(page);
     const itemCount = 10;
 
+    const addFirstProductToCart = async () => {
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
+    };
+
     await homePage.goto();
     await homePage.openFirstProduct();
     const { price } = await productPage.addToCartAndCapture();
 
     for (let i = 1; i < itemCount; i++) {
-      await homePage.goto();
-      await homePage.openFirstProduct();
-      await productPage.addToCart();
+      await addFirstProductToCart();
     }
 
     await cartPage.goto();
