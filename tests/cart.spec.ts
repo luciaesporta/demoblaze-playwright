@@ -2,7 +2,9 @@ import { test, expect } from '../fixtures/authFixtures';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
+import { AuthPage } from '../pages/AuthPage';
 import { PAGE_TITLE, PRODUCT_PAGE_URL } from '../utils/constants';
+import { generateUser } from '../utils/testData';
 
 test.describe('Cart', () => {
   test('cart persists across page navigation', async ({ cartWithOneProduct }) => {
@@ -219,5 +221,32 @@ test.describe('Cart — advanced operations', () => {
 
     expect(await cartPage.getItemName(0)).toBe(firstName);
     await expect(cartPage.cartTotal).toHaveText(firstPrice);
+  });
+
+  test('cart is not shared between different users', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+    const authPage = new AuthPage(page);
+    const userA = generateUser();
+    const userB = generateUser();
+
+    await homePage.goto();
+    await authPage.register(userA.username, userA.password);
+    await authPage.login(userA.username, userA.password);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    await productPage.addToCart();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    await authPage.logout();
+    await authPage.register(userB.username, userB.password);
+    await authPage.login(userB.username, userB.password);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(0);
   });
 });
