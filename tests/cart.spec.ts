@@ -192,4 +192,32 @@ test.describe('Cart — advanced operations', () => {
     const total = await cartPage.getTotal();
     expect(total === '' || total === '0').toBeTruthy();
   });
+
+  test('deleting first item keeps second item in place', async ({ cartWithTwoProducts }) => {
+    const { page, first: { name: firstName }, second: { name: secondName, price: secondPrice } } = cartWithTwoProducts;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(2);
+
+    await cartPage.deleteRowByName(firstName);
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    expect(await cartPage.getItemName(0)).toBe(secondName);
+    await expect(cartPage.cartTotal).toHaveText(secondPrice);
+  });
+
+  test('deleting last item keeps first item in place', async ({ cartWithTwoProducts }) => {
+    const { page, first: { name: firstName, price: firstPrice }, second: { name: secondName } } = cartWithTwoProducts;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(2);
+
+    await cartPage.deleteRowByName(secondName);
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    expect(await cartPage.getItemName(0)).toBe(firstName);
+    await expect(cartPage.cartTotal).toHaveText(firstPrice);
+  });
 });
