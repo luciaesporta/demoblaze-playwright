@@ -261,4 +261,18 @@ test.describe('Cart — advanced operations', () => {
     await cartPage.openPlaceOrderModal();
     await expect(cartPage.orderModal).not.toBeVisible({ timeout: 3_000 });
   });
+
+  test('cart persists after page refresh', async ({ cartWithOneProduct }) => {
+    const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    await expect(cartPage.cartRows).toHaveCount(1);
+    await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
+    await expect(cartPage.cartTotal).toHaveText(expectedPrice);
+  });
 });
