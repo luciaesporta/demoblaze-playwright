@@ -249,4 +249,16 @@ test.describe('Cart — advanced operations', () => {
     await cartPage.goto();
     await expect(cartPage.cartRows).toHaveCount(0);
   });
+
+  test('Place Order on empty cart should not allow checkout', async ({ authenticatedPage }) => {
+    test.fail();
+    const { page } = authenticatedPage;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(0);
+
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).not.toBeVisible({ timeout: 3_000 });
+  });
 });
