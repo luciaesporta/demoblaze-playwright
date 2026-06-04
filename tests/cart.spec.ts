@@ -275,4 +275,31 @@ test.describe('Cart — advanced operations', () => {
     await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
     await expect(cartPage.cartTotal).toHaveText(expectedPrice);
   });
+
+  test('products from different categories coexist in cart', async ({ authenticatedPage }) => {
+    const { page } = authenticatedPage;
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await homePage.openCategory('Phones');
+    await homePage.openFirstProduct();
+    const phone = await productPage.addToCartAndCapture();
+
+    await homePage.goto();
+    await homePage.openCategory('Laptops');
+    await homePage.openFirstProduct();
+    const laptop = await productPage.addToCartAndCapture();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(2);
+
+    const names = [await cartPage.getItemName(0), await cartPage.getItemName(1)];
+    expect(names).toContain(phone.name);
+    expect(names).toContain(laptop.name);
+
+    const expectedTotal = String(Number(phone.price) + Number(laptop.price));
+    await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+  });
 });
