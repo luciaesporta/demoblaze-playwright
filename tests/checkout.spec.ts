@@ -1,7 +1,11 @@
 import { test, expect } from '../fixtures/authFixtures';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
-import { DEFAULT_ORDER } from '../utils/testData';
+import {
+  DEFAULT_ORDER,
+  VALIDATED_EMPTY_FIELD_SCENARIOS,
+  UNVALIDATED_EMPTY_FIELD_SCENARIOS,
+} from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
 
 test.describe('Checkout', () => {
@@ -149,4 +153,43 @@ test.describe('Checkout', () => {
     await expect(cartPage.getRowPriceCell(0)).toContainText(expectedPrice);
     await expect(cartPage.cartTotal).toHaveText(totalBefore);
   });
+});
+
+test.describe('Checkout — individual empty field validation', () => {
+  for (const scenario of VALIDATED_EMPTY_FIELD_SCENARIOS) {
+    test(`purchase blocked when ${scenario.description}`, async ({ cartWithOneProduct }) => {
+      const { page } = cartWithOneProduct;
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
+
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
+
+      await checkoutPage.fillOrderForm(scenario.order);
+      await checkoutPage.clickPurchase();
+
+      await expect(checkoutPage.confirmationModal).not.toBeVisible({ timeout: 3_000 });
+      await expect(cartPage.orderModal).toBeVisible();
+    });
+  }
+
+  for (const scenario of UNVALIDATED_EMPTY_FIELD_SCENARIOS) {
+    test(`purchase blocked when ${scenario.description}`, async ({ cartWithOneProduct }) => {
+      test.fail();
+      const { page } = cartWithOneProduct;
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
+
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
+
+      await checkoutPage.fillOrderForm(scenario.order);
+      await checkoutPage.clickPurchase();
+
+      await expect(checkoutPage.confirmationModal).not.toBeVisible({ timeout: 3_000 });
+      await expect(cartPage.orderModal).toBeVisible();
+    });
+  }
 });

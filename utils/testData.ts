@@ -62,6 +62,18 @@ export const DEFAULT_ORDER: OrderDetails = {
   year: '2026',
 };
 
+export const VALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; order: OrderDetails }[] = [
+  { description: 'name empty', order: { ...DEFAULT_ORDER, name: '' } },
+  { description: 'credit card empty', order: { ...DEFAULT_ORDER, creditCard: '' } },
+];
+
+export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; order: OrderDetails }[] = [
+  { description: 'country empty', order: { ...DEFAULT_ORDER, country: '' } },
+  { description: 'city empty', order: { ...DEFAULT_ORDER, city: '' } },
+  { description: 'month empty', order: { ...DEFAULT_ORDER, month: '' } },
+  { description: 'year empty', order: { ...DEFAULT_ORDER, year: '' } },
+];
+
 export const SHORT_CREDIT_CARD = '1234';
 export const LONG_CREDIT_CARD = '12345678901234567';
 export const NON_NUMERIC_CREDIT_CARD = 'abcd';
