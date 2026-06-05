@@ -318,4 +318,20 @@ test.describe('Cart — advanced operations', () => {
 
     expect(await cartPage.getItemPrice(0)).toBe(detailPrice);
   });
+
+  test('cart name matches product detail page name', async ({ authenticatedPage }) => {
+    const { page } = authenticatedPage;
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    const { name: detailName } = await productPage.addToCartAndCapture();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    expect(await cartPage.getItemName(0)).toBe(detailName);
+  });
 });
