@@ -53,6 +53,15 @@ Supporting features include user authentication (sign up and log in), which enab
 | Cart | Cart state is preserved after interrupting the purchase flow |
 | Cart | Adding the same product twice results in two rows |
 | Cart | Adding 10+ products sums total correctly |
+| Cart | Deleting all items one by one empties the cart |
+| Cart | Deleting first item keeps second item in place |
+| Cart | Deleting last item keeps first item in place |
+| Cart | Cart is not shared between different users |
+| Cart | Place Order on empty cart should not allow checkout (known bug — `test.fail`) |
+| Cart | Cart persists after page refresh |
+| Cart | Products from different categories coexist in cart |
+| Cart | Cart price matches product detail page price |
+| Cart | Cart name matches product detail page name |
 | Checkout | Successful purchase with all fields completed |
 | Checkout | Purchase cannot be submitted with mandatory fields empty |
 | Checkout | Total in modal matches cart total |
@@ -60,6 +69,13 @@ Supporting features include user authentication (sign up and log in), which enab
 | Checkout | Modal can be dismissed without placing an order |
 | Checkout | Credit card field rejects non-numeric characters (known bug — `test.fail`) |
 | Checkout | Credit card field validates length (known bug — `test.fail`) |
+| Checkout | Purchase blocked when name empty |
+| Checkout | Purchase blocked when credit card empty |
+| Checkout | Purchase blocked when country empty (known bug — `test.fail`) |
+| Checkout | Purchase blocked when city empty (known bug — `test.fail`) |
+| Checkout | Purchase blocked when month empty (known bug — `test.fail`) |
+| Checkout | Purchase blocked when year empty (known bug — `test.fail`) |
+| Checkout | Purchase blocked when name contains only numbers (known bug — `test.fail`) |
 | UI | Home page displays the store title |
 | UI | Home page loads product cards |
 | UI | Filtering by category updates the product list |

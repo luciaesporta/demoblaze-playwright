@@ -72,6 +72,7 @@ export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; 
   { description: 'city empty', order: { ...DEFAULT_ORDER, city: '' } },
   { description: 'month empty', order: { ...DEFAULT_ORDER, month: '' } },
   { description: 'year empty', order: { ...DEFAULT_ORDER, year: '' } },
+  { description: 'name contains only numbers', order: { ...DEFAULT_ORDER, name: '12345' } },
 ];
 
 export const SHORT_CREDIT_CARD = '1234';

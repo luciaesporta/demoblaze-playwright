@@ -192,4 +192,5 @@ test.describe('Checkout — individual empty field validation', () => {
       await expect(cartPage.orderModal).toBeVisible();
     });
   }
+
 });
