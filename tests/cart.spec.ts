@@ -302,4 +302,20 @@ test.describe('Cart — advanced operations', () => {
     const expectedTotal = String(Number(phone.price) + Number(laptop.price));
     await expect(cartPage.cartTotal).toHaveText(expectedTotal);
   });
+
+  test('cart price matches product detail page price', async ({ authenticatedPage }) => {
+    const { page } = authenticatedPage;
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    const { price: detailPrice } = await productPage.addToCartAndCapture();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    expect(await cartPage.getItemPrice(0)).toBe(detailPrice);
+  });
 });
