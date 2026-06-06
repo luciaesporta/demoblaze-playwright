@@ -76,6 +76,14 @@ Supporting features include user authentication (sign up and log in), which enab
 | Checkout | Purchase blocked when month empty (known bug — `test.fail`) |
 | Checkout | Purchase blocked when year empty (known bug — `test.fail`) |
 | Checkout | Purchase blocked when name contains only numbers (known bug — `test.fail`) |
+| Checkout | Purchase blocked when country contains only numbers (known bug — `test.fail`) |
+| Checkout | Purchase blocked when city contains special characters (known bug — `test.fail`) |
+| Checkout | Purchase blocked when month out of range — 13 (known bug — `test.fail`) |
+| Checkout | Purchase blocked when year in the past — 2020 (known bug — `test.fail`) |
+| Checkout | Purchase blocked when credit card with spaces (known bug — `test.fail`) |
+| Checkout | Purchase blocked when credit card with dashes (known bug — `test.fail`) |
+| Checkout | Place Order modal can be closed with X button |
+| Checkout | Place Order modal can be closed with ESC key (known bug — `test.fail`) |
 | UI | Home page displays the store title |
 | UI | Home page loads product cards |
 | UI | Filtering by category updates the product list |
