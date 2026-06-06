@@ -77,6 +77,8 @@ export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; 
   { description: 'city contains special characters', order: { ...DEFAULT_ORDER, city: '!@#$%^&*' } },
   { description: 'month out of range (13)', order: { ...DEFAULT_ORDER, month: '13' } },
   { description: 'year in the past (2020)', order: { ...DEFAULT_ORDER, year: '2020' } },
+  { description: 'credit card with spaces', order: { ...DEFAULT_ORDER, creditCard: '4111 1111 1111 1111' } },
+  { description: 'credit card with dashes', order: { ...DEFAULT_ORDER, creditCard: '4111-1111-1111-1111' } },
 ];
 
 export const SHORT_CREDIT_CARD = '1234';
