@@ -75,6 +75,8 @@ export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; 
   { description: 'name contains only numbers', order: { ...DEFAULT_ORDER, name: '12345' } },
   { description: 'country contains only numbers', order: { ...DEFAULT_ORDER, country: '12345' } },
   { description: 'city contains special characters', order: { ...DEFAULT_ORDER, city: '!@#$%^&*' } },
+  { description: 'month out of range (13)', order: { ...DEFAULT_ORDER, month: '13' } },
+  { description: 'year in the past (2020)', order: { ...DEFAULT_ORDER, year: '2020' } },
 ];
 
 export const SHORT_CREDIT_CARD = '1234';
