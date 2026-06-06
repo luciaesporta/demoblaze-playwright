@@ -153,6 +153,33 @@ test.describe('Checkout', () => {
     await expect(cartPage.getRowPriceCell(0)).toContainText(expectedPrice);
     await expect(cartPage.cartTotal).toHaveText(totalBefore);
   });
+
+  test('Place Order modal can be closed with X button', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await cartPage.closePlaceOrderModalWithX();
+    await expect(cartPage.orderModal).not.toBeVisible();
+    await expect(cartPage.cartRows).toHaveCount(1);
+  });
+
+  test('Place Order modal can be closed with ESC key', async ({ cartWithOneProduct }) => {
+    test.fail();
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await cartPage.pressEscOnPlaceOrderModal();
+    await expect(cartPage.orderModal).not.toBeVisible({ timeout: 3_000 });
+    await expect(cartPage.cartRows).toHaveCount(1);
+  });
 });
 
 test.describe('Checkout — individual empty field validation', () => {

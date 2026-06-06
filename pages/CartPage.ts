@@ -8,6 +8,7 @@ export class CartPage {
   private readonly _placeOrderButton: Locator;
   private readonly _orderModal: Locator;
   private readonly _orderModalCloseButton: Locator;
+  private readonly _orderModalCloseX: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -18,6 +19,7 @@ export class CartPage {
     this._orderModalCloseButton = this._orderModal
       .getByRole('button')
       .filter({ hasText: 'Close' });
+    this._orderModalCloseX = this._orderModal.locator('.close');
   }
 
   get cartRows(): Locator {
@@ -92,5 +94,14 @@ export class CartPage {
   async closePlaceOrderModal(): Promise<void> {
     await this._orderModalCloseButton.click();
     await this._orderModal.waitFor({ state: 'hidden' });
+  }
+
+  async closePlaceOrderModalWithX(): Promise<void> {
+    await this._orderModalCloseX.click();
+    await this._orderModal.waitFor({ state: 'hidden' });
+  }
+
+  async pressEscOnPlaceOrderModal(): Promise<void> {
+    await this.page.keyboard.press('Escape');
   }
 }
