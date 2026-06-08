@@ -180,6 +180,23 @@ test.describe('Checkout', () => {
     await expect(cartPage.orderModal).not.toBeVisible({ timeout: 3_000 });
     await expect(cartPage.cartRows).toHaveCount(1);
   });
+
+  test('confirmation ID and Amount have valid format', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+    await checkoutPage.submitPurchase();
+
+    const confirmationText = await checkoutPage.getConfirmationText();
+    expect(confirmationText).toMatch(/Id:\s*\d+/);
+    expect(confirmationText).toMatch(/Amount:\s*\d+\s*USD/);
+  });
 });
 
 test.describe('Checkout — individual empty field validation', () => {
