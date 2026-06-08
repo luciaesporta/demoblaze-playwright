@@ -90,6 +90,21 @@ test.describe('UI — Navigation', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
+  test('navbar logo is not clickable while Place Order modal is open', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await expect(page.locator('a.navbar-brand')).toBeVisible();
+    const navResult = await page.locator('a.navbar-brand').click({ timeout: 2_000, trial: true }).then(() => true).catch(() => false);
+    expect(navResult).toBe(false);
+
+    await expect(page).toHaveURL(CART_PAGE_URL);
+  });
+
   test('cart link in navbar navigates to the cart page', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();

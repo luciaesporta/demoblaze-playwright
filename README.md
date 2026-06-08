@@ -92,6 +92,8 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Clicking a product card navigates to its detail page |
 | UI | Detail page loads correctly from catalog |
 | UI | Navbar logo returns to home from a product page |
+| UI | Navbar logo returns to home from the cart page |
+| UI | Navbar logo is not clickable while Place Order modal is open |
 | UI | Cart link in navbar navigates to the cart page |
 | UI | Pagination navigates between product pages |
 | UI | Previous button on first page does not change product list (known bug — `test.fail`) |
