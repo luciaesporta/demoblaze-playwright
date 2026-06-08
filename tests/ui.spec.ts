@@ -141,6 +141,25 @@ test.describe('UI — Navigation', () => {
     const afterNext = await homePage.getProductNames();
     expect(afterNext).toEqual(lastPageProducts);
   });
+
+  test('switching category resets pagination to first page', async ({ page }) => {
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    const firstPageProducts = await homePage.getProductNames();
+
+    await homePage.clickNext();
+    await expect(async () => {
+      const products = await homePage.getProductNames();
+      expect(products).not.toEqual(firstPageProducts);
+    }).toPass();
+
+    await homePage.openCategory('Phones');
+
+    const phonesProducts = await homePage.getProductNames();
+    expect(phonesProducts[0]).toBe(CATEGORY_PRODUCTS.Phones[0]);
+  });
 });
 
 test.describe('UI — Product detail', () => {

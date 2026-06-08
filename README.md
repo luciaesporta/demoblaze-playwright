@@ -97,6 +97,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Previous button on first page does not change product list (known bug — `test.fail`) |
 | UI | Next button on last page does not change product list (known bug — `test.fail`) |
 | UI | Category shows exact product count (parametrized: Phones 7, Laptops 6, Monitors 2) |
+| UI | Switching category resets pagination to first page |
 | UI | Category filters return correct products (parametrized per category) |
 | UI | Product card and detail images load (parametrized per category / product) |
 | UI | Hero banner auto-advances and responds to manual controls |
