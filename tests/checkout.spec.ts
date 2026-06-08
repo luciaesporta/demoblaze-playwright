@@ -197,6 +197,25 @@ test.describe('Checkout', () => {
     expect(confirmationText).toMatch(/Id:\s*\d+/);
     expect(confirmationText).toMatch(/Amount:\s*\d+\s*USD/);
   });
+
+  test('confirmation date matches current date', async ({ cartWithOneProduct }) => {
+    test.fail();
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+    await checkoutPage.submitPurchase();
+
+    const confirmationText = await checkoutPage.getConfirmationText();
+    const today = new Date();
+    const expectedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+    expect(confirmationText).toContain(expectedDate);
+  });
 });
 
 test.describe('Checkout — individual empty field validation', () => {
