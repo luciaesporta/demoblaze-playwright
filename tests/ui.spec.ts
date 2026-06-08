@@ -92,14 +92,15 @@ test.describe('UI — Navigation', () => {
 
   test('navbar logo is not clickable while Place Order modal is open', async ({ cartWithOneProduct }) => {
     const { page } = cartWithOneProduct;
+    const homePage = new HomePage(page);
     const cartPage = new CartPage(page);
 
     await cartPage.goto();
     await cartPage.openPlaceOrderModal();
     await expect(cartPage.orderModal).toBeVisible();
 
-    await expect(page.locator('a.navbar-brand')).toBeVisible();
-    const navResult = await page.locator('a.navbar-brand').click({ timeout: 2_000, trial: true }).then(() => true).catch(() => false);
+    await expect(homePage.navbarBrand).toBeVisible();
+    const navResult = await homePage.navbarBrand.click({ timeout: 2_000, trial: true }).then(() => true).catch(() => false);
     expect(navResult).toBe(false);
 
     await expect(page).toHaveURL(CART_PAGE_URL);

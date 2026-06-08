@@ -59,6 +59,10 @@ export class HomePage {
     return this._firstProductLink;
   }
 
+  get navbarBrand(): Locator {
+    return this._navbarBrand;
+  }
+
   get cartNavLink(): Locator {
     return this._cartNavLink;
   }
