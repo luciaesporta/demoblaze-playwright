@@ -84,6 +84,8 @@ Supporting features include user authentication (sign up and log in), which enab
 | Checkout | Purchase blocked when credit card with dashes (known bug — `test.fail`) |
 | Checkout | Place Order modal can be closed with X button |
 | Checkout | Place Order modal can be closed with ESC key (known bug — `test.fail`) |
+| Checkout | Confirmation ID and Amount have valid format |
+| Checkout | Confirmation date matches current date (known bug — `test.fail`) |
 | UI | Home page displays the store title |
 | UI | Home page loads product cards |
 | UI | Filtering by category updates the product list |
@@ -92,6 +94,9 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Navbar logo returns to home from a product page |
 | UI | Cart link in navbar navigates to the cart page |
 | UI | Pagination navigates between product pages |
+| UI | Previous button on first page does not change product list (known bug — `test.fail`) |
+| UI | Next button on last page does not change product list (known bug — `test.fail`) |
+| UI | Category shows exact product count (parametrized: Phones 7, Laptops 6, Monitors 2) |
 | UI | Category filters return correct products (parametrized per category) |
 | UI | Product card and detail images load (parametrized per category / product) |
 | UI | Hero banner auto-advances and responds to manual controls |

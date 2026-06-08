@@ -105,6 +105,42 @@ test.describe('UI — Navigation', () => {
       expect(initialProducts).toContain(prevProducts[0]);
     }).toPass();
   });
+
+  test('Previous button on first page does not change product list', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    const initialProducts = await homePage.getProductNames();
+
+    await homePage.clickPrev();
+    await page.waitForTimeout(1000);
+
+    const afterPrev = await homePage.getProductNames();
+    expect(afterPrev).toEqual(initialProducts);
+  });
+
+  test('Next button on last page does not change product list', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    await homePage.clickNext();
+    await expect(async () => {
+      const products = await homePage.getProductNames();
+      expect(products.length).toBeGreaterThan(0);
+    }).toPass();
+    const lastPageProducts = await homePage.getProductNames();
+
+    await homePage.clickNext();
+    await page.waitForTimeout(1000);
+
+    const afterNext = await homePage.getProductNames();
+    expect(afterNext).toEqual(lastPageProducts);
+  });
 });
 
 test.describe('UI — Product detail', () => {
