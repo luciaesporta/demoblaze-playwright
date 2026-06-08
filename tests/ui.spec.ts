@@ -148,7 +148,7 @@ test.describe('UI — Navigation', () => {
     }).toPass();
     const lastPageProducts = await homePage.getProductNames();
 
-    await homePage.clickNext();
+    await page.locator('#next2').click({ timeout: 5_000 });
     await page.waitForTimeout(1000);
 
     const afterNext = await homePage.getProductNames();
