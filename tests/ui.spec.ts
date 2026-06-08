@@ -162,6 +162,21 @@ test.describe('UI — Category filters', () => {
   }
 });
 
+test.describe('UI — Category product count', () => {
+  for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [CategoryName, readonly string[]][]) {
+    test(`"${category}" shows exactly ${expected.length} products`, async ({ page }) => {
+      const homePage = new HomePage(page);
+      await homePage.goto();
+      await homePage.openCategory(category);
+
+      await expect(async () => {
+        const count = await homePage.getProductCardCount();
+        expect(count).toBe(expected.length);
+      }).toPass();
+    });
+  }
+});
+
 test.describe('UI — Images', () => {
   test('home page product card images all load', async ({ page }) => {
     const homePage = new HomePage(page);
