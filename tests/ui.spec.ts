@@ -77,6 +77,19 @@ test.describe('UI — Navigation', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
+  test('navbar logo returns to home from the cart page', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const cartPage = new CartPage(page);
+
+    await cartPage.goto();
+    await expect(page).toHaveURL(CART_PAGE_URL);
+
+    await homePage.clickNavBrand();
+
+    await expect(page).toHaveTitle(PAGE_TITLE);
+    await expect(homePage.firstProductLink).toBeVisible();
+  });
+
   test('cart link in navbar navigates to the cart page', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
