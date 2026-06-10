@@ -262,6 +262,15 @@ test.describe('UI — Product detail', () => {
     await expect(productPage.productDescription).toBeVisible();
     expect((await productPage.getProductDescription()).length).toBeGreaterThan(0);
   });
+
+  test('non-existent product URL shows empty detail page', async ({ page }) => {
+    const productPage = new ProductPage(page);
+
+    await page.goto('/prod.html?idp_=99999', { waitUntil: 'domcontentloaded' });
+
+    await expect(productPage.productName).not.toBeVisible({ timeout: 3_000 });
+    await expect(productPage.productPrice).not.toBeVisible({ timeout: 3_000 });
+  });
 });
 
 test.describe('UI — Category filters', () => {
