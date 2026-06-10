@@ -203,6 +203,29 @@ test.describe('UI — Navigation', () => {
     const phonesProducts = await homePage.getProductNames();
     expect(phonesProducts[0]).toBe(CATEGORY_PRODUCTS.Phones[0]);
   });
+
+  test('browser back/forward after category filter preserves navigation', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    const allProducts = await homePage.getProductNames();
+
+    await homePage.openCategory('Phones');
+    const phonesProducts = await homePage.getProductNames();
+    expect(phonesProducts.length).toBe(CATEGORY_PRODUCTS.Phones.length);
+
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await expect(homePage.firstProductLink).toBeVisible();
+    const afterBack = await homePage.getProductNames();
+    expect(afterBack).toEqual(allProducts);
+
+    await page.goForward({ waitUntil: 'domcontentloaded' });
+    await expect(homePage.firstProductLink).toBeVisible();
+    const afterForward = await homePage.getProductNames();
+    expect(afterForward).toEqual(phonesProducts);
+  });
 });
 
 test.describe('UI — Product detail', () => {
