@@ -44,6 +44,20 @@ test.describe('UI — Home page', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
+  test('products load correctly after page refresh', async ({ page }) => {
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    const initialProducts = await homePage.getProductNames();
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    const afterRefresh = await homePage.getProductNames();
+    expect(afterRefresh).toEqual(initialProducts);
+  });
+
   test('page title and favicon are present and correct', async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
