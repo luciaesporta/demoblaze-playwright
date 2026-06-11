@@ -100,6 +100,10 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Next button on last page does not change product list (known bug — `test.fail`) |
 | UI | Category shows exact product count (parametrized: Phones 7, Laptops 6, Monitors 2) |
 | UI | Switching category resets pagination to first page |
+| UI | Products load correctly after page refresh |
+| UI | Browser back/forward after category filter preserves navigation (known bug — `test.fail`) |
+| UI | Non-existent product URL shows empty detail page |
+| UI | Direct URL to cart without products renders correctly |
 | UI | Category filters return correct products (parametrized per category) |
 | UI | Product card and detail images load (parametrized per category / product) |
 | UI | Hero banner auto-advances and responds to manual controls |

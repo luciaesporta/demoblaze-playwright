@@ -271,6 +271,16 @@ test.describe('UI — Product detail', () => {
     await expect(productPage.productName).not.toBeVisible({ timeout: 3_000 });
     await expect(productPage.productPrice).not.toBeVisible({ timeout: 3_000 });
   });
+
+  test('direct URL to cart without products renders correctly', async ({ page }) => {
+    const cartPage = new CartPage(page);
+
+    await page.goto('/cart.html', { waitUntil: 'domcontentloaded' });
+
+    await expect(page).toHaveURL(CART_PAGE_URL);
+    await expect(cartPage.cartRows).toHaveCount(0);
+    await expect(cartPage.placeOrderButton).toBeVisible();
+  });
 });
 
 test.describe('UI — Category filters', () => {
