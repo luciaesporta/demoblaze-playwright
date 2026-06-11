@@ -178,7 +178,7 @@ test.describe('UI — Navigation', () => {
     }).toPass();
     const lastPageProducts = await homePage.getProductNames();
 
-    await page.locator('#next2').click({ timeout: 5_000 });
+    await homePage.clickNext({ timeout: 5_000 });
     await page.waitForTimeout(1000);
 
     const afterNext = await homePage.getProductNames();
@@ -271,7 +271,9 @@ test.describe('UI — Product detail', () => {
     await expect(productPage.productName).not.toBeVisible({ timeout: 3_000 });
     await expect(productPage.productPrice).not.toBeVisible({ timeout: 3_000 });
   });
+});
 
+test.describe('UI — Direct URL access', () => {
   test('direct URL to cart without products renders correctly', async ({ page }) => {
     const cartPage = new CartPage(page);
 

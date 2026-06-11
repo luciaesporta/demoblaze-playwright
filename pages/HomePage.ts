@@ -103,8 +103,8 @@ export class HomePage {
     await this._cartNavLink.click(options);
   }
 
-  async clickNext(): Promise<void> {
-    await this._nextButton.click();
+  async clickNext(options: Parameters<Locator['click']>[0] = {}): Promise<void> {
+    await this._nextButton.click(options);
   }
 
   async clickPrev(): Promise<void> {
