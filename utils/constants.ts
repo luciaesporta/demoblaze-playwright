@@ -46,4 +46,6 @@ export const CONTACT_FORM_SAMPLE = {
   message: 'This is a test message.',
 } as const;
 
+export const INVALID_EMAILS = ['usernoatsign', 'user@', '@nodomain.com'] as const;
+
 export const HERO_CAROUSEL_MIN_DISTINCT_SLIDES = 3;

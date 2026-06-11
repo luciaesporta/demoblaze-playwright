@@ -11,6 +11,7 @@ import {
   CATEGORY_PRODUCTS,
   MESSAGES,
   CONTACT_FORM_SAMPLE,
+  INVALID_EMAILS,
   HERO_CAROUSEL_MIN_DISTINCT_SLIDES,
   type CategoryName,
 } from '../utils/constants';
@@ -405,7 +406,7 @@ test.describe('UI — Modals', () => {
     expect(message).not.toContain(MESSAGES.contactSuccess);
   });
 
-  for (const invalidEmail of ['usernoatsign', 'user@', '@nodomain.com']) {
+  for (const invalidEmail of INVALID_EMAILS) {
     test(`contact form rejects invalid email: "${invalidEmail}"`, async ({ page }) => {
       test.fail();
       const homePage = new HomePage(page);
