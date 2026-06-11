@@ -395,6 +395,34 @@ test.describe('UI — Modals', () => {
     expect(message).toContain(MESSAGES.contactSuccess);
   });
 
+  test('contact modal closes after sending message', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openContactModal();
+    await homePage.fillContactForm(CONTACT_FORM_SAMPLE);
+    await homePage.submitContactForm();
+
+    await expect(homePage.contactModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('contact form fields are cleared after closing and reopening', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openContactModal();
+    await homePage.fillContactForm(CONTACT_FORM_SAMPLE);
+    await homePage.closeContactModal();
+
+    await homePage.openContactModal();
+    const values = await homePage.contactFieldValues();
+    expect(values.email).toBe('');
+    expect(values.name).toBe('');
+    expect(values.message).toBe('');
+  });
+
   test('contact form with empty fields should not submit', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);

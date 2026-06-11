@@ -215,13 +215,14 @@ test.describe('Auth — login with invalid credentials', () => {
   let registeredUser: TestUser;
 
   test.beforeAll(async ({ browser }) => {
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    const page = await context.newPage();
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     registeredUser = generateUser();
     await homePage.goto();
     await authPage.register(registeredUser.username, registeredUser.password);
-    await page.close();
+    await context.close();
   });
 
   for (const scenario of INVALID_LOGIN_SCENARIOS) {

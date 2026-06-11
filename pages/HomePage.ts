@@ -87,6 +87,10 @@ export class HomePage {
     return this._videoElement;
   }
 
+  get contactModal(): Locator {
+    return this._contactModal;
+  }
+
   get activeCarouselItem(): Locator {
     return this._activeCarouselItem;
   }
@@ -158,6 +162,11 @@ export class HomePage {
     await this._contactModal.waitFor({ state: 'visible' });
   }
 
+  async closeContactModal(): Promise<void> {
+    await this._contactModal.locator('.close').click();
+    await this._contactModal.waitFor({ state: 'hidden' });
+  }
+
   async fillContactForm(data: { email: string; name: string; message: string }): Promise<void> {
     await this._contactEmail.fill(data.email);
     await this._contactName.fill(data.name);
@@ -177,6 +186,14 @@ export class HomePage {
     });
     await this._contactSendButton.click({ force: true });
     return dialogPromise;
+  }
+
+  async contactFieldValues(): Promise<{ email: string; name: string; message: string }> {
+    return {
+      email: await this._contactEmail.inputValue(),
+      name: await this._contactName.inputValue(),
+      message: await this._contactMessage.inputValue(),
+    };
   }
 
   async openFirstProduct(): Promise<void> {
