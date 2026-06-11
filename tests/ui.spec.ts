@@ -393,6 +393,31 @@ test.describe('UI — Modals', () => {
 
     expect(message).toContain(MESSAGES.contactSuccess);
   });
+
+  test('contact form with empty fields should not submit', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openContactModal();
+    const message = await homePage.submitContactForm();
+
+    expect(message).not.toContain(MESSAGES.contactSuccess);
+  });
+
+  for (const invalidEmail of ['usernoatsign', 'user@', '@nodomain.com']) {
+    test(`contact form rejects invalid email: "${invalidEmail}"`, async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      await homePage.goto();
+
+      await homePage.openContactModal();
+      await homePage.fillContactForm({ ...CONTACT_FORM_SAMPLE, email: invalidEmail });
+      const message = await homePage.submitContactForm();
+
+      expect(message).not.toContain(MESSAGES.contactSuccess);
+    });
+  }
 });
 
 test.describe('UI — Session', () => {

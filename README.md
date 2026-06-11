@@ -110,6 +110,8 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Page title and favicon are present and correct |
 | UI | About us modal loads video content |
 | UI | Contact form can be submitted with valid data |
+| UI | Contact form with empty fields should not submit (known bug — `test.fail`) |
+| UI | Contact form rejects invalid email (parametrized: no @, no domain, no user) (known bug — `test.fail`) |
 | UI | Logged-in user can log out |
 | UI | Log out link visible regardless of session state (known bug — `test.fail`) |
 | Mobile | Application is usable on mobile viewport |
