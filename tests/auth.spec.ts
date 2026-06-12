@@ -256,6 +256,29 @@ test.describe('Auth — session persistence', () => {
     await expect(authPage.loggedInUsername).toBeVisible();
     await expect(authPage.loggedInUsername).toContainText(username);
   });
+
+  test('session persists after closing and reopening tab', async ({ context }) => {
+    const page = await context.newPage();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    await authPage.login(username, password);
+    await expect(authPage.loggedInUsername).toBeVisible();
+
+    await page.close();
+
+    const newPage = await context.newPage();
+    const newHomePage = new HomePage(newPage);
+    const newAuthPage = new AuthPage(newPage);
+
+    await newHomePage.goto();
+
+    await expect(newAuthPage.loggedInUsername).toBeVisible();
+    await expect(newAuthPage.loggedInUsername).toContainText(username);
+  });
 });
 
 test.describe('Auth — sign up field validation', () => {
