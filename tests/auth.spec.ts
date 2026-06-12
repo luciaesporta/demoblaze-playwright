@@ -239,6 +239,25 @@ test.describe('Auth — login with invalid credentials', () => {
   }
 });
 
+test.describe('Auth — session persistence', () => {
+  test('session persists after page refresh', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    await authPage.login(username, password);
+
+    await expect(authPage.loggedInUsername).toBeVisible();
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    await expect(authPage.loggedInUsername).toBeVisible();
+    await expect(authPage.loggedInUsername).toContainText(username);
+  });
+});
+
 test.describe('Auth — sign up field validation', () => {
   for (const scenario of INVALID_SIGNUP_SCENARIOS) {
     test(`sign up fails with ${scenario.description}`, async ({ page }) => {

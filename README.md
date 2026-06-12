@@ -43,6 +43,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Auth | Login fails with wrong password |
 | Auth | Login does not trim whitespace around username |
 | Auth | Login username is case-sensitive |
+| Auth | Session persists after page refresh |
 | Cart | Guest user can add a product to cart |
 | Cart | Authenticated user can add a product to cart |
 | Cart | Empty cart shows no items and blank total |
