@@ -303,6 +303,25 @@ test.describe('Auth — session persistence', () => {
     await cartPage.goto();
     await expect(cartPage.cartRows).toHaveCount(0);
   });
+
+  test('consecutive logins with different users switch session correctly', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const userA = generateUser();
+    const userB = generateUser();
+
+    await homePage.goto();
+    await authPage.register(userA.username, userA.password);
+    await authPage.login(userA.username, userA.password);
+    await expect(authPage.loggedInUsername).toContainText(userA.username);
+
+    await authPage.logout();
+    await expect(authPage.logInNavButton).toBeVisible();
+
+    await authPage.register(userB.username, userB.password);
+    await authPage.login(userB.username, userB.password);
+    await expect(authPage.loggedInUsername).toContainText(userB.username);
+  });
 });
 
 test.describe('Auth — sign up field validation', () => {
