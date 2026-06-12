@@ -109,6 +109,9 @@ Supporting features include user authentication (sign up and log in), which enab
 | UI | Hero banner auto-advances and responds to manual controls |
 | UI | Page title and favicon are present and correct |
 | UI | About us modal loads video content |
+| UI | About us modal can be closed with X button |
+| UI | About us modal can be closed with ESC key (known bug — `test.fail`) |
+| UI | About us modal can be closed by clicking outside (known bug — `test.fail`) |
 | UI | Contact form can be submitted with valid data |
 | UI | Contact form with empty fields should not submit (known bug — `test.fail`) |
 | UI | Contact modal closes after sending message (known bug — `test.fail`) |

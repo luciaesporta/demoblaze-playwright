@@ -153,6 +153,19 @@ export class HomePage {
     await this._videoModal.waitFor({ state: 'visible' });
   }
 
+  async closeAboutUsModalWithX(): Promise<void> {
+    await this._videoModal.locator('.close').click();
+    await this._videoModal.waitFor({ state: 'hidden' });
+  }
+
+  async pressEscOnAboutUsModal(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async clickOutsideAboutUsModal(): Promise<void> {
+    await this.page.mouse.click(1, 1);
+  }
+
   async getVideoPoster(): Promise<string | null> {
     return this._videoElement.getAttribute('poster');
   }

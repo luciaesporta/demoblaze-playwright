@@ -384,6 +384,41 @@ test.describe('UI — Modals', () => {
     expect(await homePage.getVideoPoster()).toBeTruthy();
   });
 
+  test('About us modal can be closed with X button', async ({ page }) => {
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openAboutUsModal();
+    await expect(homePage.videoModal).toBeVisible();
+
+    await homePage.closeAboutUsModalWithX();
+    await expect(homePage.videoModal).not.toBeVisible();
+  });
+
+  test('About us modal can be closed with ESC key', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openAboutUsModal();
+    await expect(homePage.videoModal).toBeVisible();
+
+    await homePage.pressEscOnAboutUsModal();
+    await expect(homePage.videoModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('About us modal can be closed by clicking outside', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await homePage.openAboutUsModal();
+    await expect(homePage.videoModal).toBeVisible();
+
+    await homePage.clickOutsideAboutUsModal();
+    await expect(homePage.videoModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
   test('contact form can be submitted with valid data', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
