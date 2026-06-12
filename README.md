@@ -45,6 +45,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Auth | Login username is case-sensitive |
 | Auth | Session persists after page refresh |
 | Auth | Session persists after closing and reopening tab |
+| Auth | Logout clears the cart |
 | Cart | Guest user can add a product to cart |
 | Cart | Authenticated user can add a product to cart |
 | Cart | Empty cart shows no items and blank total |

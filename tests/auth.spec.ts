@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
+import { ProductPage } from '../pages/ProductPage';
+import { CartPage } from '../pages/CartPage';
 import {
   generateUser,
   INVALID_LOGIN_SCENARIOS,
@@ -278,6 +280,28 @@ test.describe('Auth — session persistence', () => {
 
     await expect(newAuthPage.loggedInUsername).toBeVisible();
     await expect(newAuthPage.loggedInUsername).toContainText(username);
+  });
+
+  test('logout clears the cart', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    await authPage.login(username, password);
+    await expect(authPage.loggedInUsername).toBeVisible();
+
+    await homePage.openProduct(0);
+    await productPage.addToCart();
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    await authPage.logout();
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(0);
   });
 });
 
