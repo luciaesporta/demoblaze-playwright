@@ -87,6 +87,14 @@ export class AuthPage {
     return this._logoutButton;
   }
 
+  get logInSubmit(): Locator {
+    return this._logInSubmit;
+  }
+
+  get logInModalCloseX(): Locator {
+    return this._logInModalCloseX;
+  }
+
   private async _expandNavbarIfCollapsed(): Promise<void> {
     const isVisible = await this._navbarCollapsible.isVisible();
     if (!isVisible) {
