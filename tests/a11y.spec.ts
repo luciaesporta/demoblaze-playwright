@@ -121,3 +121,36 @@ test.describe('A11y — Labels', () => {
     expect(hasLabels).toBe(true);
   });
 });
+
+test.describe('A11y — Images', () => {
+  test('product card images have alt text', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    const allHaveAlt = await page.evaluate(() => {
+      const images = document.querySelectorAll('.card-img-top');
+      return Array.from(images).every((img) => {
+        const alt = img.getAttribute('alt');
+        return alt !== null && alt.trim().length > 0;
+      });
+    });
+    expect(allHaveAlt).toBe(true);
+  });
+
+  test('product detail image has alt text', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+    await homePage.openProduct(0);
+
+    const hasAlt = await page.evaluate(() => {
+      const img = document.querySelector('.product-image img, #imgp img');
+      if (!img) return false;
+      const alt = img.getAttribute('alt');
+      return alt !== null && alt.trim().length > 0;
+    });
+    expect(hasAlt).toBe(true);
+  });
+});
