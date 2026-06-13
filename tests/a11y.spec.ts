@@ -67,3 +67,57 @@ test.describe('A11y — Sign up modal', () => {
     expect(message).toContain(MESSAGES.signUpSuccess);
   });
 });
+
+test.describe('A11y — Labels', () => {
+  test('login modal inputs have associated labels', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openLoginModal();
+
+    const hasLabels = await page.evaluate(() => {
+      const inputs = document.querySelectorAll('#logInModal input');
+      return Array.from(inputs).every((input) => {
+        const id = input.id;
+        return !!document.querySelector(`label[for="${id}"]`);
+      });
+    });
+    expect(hasLabels).toBe(true);
+  });
+
+  test('sign up modal inputs have associated labels', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.openSignUpModal();
+
+    const hasLabels = await page.evaluate(() => {
+      const inputs = document.querySelectorAll('#signInModal input');
+      return Array.from(inputs).every((input) => {
+        const id = input.id;
+        return !!document.querySelector(`label[for="${id}"]`);
+      });
+    });
+    expect(hasLabels).toBe(true);
+  });
+
+  test('contact modal inputs have associated labels', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+
+    await homePage.goto();
+    await homePage.openContactModal();
+
+    const hasLabels = await page.evaluate(() => {
+      const inputs = document.querySelectorAll('#exampleModal input, #exampleModal textarea');
+      return Array.from(inputs).every((input) => {
+        const id = input.id;
+        return !!document.querySelector(`label[for="${id}"]`);
+      });
+    });
+    expect(hasLabels).toBe(true);
+  });
+});

@@ -130,6 +130,9 @@ Supporting features include user authentication (sign up and log in), which enab
 | A11y | Login modal tab navigation follows logical focus order (known bug — `test.fail`) |
 | A11y | Pressing Enter on password field submits login (known bug — `test.fail`) |
 | A11y | Pressing Enter on password field submits sign up (known bug — `test.fail`) |
+| A11y | Login modal inputs have associated labels (known bug — `test.fail`) |
+| A11y | Sign up modal inputs have associated labels |
+| A11y | Contact modal inputs have associated labels (known bug — `test.fail`) |
 
 ## Run locally
 
