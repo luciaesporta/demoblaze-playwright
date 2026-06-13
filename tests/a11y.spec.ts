@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { generateUser } from '../utils/testData';
+import { MESSAGES } from '../utils/constants';
 
 test.describe('A11y — Login modal', () => {
   test('tab navigation follows logical focus order', async ({ page }) => {
@@ -42,5 +43,27 @@ test.describe('A11y — Login modal', () => {
     await expect(authPage.logInModal).not.toBeVisible({ timeout: 5_000 });
     await expect(authPage.loggedInUsername).toBeVisible();
     await expect(authPage.loggedInUsername).toContainText(username);
+  });
+});
+
+test.describe('A11y — Sign up modal', () => {
+  test('pressing Enter on password field submits sign up', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.openSignUpModal();
+    await authPage.signUpUsername.fill(username);
+    await authPage.signUpPassword.fill(password);
+
+    const dialogPromise = page.waitForEvent('dialog', { timeout: 5_000 });
+    await authPage.signUpPassword.press('Enter');
+    const dialog = await dialogPromise;
+    const message = dialog.message();
+    await dialog.accept();
+
+    expect(message).toContain(MESSAGES.signUpSuccess);
   });
 });
