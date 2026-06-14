@@ -136,6 +136,8 @@ Supporting features include user authentication (sign up and log in), which enab
 | A11y | Product card images have alt text (known bug — `test.fail`) |
 | A11y | Product detail image has alt text (known bug — `test.fail`) |
 | A11y | Home page has correct heading hierarchy (known bug — `test.fail`) |
+| A11y | Login error displays inline feedback, not just alert (known bug — `test.fail`) |
+| A11y | Product card text meets WCAG AA contrast ratio |
 
 ## Run locally
 

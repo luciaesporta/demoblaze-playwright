@@ -179,3 +179,67 @@ test.describe('A11y — Semantics', () => {
     expect(hierarchy.noSkips).toBe(true);
   });
 });
+
+test.describe('A11y — Error visibility and contrast', () => {
+  test('login error displays inline feedback, not just alert', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+    await authPage.loginExpectingError('nonexistent_user_xyz', 'wrongpass');
+
+    const hasInlineError = await page.evaluate(() => {
+      const modal = document.querySelector('#logInModal');
+      if (!modal) return false;
+      const errorElements = modal.querySelectorAll(
+        '.alert, .error, .invalid-feedback, .text-danger, [role="alert"]',
+      );
+      return errorElements.length > 0;
+    });
+    expect(hasInlineError).toBe(true);
+  });
+
+  test('product card text meets WCAG AA contrast ratio', async ({ page }) => {
+    const homePage = new HomePage(page);
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    const meetsContrast = await page.evaluate(() => {
+      function luminance(r: number, g: number, b: number): number {
+        const srgb = [r, g, b].map((c) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * srgb[0]! + 0.7152 * srgb[1]! + 0.0722 * srgb[2]!;
+      }
+
+      function parseColor(color: string): [number, number, number] {
+        const match = color.match(/\d+/g);
+        if (!match) return [0, 0, 0];
+        return [parseInt(match[0]!, 10), parseInt(match[1]!, 10), parseInt(match[2]!, 10)];
+      }
+
+      function contrastRatio(l1: number, l2: number): number {
+        const lighter = Math.max(l1, l2);
+        const darker = Math.min(l1, l2);
+        return (lighter + 0.05) / (darker + 0.05);
+      }
+
+      const cards = document.querySelectorAll('.card-title a');
+      const WCAG_AA_NORMAL = 4.5;
+      return Array.from(cards).every((card) => {
+        const style = window.getComputedStyle(card);
+        const fg = parseColor(style.color);
+        const parent = card.closest('.card-body');
+        const bg = parent
+          ? parseColor(window.getComputedStyle(parent).backgroundColor)
+          : [255, 255, 255] as [number, number, number];
+        const fgLum = luminance(...fg);
+        const bgLum = luminance(...bg);
+        return contrastRatio(fgLum, bgLum) >= WCAG_AA_NORMAL;
+      });
+    });
+    expect(meetsContrast).toBe(true);
+  });
+});
