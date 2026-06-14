@@ -154,3 +154,28 @@ test.describe('A11y — Images', () => {
     expect(hasAlt).toBe(true);
   });
 });
+
+test.describe('A11y — Semantics', () => {
+  test('home page has correct heading hierarchy', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    const hierarchy = await page.evaluate(() => {
+      const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      const visible = Array.from(headings).filter(
+        (h) => (h as HTMLElement).offsetParent !== null,
+      );
+      const levels = visible.map((h) => parseInt(h.tagName.charAt(1), 10));
+      const hasH1 = levels.includes(1);
+      const noSkips = levels.every(
+        (level, i) => i === 0 || level <= (levels[i - 1] ?? 0) + 1,
+      );
+      return { hasH1, noSkips };
+    });
+
+    expect(hierarchy.hasH1).toBe(true);
+    expect(hierarchy.noSkips).toBe(true);
+  });
+});
