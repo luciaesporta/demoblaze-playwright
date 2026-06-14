@@ -70,6 +70,43 @@ test.describe('Mobile', () => {
     });
   }
 
+  test('cart layout does not overflow on mobile viewport', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    await productPage.addToCart();
+    await homePage.goto();
+    await homePage.openProduct(1);
+    await productPage.addToCart();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(2);
+
+    const hasOverflow = await page.evaluate(() => {
+      const table = document.querySelector('#tbodyid')?.closest('table');
+      if (!table) return true;
+      return table.scrollWidth > table.clientWidth;
+    });
+    expect(hasOverflow).toBe(false);
+
+    await expect(cartPage.cartTotal).toBeVisible();
+    await expect(cartPage.placeOrderButton).toBeVisible();
+
+    const allColumnsVisible = await page.evaluate(() => {
+      const rows = document.querySelectorAll('#tbodyid tr');
+      return Array.from(rows).every((row) => {
+        const cells = row.querySelectorAll('td');
+        return Array.from(cells).every(
+          (cell) => (cell as HTMLElement).offsetWidth > 0,
+        );
+      });
+    });
+    expect(allColumnsVisible).toBe(true);
+  });
+
   test('full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
     const { page } = authenticatedPage;
     const homePage = new HomePage(page);
