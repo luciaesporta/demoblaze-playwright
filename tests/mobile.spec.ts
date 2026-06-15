@@ -70,6 +70,39 @@ test.describe('Mobile', () => {
     });
   }
 
+  test('carousel responds to swipe gestures', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    await homePage.goto();
+
+    await expect(homePage.activeCarouselItem).toBeVisible();
+    const initialSrc = await homePage.getActiveCarouselSrc();
+
+    await homePage.swipeCarousel('left');
+    await page.waitForFunction(
+      (prevSrc) => {
+        const img = document.querySelector('.carousel-item.active img');
+        return img?.getAttribute('src') !== prevSrc;
+      },
+      initialSrc,
+      { timeout: 5_000 },
+    );
+    const afterSwipeLeft = await homePage.getActiveCarouselSrc();
+    expect(afterSwipeLeft).not.toBe(initialSrc);
+
+    await homePage.swipeCarousel('right');
+    await page.waitForFunction(
+      (prevSrc) => {
+        const img = document.querySelector('.carousel-item.active img');
+        return img?.getAttribute('src') !== prevSrc;
+      },
+      afterSwipeLeft,
+      { timeout: 5_000 },
+    );
+    const afterSwipeRight = await homePage.getActiveCarouselSrc();
+    expect(afterSwipeRight).not.toBe(afterSwipeLeft);
+  });
+
   test('cart layout does not overflow on mobile viewport', async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);

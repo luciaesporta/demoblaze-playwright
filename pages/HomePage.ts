@@ -123,6 +123,19 @@ export class HomePage {
     await this._carouselPrev.click();
   }
 
+  async swipeCarousel(direction: 'left' | 'right'): Promise<void> {
+    const carousel = this.page.locator('#carouselExampleIndicators');
+    const box = await carousel.boundingBox();
+    if (!box) return;
+    const centerY = box.y + box.height / 2;
+    const startX = direction === 'left' ? box.x + box.width * 0.8 : box.x + box.width * 0.2;
+    const endX = direction === 'left' ? box.x + box.width * 0.2 : box.x + box.width * 0.8;
+    await this.page.mouse.move(startX, centerY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(endX, centerY, { steps: 10 });
+    await this.page.mouse.up();
+  }
+
   async clickHamburger(options: Parameters<Locator['click']>[0] = {}): Promise<void> {
     await this._hamburger.click(options);
   }

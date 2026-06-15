@@ -127,6 +127,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Mobile | Login and sign up modals are usable |
 | Mobile | Category filters work through collapsed navbar (parametrized per category) |
 | Mobile | Cart layout does not overflow on mobile viewport |
+| Mobile | Carousel responds to swipe gestures (known bug — `test.fail`) |
 | Mobile | Full purchase flow completes on mobile viewport |
 | A11y | Login modal tab navigation follows logical focus order (known bug — `test.fail`) |
 | A11y | Pressing Enter on password field submits login (known bug — `test.fail`) |
