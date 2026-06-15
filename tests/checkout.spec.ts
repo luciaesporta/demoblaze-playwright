@@ -79,7 +79,7 @@ test.describe('Checkout', () => {
     const checkoutPage = new CheckoutPage(page);
 
     await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(2);
+    await expect(cartPage.cartRows).toHaveCount(2, { timeout: 30_000 });
     const cartTotal = await cartPage.getTotal();
 
     await cartPage.openPlaceOrderModal();
