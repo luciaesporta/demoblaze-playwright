@@ -52,6 +52,34 @@ export class CheckoutPage {
     return this._confirmationBody;
   }
 
+  get nameInput(): Locator {
+    return this._nameInput;
+  }
+
+  get countryInput(): Locator {
+    return this._countryInput;
+  }
+
+  get cityInput(): Locator {
+    return this._cityInput;
+  }
+
+  get creditCardInput(): Locator {
+    return this._creditCardInput;
+  }
+
+  get monthInput(): Locator {
+    return this._monthInput;
+  }
+
+  get yearInput(): Locator {
+    return this._yearInput;
+  }
+
+  get purchaseButton(): Locator {
+    return this._purchaseButton;
+  }
+
   async fillOrderForm(order: OrderDetails): Promise<void> {
     await this._nameInput.fill(order.name);
     await this._countryInput.fill(order.country);
