@@ -140,6 +140,37 @@ test.describe('Mobile', () => {
     expect(allColumnsVisible).toBe(true);
   });
 
+  test('Place Order modal fields are visible without horizontal scroll', async ({ page }) => {
+    test.fail();
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    await productPage.addToCart();
+
+    await cartPage.goto();
+    await cartPage.openPlaceOrderModal();
+    await expect(cartPage.orderModal).toBeVisible();
+
+    await expect(checkoutPage.nameInput).toBeVisible();
+    await expect(checkoutPage.countryInput).toBeVisible();
+    await expect(checkoutPage.cityInput).toBeVisible();
+    await expect(checkoutPage.creditCardInput).toBeVisible();
+    await expect(checkoutPage.monthInput).toBeVisible();
+    await expect(checkoutPage.yearInput).toBeVisible();
+    await expect(checkoutPage.purchaseButton).toBeVisible();
+
+    const hasOverflow = await page.evaluate(() => {
+      const modal = document.querySelector('#orderModal .modal-dialog');
+      if (!modal) return true;
+      return modal.scrollWidth > modal.clientWidth;
+    });
+    expect(hasOverflow).toBe(false);
+  });
+
   test('full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
     const { page } = authenticatedPage;
     const homePage = new HomePage(page);
