@@ -3,6 +3,7 @@ export const PRODUCT_PAGE_URL = /prod\.html/;
 export const CART_PAGE_URL = /cart\.html/;
 export const FAVICON_HREF = /blazemeter-favicon/;
 export const MOBILE_VIEWPORT = { width: 390, height: 844 } as const;
+export const MOBILE_LANDSCAPE_VIEWPORT = { width: 844, height: 390 } as const;
 
 export const CATEGORY_PRODUCTS = {
   Phones: [

@@ -6,6 +6,7 @@ import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import {
   MOBILE_VIEWPORT,
+  MOBILE_LANDSCAPE_VIEWPORT,
   MESSAGES,
   CATEGORY_PRODUCTS,
   type CategoryName,
@@ -169,6 +170,33 @@ test.describe('Mobile', () => {
       return modal.scrollWidth > modal.clientWidth;
     });
     expect(hasOverflow).toBe(false);
+  });
+
+  test('orientation change from portrait to landscape does not break layout', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    await page.setViewportSize(MOBILE_LANDSCAPE_VIEWPORT);
+
+    await expect(homePage.firstProductLink).toBeVisible();
+    await expect(homePage.navbarBrand).toBeVisible();
+
+    const hasOverflow = await page.evaluate(() => {
+      return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+    });
+    expect(hasOverflow).toBe(false);
+
+    await cartPage.goto();
+    await expect(cartPage.placeOrderButton).toBeVisible();
+
+    await page.setViewportSize(MOBILE_VIEWPORT);
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+    await expect(homePage.navbarBrand).toBeVisible();
   });
 
   test('full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
