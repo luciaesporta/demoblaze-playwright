@@ -71,6 +71,32 @@ test.describe('Mobile', () => {
     });
   }
 
+  test('category list expands and collapses with tap on mobile', async ({ page }) => {
+    const homePage = new HomePage(page);
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    const categoriesVisible = await page.evaluate(() => {
+      const catList = document.querySelector('#itemc');
+      if (!catList) return false;
+      const rect = catList.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+    expect(categoriesVisible).toBe(true);
+
+    for (const category of CATEGORY_NAMES) {
+      const categoryLink = page.locator('#itemc').getByText(category, { exact: true });
+      await expect(categoryLink).toBeVisible();
+    }
+
+    await homePage.openCategory('Phones');
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    const productCount = await homePage.getProductCardCount();
+    expect(productCount).toBe(CATEGORY_PRODUCTS.Phones.length);
+  });
+
   test('carousel responds to swipe gestures', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);

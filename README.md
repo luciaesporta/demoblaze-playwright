@@ -126,6 +126,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | Mobile | Application is usable on mobile viewport |
 | Mobile | Login and sign up modals are usable |
 | Mobile | Category filters work through collapsed navbar (parametrized per category) |
+| Mobile | Category list expands and collapses with tap on mobile |
 | Mobile | Cart layout does not overflow on mobile viewport |
 | Mobile | Carousel responds to swipe gestures (known bug — `test.fail`) |
 | Mobile | Place Order modal fields are visible without horizontal scroll (known bug — `test.fail`) |
