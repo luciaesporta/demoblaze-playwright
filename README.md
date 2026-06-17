@@ -143,6 +143,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | A11y | Home page has correct heading hierarchy (known bug — `test.fail`) |
 | A11y | Login error displays inline feedback, not just alert (known bug — `test.fail`) |
 | A11y | Product card text meets WCAG AA contrast ratio |
+| API | Intercept addtocart request and validate payload |
 
 ## Run locally
 
@@ -172,6 +173,7 @@ tests/
   checkout.spec.ts   Purchase flow + known-bug placeholders
   ui.spec.ts         Desktop UI scenarios (home, navigation, images, carousel, modals)
   mobile.spec.ts     Mobile-viewport scenarios (collapsed navbar, mobile auth, mobile checkout)
+  api.spec.ts        API/network request interception and payload validation
 utils/
   constants.ts       PAGE_TITLE, URL patterns, MESSAGES, CATEGORY_PRODUCTS, viewport, etc.
   testData.ts        generateUser(), DEFAULT_ORDER, invalid-login scenarios, CC constants
