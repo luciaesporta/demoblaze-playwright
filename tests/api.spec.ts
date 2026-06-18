@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
+import { AuthPage } from '../pages/AuthPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 
@@ -61,5 +62,29 @@ test.describe('API — Delete from cart', () => {
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
+  });
+});
+
+test.describe('API — Network failure', () => {
+  test('mocked login network failure does not break the UI', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+
+    await homePage.goto();
+
+    await page.route('**/login', (route) => route.abort('connectionfailed'));
+
+    await authPage.openLoginModal();
+    await authPage.logInUsername.fill('testuser');
+    await authPage.logInPassword.fill('testpass');
+    await authPage.logInSubmit.click();
+
+    await expect(authPage.logInModal).toBeVisible({ timeout: 5_000 });
+    await expect(homePage.navbarBrand).toBeVisible();
+
+    await page.unroute('**/login');
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
   });
 });
