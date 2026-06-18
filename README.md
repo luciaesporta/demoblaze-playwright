@@ -146,6 +146,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | API | Intercept addtocart request and validate payload |
 | API | Intercept deleteitem request and validate payload and response |
 | API | Mocked login network failure does not break the UI |
+| API | Delayed catalog response (3s mock) does not break the UI |
 
 ## Run locally
 
