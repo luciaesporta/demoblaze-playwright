@@ -144,6 +144,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | A11y | Login error displays inline feedback, not just alert (known bug — `test.fail`) |
 | A11y | Product card text meets WCAG AA contrast ratio |
 | API | Intercept addtocart request and validate payload |
+| API | Intercept deleteitem request and validate payload and response |
 
 ## Run locally
 
