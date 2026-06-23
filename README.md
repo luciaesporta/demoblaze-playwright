@@ -149,6 +149,10 @@ Supporting features include user authentication (sign up and log in), which enab
 | API | Login triggers /check request with 200 status |
 | API | Delayed catalog response (3s mock) does not break the UI |
 | API | No 4xx/5xx responses during full purchase flow |
+| Visual | Home page matches screenshot |
+| Visual | Cart page matches screenshot |
+| Visual | Checkout modal matches screenshot |
+| Perf | Home page loads in under 3 seconds |
 
 ## Run locally
 
@@ -179,6 +183,7 @@ tests/
   ui.spec.ts         Desktop UI scenarios (home, navigation, images, carousel, modals)
   mobile.spec.ts     Mobile-viewport scenarios (collapsed navbar, mobile auth, mobile checkout)
   api.spec.ts        API/network request interception and payload validation
+  performance.spec.ts Visual regression screenshots + performance smoke tests
 utils/
   constants.ts       PAGE_TITLE, URL patterns, MESSAGES, CATEGORY_PRODUCTS, viewport, etc.
   testData.ts        generateUser(), DEFAULT_ORDER, invalid-login scenarios, CC constants
