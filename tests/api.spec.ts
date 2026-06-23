@@ -107,6 +107,9 @@ test.describe('API — Login check', () => {
 
     expect(response.status()).toBe(200);
     expect(response.url()).toContain('/check');
+  });
+});
+
 test.describe('API — Slow response', () => {
   test('delayed catalog response does not break the UI', async ({ page }) => {
     const homePage = new HomePage(page);
