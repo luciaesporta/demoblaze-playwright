@@ -3,7 +3,8 @@ import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
-import { generateUser } from '../utils/testData';
+import { CheckoutPage } from '../pages/CheckoutPage';
+import { generateUser, DEFAULT_ORDER } from '../utils/testData';
 
 test.describe('API — Add to cart', () => {
   test('addtocart request contains valid payload', async ({ page }) => {
@@ -127,5 +128,41 @@ test.describe('API — Slow response', () => {
 
     const cardCount = await homePage.getProductCardCount();
     expect(cardCount).toBeGreaterThan(0);
+  });
+});
+
+test.describe('API — Happy path network audit', () => {
+  test('no 4xx/5xx responses during full purchase flow', async ({ page }) => {
+    const errors: { url: string; status: number }[] = [];
+    page.on('response', (response) => {
+      if (response.status() >= 400) {
+        errors.push({ url: response.url(), status: response.status() });
+      }
+    });
+
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+    await authPage.login(username, password);
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+    await productPage.addToCart();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+    await cartPage.openPlaceOrderModal();
+
+    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+    await checkoutPage.submitPurchase();
+    await checkoutPage.dismissConfirmation();
+
+    expect(errors).toEqual([]);
   });
 });
