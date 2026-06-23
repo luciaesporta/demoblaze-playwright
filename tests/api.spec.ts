@@ -3,6 +3,7 @@ import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
+import { generateUser } from '../utils/testData';
 
 test.describe('API — Add to cart', () => {
   test('addtocart request contains valid payload', async ({ page }) => {
@@ -89,6 +90,23 @@ test.describe('API — Network failure', () => {
   });
 });
 
+test.describe('API — Login check', () => {
+  test('login triggers /check request with 200 status', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const authPage = new AuthPage(page);
+    const { username, password } = generateUser();
+
+    await homePage.goto();
+    await authPage.register(username, password);
+
+    const responsePromise = page.waitForResponse(
+      (res) => res.url().includes('/check') && res.request().method() === 'POST',
+    );
+    await authPage.login(username, password);
+    const response = await responsePromise;
+
+    expect(response.status()).toBe(200);
+    expect(response.url()).toContain('/check');
 test.describe('API — Slow response', () => {
   test('delayed catalog response does not break the UI', async ({ page }) => {
     const homePage = new HomePage(page);
