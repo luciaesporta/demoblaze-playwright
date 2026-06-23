@@ -107,5 +107,22 @@ test.describe('API — Login check', () => {
 
     expect(response.status()).toBe(200);
     expect(response.url()).toContain('/check');
+test.describe('API — Slow response', () => {
+  test('delayed catalog response does not break the UI', async ({ page }) => {
+    const homePage = new HomePage(page);
+
+    await page.route('**/entries', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      await route.continue();
+    });
+
+    await homePage.goto();
+
+    await expect(homePage.navbarBrand).toBeVisible();
+
+    await expect(homePage.firstProductLink).toBeVisible({ timeout: 15_000 });
+
+    const cardCount = await homePage.getProductCardCount();
+    expect(cardCount).toBeGreaterThan(0);
   });
 });
