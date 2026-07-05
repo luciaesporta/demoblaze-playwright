@@ -149,6 +149,7 @@ Supporting features include user authentication (sign up and log in), which enab
 | API | Login triggers /check request with 200 status |
 | API | Delayed catalog response (3s mock) does not break the UI |
 | API | No 4xx/5xx responses during full purchase flow |
+| API | No console errors during navigation (smoke) |
 | Visual | Home page matches screenshot |
 | Visual | Cart page matches screenshot |
 | Visual | Checkout modal matches screenshot |

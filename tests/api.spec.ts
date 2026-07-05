@@ -166,3 +166,34 @@ test.describe('API — Happy path network audit', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test.describe('API — Console errors smoke', () => {
+  test('no console errors during navigation', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
+      }
+    });
+
+    const homePage = new HomePage(page);
+    const productPage = new ProductPage(page);
+    const cartPage = new CartPage(page);
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    await homePage.openCategory('Phones');
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    await homePage.openFirstProduct();
+    await expect(productPage.productName).toBeVisible();
+
+    await productPage.addToCart();
+
+    await cartPage.goto();
+    await expect(cartPage.cartRows).toHaveCount(1);
+
+    expect(errors).toEqual([]);
+  });
+});
