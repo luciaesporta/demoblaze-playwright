@@ -153,6 +153,8 @@ Supporting features include user authentication (sign up and log in), which enab
 | Visual | Home page matches screenshot |
 | Visual | Cart page matches screenshot |
 | Visual | Checkout modal matches screenshot |
+| Perf | Product card images do not exceed 500 KB |
+| Perf | Product detail image does not exceed 500 KB |
 | Perf | Home page loads in under 3 seconds |
 
 ## Run locally
