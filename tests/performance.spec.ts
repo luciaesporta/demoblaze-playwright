@@ -10,7 +10,7 @@ test.describe('Visual regression', () => {
     const homePage = new HomePage(page);
     await homePage.goto();
     await expect(homePage.firstProductLink).toBeVisible();
-    await expect(page).toHaveScreenshot('home.png', { fullPage: true, maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('home.png', { fullPage: true });
   });
 
   test('cart page matches screenshot', async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe('Visual regression', () => {
 
     await cartPage.goto();
     await expect(cartPage.cartRows).toHaveCount(1);
-    await expect(page).toHaveScreenshot('cart.png', { fullPage: true, maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('cart.png', { fullPage: true });
   });
 
   test('checkout modal matches screenshot', async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe('Visual regression', () => {
     await expect(cartPage.cartRows).toHaveCount(1);
     await cartPage.openPlaceOrderModal();
     await expect(cartPage.orderModal).toBeVisible();
-    await expect(page).toHaveScreenshot('checkout-modal.png', { fullPage: true, maxDiffPixelRatio: 0.05 });
+    await expect(page).toHaveScreenshot('checkout-modal.png', { fullPage: true });
   });
 });
 
