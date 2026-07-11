@@ -159,6 +159,7 @@ test.describe('UI — Navigation', () => {
     const initialProducts = await homePage.getProductNames();
 
     await homePage.clickPrev();
+    // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
     const afterPrev = await homePage.getProductNames();
@@ -180,6 +181,7 @@ test.describe('UI — Navigation', () => {
     const lastPageProducts = await homePage.getProductNames();
 
     await homePage.clickNext({ timeout: 5_000 });
+    // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
     const afterNext = await homePage.getProductNames();
@@ -215,7 +217,7 @@ test.describe('UI — Navigation', () => {
 
     await homePage.openCategory('Phones');
     const phonesProducts = await homePage.getProductNames();
-    expect(phonesProducts.length).toBe(CATEGORY_PRODUCTS.Phones.length);
+    expect(phonesProducts).toHaveLength(CATEGORY_PRODUCTS.Phones.length);
 
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(homePage.firstProductLink).toBeVisible();
@@ -392,7 +394,7 @@ test.describe('UI — Modals', () => {
     await expect(homePage.videoModal).toBeVisible();
 
     await homePage.closeAboutUsModalWithX();
-    await expect(homePage.videoModal).not.toBeVisible();
+    await expect(homePage.videoModal).toBeHidden();
   });
 
   test('About us modal can be closed with ESC key', async ({ page }) => {
@@ -493,7 +495,7 @@ test.describe('UI — Session', () => {
 
     await authPage.logout();
 
-    await expect(authPage.loggedInUsername).not.toBeVisible();
+    await expect(authPage.loggedInUsername).toBeHidden();
     await expect(authPage.logInNavButton).toBeVisible();
   });
 

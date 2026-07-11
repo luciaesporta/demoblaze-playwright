@@ -2,8 +2,6 @@ import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
-import { CheckoutPage } from '../pages/CheckoutPage';
-import { DEFAULT_ORDER } from '../utils/testData';
 
 test.describe('Visual regression', () => {
   test('home page matches screenshot', async ({ page }) => {

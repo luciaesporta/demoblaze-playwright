@@ -43,7 +43,7 @@ test.describe('Checkout', () => {
 
     await checkoutPage.clickPurchase();
 
-    await expect(checkoutPage.confirmationModal).not.toBeVisible();
+    await expect(checkoutPage.confirmationModal).toBeHidden();
     await expect(cartPage.orderModal).toBeVisible();
   });
 
@@ -63,13 +63,13 @@ test.describe('Checkout', () => {
     await checkoutPage.fillOrderForm({ ...DEFAULT_ORDER, creditCard: 'abcd' });
     await checkoutPage.clickPurchase();
 
-    await expect(checkoutPage.confirmationModal).not.toBeVisible();
+    await expect(checkoutPage.confirmationModal).toBeHidden();
     await expect(cartPage.orderModal).toBeVisible();
 
     await checkoutPage.fillCreditCard('@@##');
     await checkoutPage.clickPurchase();
 
-    await expect(checkoutPage.confirmationModal).not.toBeVisible();
+    await expect(checkoutPage.confirmationModal).toBeHidden();
     await expect(cartPage.orderModal).toBeVisible();
   });
 
@@ -125,13 +125,13 @@ test.describe('Checkout', () => {
     await checkoutPage.fillOrderFormWithShortCard(DEFAULT_ORDER);
     await checkoutPage.clickPurchase();
 
-    await expect(checkoutPage.confirmationModal).not.toBeVisible();
+    await expect(checkoutPage.confirmationModal).toBeHidden();
     await expect(cartPage.orderModal).toBeVisible();
 
     await checkoutPage.fillOrderFormWithLongCard();
     await checkoutPage.clickPurchase();
 
-    await expect(checkoutPage.confirmationModal).not.toBeVisible();
+    await expect(checkoutPage.confirmationModal).toBeHidden();
     await expect(cartPage.orderModal).toBeVisible();
   });
 
@@ -147,7 +147,7 @@ test.describe('Checkout', () => {
     await expect(cartPage.orderModal).toBeVisible();
     await cartPage.closePlaceOrderModal();
 
-    await expect(cartPage.orderModal).not.toBeVisible();
+    await expect(cartPage.orderModal).toBeHidden();
     await expect(cartPage.cartRows).toHaveCount(1);
     await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
     await expect(cartPage.getRowPriceCell(0)).toContainText(expectedPrice);
@@ -163,7 +163,7 @@ test.describe('Checkout', () => {
     await expect(cartPage.orderModal).toBeVisible();
 
     await cartPage.closePlaceOrderModalWithX();
-    await expect(cartPage.orderModal).not.toBeVisible();
+    await expect(cartPage.orderModal).toBeHidden();
     await expect(cartPage.cartRows).toHaveCount(1);
   });
 
