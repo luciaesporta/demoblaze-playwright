@@ -95,7 +95,7 @@ test.describe('Auth', () => {
     const message = await authPage.loginExpectingError(username.toUpperCase(), password);
 
     expect(message).toContain(MESSAGES.loginUserNotFound);
-    await expect(authPage.loggedInUsername).not.toBeVisible();
+    await expect(authPage.loggedInUsername).toBeHidden();
   });
 
   test('login does not trim leading or trailing whitespace from username', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('Auth', () => {
     const message = await authPage.loginExpectingError(`  ${username}  `, password);
 
     expect(message).toContain(MESSAGES.loginUserNotFound);
-    await expect(authPage.loggedInUsername).not.toBeVisible();
+    await expect(authPage.loggedInUsername).toBeHidden();
   });
 
   test('successful login after registration', async ({ page }) => {
@@ -133,7 +133,7 @@ test.describe('Auth', () => {
     await authPage.openLoginModal();
     await authPage.submitEmptyLogin();
     await expect(authPage.logInModal).toBeVisible();
-    await expect(authPage.loggedInUsername).not.toBeVisible();
+    await expect(authPage.loggedInUsername).toBeHidden();
 
     await homePage.goto();
 
@@ -236,7 +236,7 @@ test.describe('Auth — login with invalid credentials', () => {
       await homePage.goto();
       await authPage.loginExpectingError(username, scenario.password);
 
-      await expect(authPage.loggedInUsername).not.toBeVisible();
+      await expect(authPage.loggedInUsername).toBeHidden();
     });
   }
 });
@@ -338,7 +338,7 @@ test.describe('Auth — sign up field validation', () => {
 
       expect(message).toContain(MESSAGES.signUpMissingFields);
       await expect(authPage.signUpModal).toBeVisible();
-      await expect(authPage.loggedInUsername).not.toBeVisible();
+      await expect(authPage.loggedInUsername).toBeHidden();
     });
   }
 });
