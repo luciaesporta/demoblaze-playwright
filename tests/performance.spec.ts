@@ -44,6 +44,54 @@ test.describe('Visual regression', () => {
   });
 });
 
+test.describe('Performance — Image size', () => {
+  const MAX_IMAGE_SIZE_KB = 500;
+
+  test('product card images do not exceed size limit', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const oversized: { url: string; sizeKB: number }[] = [];
+
+    page.on('response', (response) => {
+      const url = response.url();
+      const contentType = response.headers()['content-type'] ?? '';
+      if (contentType.startsWith('image/')) {
+        const contentLength = parseInt(response.headers()['content-length'] ?? '0', 10);
+        const sizeKB = contentLength / 1024;
+        if (sizeKB > MAX_IMAGE_SIZE_KB) {
+          oversized.push({ url, sizeKB: Math.round(sizeKB) });
+        }
+      }
+    });
+
+    await homePage.goto();
+    await expect(homePage.firstProductLink).toBeVisible();
+
+    expect(oversized).toEqual([]);
+  });
+
+  test('product detail image does not exceed size limit', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const oversized: { url: string; sizeKB: number }[] = [];
+
+    page.on('response', (response) => {
+      const url = response.url();
+      const contentType = response.headers()['content-type'] ?? '';
+      if (contentType.startsWith('image/')) {
+        const contentLength = parseInt(response.headers()['content-length'] ?? '0', 10);
+        const sizeKB = contentLength / 1024;
+        if (sizeKB > MAX_IMAGE_SIZE_KB) {
+          oversized.push({ url, sizeKB: Math.round(sizeKB) });
+        }
+      }
+    });
+
+    await homePage.goto();
+    await homePage.openFirstProduct();
+
+    expect(oversized).toEqual([]);
+  });
+});
+
 test.describe('Performance', () => {
   test('home page loads in under 3 seconds', async ({ page }) => {
     const start = Date.now();
