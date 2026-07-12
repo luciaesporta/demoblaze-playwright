@@ -21,151 +21,151 @@ Supporting features include user authentication (sign up and log in), which enab
 
 ## Test coverage
 
-| Area | Scenario |
-|------|----------|
-| Auth | Successful user registration |
-| Auth | Sign up rejects duplicate username |
-| Auth | Sign up fails with only username (missing password) |
-| Auth | Sign up fails with only password (missing username) |
-| Auth | Sign up accepts username with special characters (parametrized: punctuation, emoji, whitespace) |
-| Auth | Sign up accepts username longer than 100 characters |
-| Auth | Sign up safely handles basic SQL injection payload in username (security smoke test) |
-| Auth | Sign up safely handles XSS payload in username — no script execution (security smoke test) |
-| Auth | Successful login after registration |
-| Auth | Login and sign up forms reject empty submission |
-| Auth | Login modal fields are cleared after closing with X and reopening (known bug — `test.fail`) |
-| Auth | ESC key closes login modal (known bug — `test.fail`) |
-| Auth | ESC key closes sign up modal (known bug — `test.fail`) |
-| Auth | Clicking outside closes login modal (known bug — `test.fail`) |
-| Auth | Clicking outside closes sign up modal (known bug — `test.fail`) |
-| Auth | Password fields mask their input |
-| Auth | Login fails with non-existent user |
-| Auth | Login fails with wrong password |
-| Auth | Login does not trim whitespace around username |
-| Auth | Login username is case-sensitive |
-| Auth | Session persists after page refresh |
-| Auth | Session persists after closing and reopening tab |
-| Auth | Logout clears the cart |
-| Auth | Consecutive logins with different users switch session correctly |
-| Cart | Guest user can add a product to cart |
-| Cart | Authenticated user can add a product to cart |
-| Cart | Empty cart shows no items and blank total |
-| Cart | Cart displays full list when multiple products are added |
-| Cart | Total reflects all added items |
-| Cart | Deleting an item updates the cart correctly |
-| Cart | Cart persists across page navigation |
-| Cart | Cart state is preserved after interrupting the purchase flow |
-| Cart | Adding the same product twice results in two rows |
-| Cart | Adding 10+ products sums total correctly |
-| Cart | Deleting all items one by one empties the cart |
-| Cart | Deleting first item keeps second item in place |
-| Cart | Deleting last item keeps first item in place |
-| Cart | Cart is not shared between different users |
-| Cart | Place Order on empty cart should not allow checkout (known bug — `test.fail`) |
-| Cart | Cart persists after page refresh |
-| Cart | Products from different categories coexist in cart |
-| Cart | Cart price matches product detail page price |
-| Cart | Cart name matches product detail page name |
-| Checkout | Successful purchase with all fields completed |
-| Checkout | Purchase cannot be submitted with mandatory fields empty |
-| Checkout | Total in modal matches cart total |
-| Checkout | Order confirmation message contains purchase details |
-| Checkout | Modal can be dismissed without placing an order |
-| Checkout | Credit card field rejects non-numeric characters (known bug — `test.fail`) |
-| Checkout | Credit card field validates length (known bug — `test.fail`) |
-| Checkout | Purchase blocked when name empty |
-| Checkout | Purchase blocked when credit card empty |
-| Checkout | Purchase blocked when country empty (known bug — `test.fail`) |
-| Checkout | Purchase blocked when city empty (known bug — `test.fail`) |
-| Checkout | Purchase blocked when month empty (known bug — `test.fail`) |
-| Checkout | Purchase blocked when year empty (known bug — `test.fail`) |
-| Checkout | Purchase blocked when name contains only numbers (known bug — `test.fail`) |
-| Checkout | Purchase blocked when country contains only numbers (known bug — `test.fail`) |
-| Checkout | Purchase blocked when city contains special characters (known bug — `test.fail`) |
-| Checkout | Purchase blocked when month out of range — 13 (known bug — `test.fail`) |
-| Checkout | Purchase blocked when year in the past — 2020 (known bug — `test.fail`) |
-| Checkout | Purchase blocked when credit card with spaces (known bug — `test.fail`) |
-| Checkout | Purchase blocked when credit card with dashes (known bug — `test.fail`) |
-| Checkout | Place Order modal can be closed with X button |
-| Checkout | Place Order modal can be closed with ESC key (known bug — `test.fail`) |
-| Checkout | Confirmation ID and Amount have valid format |
-| Checkout | Confirmation date matches current date (known bug — `test.fail`) |
-| UI | Home page displays the store title |
-| UI | Home page loads product cards |
-| UI | Filtering by category updates the product list |
-| UI | Clicking a product card navigates to its detail page |
-| UI | Detail page loads correctly from catalog |
-| UI | Navbar logo returns to home from a product page |
-| UI | Navbar logo returns to home from the cart page |
-| UI | Navbar logo is not clickable while Place Order modal is open |
-| UI | Cart link in navbar navigates to the cart page |
-| UI | Pagination navigates between product pages |
-| UI | Previous button on first page does not change product list (known bug — `test.fail`) |
-| UI | Next button on last page does not change product list (known bug — `test.fail`) |
-| UI | Category shows exact product count (parametrized: Phones 7, Laptops 6, Monitors 2) |
-| UI | Switching category resets pagination to first page |
-| UI | Products load correctly after page refresh |
-| UI | Browser back/forward after category filter preserves navigation (known bug — `test.fail`) |
-| UI | Non-existent product URL shows empty detail page |
-| UI | Direct URL to cart without products renders correctly |
-| UI | Category filters return correct products (parametrized per category) |
-| UI | Product card and detail images load (parametrized per category / product) |
-| UI | Hero banner auto-advances and responds to manual controls |
-| UI | Page title and favicon are present and correct |
-| UI | About us modal loads video content |
-| UI | About us modal can be closed with X button |
-| UI | About us modal can be closed with ESC key (known bug — `test.fail`) |
-| UI | About us modal can be closed by clicking outside (known bug — `test.fail`) |
-| UI | Contact form can be submitted with valid data |
-| UI | Contact form with empty fields should not submit (known bug — `test.fail`) |
-| UI | Contact modal closes after sending message (known bug — `test.fail`) |
-| UI | Contact form fields are cleared after closing and reopening (known bug — `test.fail`) |
-| UI | Contact form rejects invalid email (parametrized: no @, no domain, no user) (known bug — `test.fail`) |
-| UI | Logged-in user can log out |
-| UI | Log out link visible regardless of session state (known bug — `test.fail`) |
-| Mobile | Application is usable on mobile viewport |
-| Mobile | Login and sign up modals are usable |
-| Mobile | Category filters work through collapsed navbar (parametrized per category) |
-| Mobile | Category list expands and collapses with tap on mobile |
-| Mobile | Cart layout does not overflow on mobile viewport |
-| Mobile | Carousel responds to swipe gestures (known bug — `test.fail`) |
-| Mobile | Place Order modal fields are visible without horizontal scroll (known bug — `test.fail`) |
-| Mobile | Orientation change from portrait to landscape does not break layout |
-| Mobile | Full purchase flow completes on mobile viewport |
-| A11y | Login modal tab navigation follows logical focus order (known bug — `test.fail`) |
-| A11y | Pressing Enter on password field submits login (known bug — `test.fail`) |
-| A11y | Pressing Enter on password field submits sign up (known bug — `test.fail`) |
-| A11y | Login modal inputs have associated labels (known bug — `test.fail`) |
-| A11y | Sign up modal inputs have associated labels |
-| A11y | Contact modal inputs have associated labels (known bug — `test.fail`) |
-| A11y | Product card images have alt text (known bug — `test.fail`) |
-| A11y | Product detail image has alt text (known bug — `test.fail`) |
-| A11y | Home page has correct heading hierarchy (known bug — `test.fail`) |
-| A11y | Login error displays inline feedback, not just alert (known bug — `test.fail`) |
-| A11y | Product card text meets WCAG AA contrast ratio |
-| API | Intercept addtocart request and validate payload |
-| API | Intercept deleteitem request and validate payload and response |
-| API | Mocked login network failure does not break the UI |
-| API | Login triggers /check request with 200 status |
-| API | Delayed catalog response (3s mock) does not break the UI |
-| API | No 4xx/5xx responses during full purchase flow |
-| API | No console errors during navigation (smoke) |
-| Visual | Home page matches screenshot |
-| Visual | Cart page matches screenshot |
-| Visual | Checkout modal matches screenshot |
-| Perf | Product card images do not exceed 500 KB |
-| Perf | Product detail image does not exceed 500 KB |
-| Perf | Home page loads in under 3 seconds |
+| Area     | Scenario                                                                                              |
+| -------- | ----------------------------------------------------------------------------------------------------- |
+| Auth     | Successful user registration                                                                          |
+| Auth     | Sign up rejects duplicate username                                                                    |
+| Auth     | Sign up fails with only username (missing password)                                                   |
+| Auth     | Sign up fails with only password (missing username)                                                   |
+| Auth     | Sign up accepts username with special characters (parametrized: punctuation, emoji, whitespace)       |
+| Auth     | Sign up accepts username longer than 100 characters                                                   |
+| Auth     | Sign up safely handles basic SQL injection payload in username (security smoke test)                  |
+| Auth     | Sign up safely handles XSS payload in username — no script execution (security smoke test)            |
+| Auth     | Successful login after registration                                                                   |
+| Auth     | Login and sign up forms reject empty submission                                                       |
+| Auth     | Login modal fields are cleared after closing with X and reopening (known bug — `test.fail`)           |
+| Auth     | ESC key closes login modal (known bug — `test.fail`)                                                  |
+| Auth     | ESC key closes sign up modal (known bug — `test.fail`)                                                |
+| Auth     | Clicking outside closes login modal (known bug — `test.fail`)                                         |
+| Auth     | Clicking outside closes sign up modal (known bug — `test.fail`)                                       |
+| Auth     | Password fields mask their input                                                                      |
+| Auth     | Login fails with non-existent user                                                                    |
+| Auth     | Login fails with wrong password                                                                       |
+| Auth     | Login does not trim whitespace around username                                                        |
+| Auth     | Login username is case-sensitive                                                                      |
+| Auth     | Session persists after page refresh                                                                   |
+| Auth     | Session persists after closing and reopening tab                                                      |
+| Auth     | Logout clears the cart                                                                                |
+| Auth     | Consecutive logins with different users switch session correctly                                      |
+| Cart     | Guest user can add a product to cart                                                                  |
+| Cart     | Authenticated user can add a product to cart                                                          |
+| Cart     | Empty cart shows no items and blank total                                                             |
+| Cart     | Cart displays full list when multiple products are added                                              |
+| Cart     | Total reflects all added items                                                                        |
+| Cart     | Deleting an item updates the cart correctly                                                           |
+| Cart     | Cart persists across page navigation                                                                  |
+| Cart     | Cart state is preserved after interrupting the purchase flow                                          |
+| Cart     | Adding the same product twice results in two rows                                                     |
+| Cart     | Adding 10+ products sums total correctly                                                              |
+| Cart     | Deleting all items one by one empties the cart                                                        |
+| Cart     | Deleting first item keeps second item in place                                                        |
+| Cart     | Deleting last item keeps first item in place                                                          |
+| Cart     | Cart is not shared between different users                                                            |
+| Cart     | Place Order on empty cart should not allow checkout (known bug — `test.fail`)                         |
+| Cart     | Cart persists after page refresh                                                                      |
+| Cart     | Products from different categories coexist in cart                                                    |
+| Cart     | Cart price matches product detail page price                                                          |
+| Cart     | Cart name matches product detail page name                                                            |
+| Checkout | Successful purchase with all fields completed                                                         |
+| Checkout | Purchase cannot be submitted with mandatory fields empty                                              |
+| Checkout | Total in modal matches cart total                                                                     |
+| Checkout | Order confirmation message contains purchase details                                                  |
+| Checkout | Modal can be dismissed without placing an order                                                       |
+| Checkout | Credit card field rejects non-numeric characters (known bug — `test.fail`)                            |
+| Checkout | Credit card field validates length (known bug — `test.fail`)                                          |
+| Checkout | Purchase blocked when name empty                                                                      |
+| Checkout | Purchase blocked when credit card empty                                                               |
+| Checkout | Purchase blocked when country empty (known bug — `test.fail`)                                         |
+| Checkout | Purchase blocked when city empty (known bug — `test.fail`)                                            |
+| Checkout | Purchase blocked when month empty (known bug — `test.fail`)                                           |
+| Checkout | Purchase blocked when year empty (known bug — `test.fail`)                                            |
+| Checkout | Purchase blocked when name contains only numbers (known bug — `test.fail`)                            |
+| Checkout | Purchase blocked when country contains only numbers (known bug — `test.fail`)                         |
+| Checkout | Purchase blocked when city contains special characters (known bug — `test.fail`)                      |
+| Checkout | Purchase blocked when month out of range — 13 (known bug — `test.fail`)                               |
+| Checkout | Purchase blocked when year in the past — 2020 (known bug — `test.fail`)                               |
+| Checkout | Purchase blocked when credit card with spaces (known bug — `test.fail`)                               |
+| Checkout | Purchase blocked when credit card with dashes (known bug — `test.fail`)                               |
+| Checkout | Place Order modal can be closed with X button                                                         |
+| Checkout | Place Order modal can be closed with ESC key (known bug — `test.fail`)                                |
+| Checkout | Confirmation ID and Amount have valid format                                                          |
+| Checkout | Confirmation date matches current date (known bug — `test.fail`)                                      |
+| UI       | Home page displays the store title                                                                    |
+| UI       | Home page loads product cards                                                                         |
+| UI       | Filtering by category updates the product list                                                        |
+| UI       | Clicking a product card navigates to its detail page                                                  |
+| UI       | Detail page loads correctly from catalog                                                              |
+| UI       | Navbar logo returns to home from a product page                                                       |
+| UI       | Navbar logo returns to home from the cart page                                                        |
+| UI       | Navbar logo is not clickable while Place Order modal is open                                          |
+| UI       | Cart link in navbar navigates to the cart page                                                        |
+| UI       | Pagination navigates between product pages                                                            |
+| UI       | Previous button on first page does not change product list (known bug — `test.fail`)                  |
+| UI       | Next button on last page does not change product list (known bug — `test.fail`)                       |
+| UI       | Category shows exact product count (parametrized: Phones 7, Laptops 6, Monitors 2)                    |
+| UI       | Switching category resets pagination to first page                                                    |
+| UI       | Products load correctly after page refresh                                                            |
+| UI       | Browser back/forward after category filter preserves navigation (known bug — `test.fail`)             |
+| UI       | Non-existent product URL shows empty detail page                                                      |
+| UI       | Direct URL to cart without products renders correctly                                                 |
+| UI       | Category filters return correct products (parametrized per category)                                  |
+| UI       | Product card and detail images load (parametrized per category / product)                             |
+| UI       | Hero banner auto-advances and responds to manual controls                                             |
+| UI       | Page title and favicon are present and correct                                                        |
+| UI       | About us modal loads video content                                                                    |
+| UI       | About us modal can be closed with X button                                                            |
+| UI       | About us modal can be closed with ESC key (known bug — `test.fail`)                                   |
+| UI       | About us modal can be closed by clicking outside (known bug — `test.fail`)                            |
+| UI       | Contact form can be submitted with valid data                                                         |
+| UI       | Contact form with empty fields should not submit (known bug — `test.fail`)                            |
+| UI       | Contact modal closes after sending message (known bug — `test.fail`)                                  |
+| UI       | Contact form fields are cleared after closing and reopening (known bug — `test.fail`)                 |
+| UI       | Contact form rejects invalid email (parametrized: no @, no domain, no user) (known bug — `test.fail`) |
+| UI       | Logged-in user can log out                                                                            |
+| UI       | Log out link visible regardless of session state (known bug — `test.fail`)                            |
+| Mobile   | Application is usable on mobile viewport                                                              |
+| Mobile   | Login and sign up modals are usable                                                                   |
+| Mobile   | Category filters work through collapsed navbar (parametrized per category)                            |
+| Mobile   | Category list expands and collapses with tap on mobile                                                |
+| Mobile   | Cart layout does not overflow on mobile viewport                                                      |
+| Mobile   | Carousel responds to swipe gestures (known bug — `test.fail`)                                         |
+| Mobile   | Place Order modal fields are visible without horizontal scroll (known bug — `test.fail`)              |
+| Mobile   | Orientation change from portrait to landscape does not break layout                                   |
+| Mobile   | Full purchase flow completes on mobile viewport                                                       |
+| A11y     | Login modal tab navigation follows logical focus order (known bug — `test.fail`)                      |
+| A11y     | Pressing Enter on password field submits login (known bug — `test.fail`)                              |
+| A11y     | Pressing Enter on password field submits sign up (known bug — `test.fail`)                            |
+| A11y     | Login modal inputs have associated labels (known bug — `test.fail`)                                   |
+| A11y     | Sign up modal inputs have associated labels                                                           |
+| A11y     | Contact modal inputs have associated labels (known bug — `test.fail`)                                 |
+| A11y     | Product card images have alt text (known bug — `test.fail`)                                           |
+| A11y     | Product detail image has alt text (known bug — `test.fail`)                                           |
+| A11y     | Home page has correct heading hierarchy (known bug — `test.fail`)                                     |
+| A11y     | Login error displays inline feedback, not just alert (known bug — `test.fail`)                        |
+| A11y     | Product card text meets WCAG AA contrast ratio                                                        |
+| API      | Intercept addtocart request and validate payload                                                      |
+| API      | Intercept deleteitem request and validate payload and response                                        |
+| API      | Mocked login network failure does not break the UI                                                    |
+| API      | Login triggers /check request with 200 status                                                         |
+| API      | Delayed catalog response (3s mock) does not break the UI                                              |
+| API      | No 4xx/5xx responses during full purchase flow                                                        |
+| API      | No console errors during navigation (smoke)                                                           |
+| Visual   | Home page matches screenshot                                                                          |
+| Visual   | Cart page matches screenshot                                                                          |
+| Visual   | Checkout modal matches screenshot                                                                     |
+| Perf     | Product card images do not exceed 500 KB                                                              |
+| Perf     | Product detail image does not exceed 500 KB                                                           |
+| Perf     | Home page loads in under 3 seconds                                                                    |
 
 ## Run locally
 
 ```bash
 npm install
 npx playwright install chromium
-npm test                  
-npm run test:headed       
-npm run test:report       
-npm run typecheck         
+npm test
+npm run test:headed
+npm run test:report
+npm run typecheck
 ```
 
 ## Project structure

@@ -32,7 +32,9 @@ test.describe('Checkout', () => {
     await expect(cartPage.cartRows).toHaveCount(0);
   });
 
-  test('purchase cannot be submitted with mandatory fields empty', async ({ cartWithOneProduct }) => {
+  test('purchase cannot be submitted with mandatory fields empty', async ({
+    cartWithOneProduct,
+  }) => {
     const { page } = cartWithOneProduct;
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);
@@ -255,5 +257,4 @@ test.describe('Checkout — individual empty field validation', () => {
       await expect(cartPage.orderModal).toBeVisible();
     });
   }
-
 });

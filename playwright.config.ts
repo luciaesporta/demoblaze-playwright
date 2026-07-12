@@ -9,10 +9,7 @@ export default defineConfig({
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
   snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
-  reporter: [
-    ['html', { open: 'never', outputFolder: 'playwright-report' }],
-    ['list'],
-  ],
+  reporter: [['html', { open: 'never', outputFolder: 'playwright-report' }], ['list']],
   use: {
     baseURL: 'https://www.demoblaze.com',
     headless: true,

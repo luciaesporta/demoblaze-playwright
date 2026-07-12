@@ -36,7 +36,7 @@ export class ProductPage {
 
   async getProductName(): Promise<string> {
     await this._productName.waitFor({ state: 'visible' });
-    return (await this._productName.textContent() ?? '').trim();
+    return ((await this._productName.textContent()) ?? '').trim();
   }
 
   async getProductPrice(): Promise<string> {
@@ -47,7 +47,7 @@ export class ProductPage {
   }
 
   async getProductDescription(): Promise<string> {
-    return (await this._productDescription.textContent() ?? '').trim();
+    return ((await this._productDescription.textContent()) ?? '').trim();
   }
 
   async getFaviconHref(): Promise<string> {

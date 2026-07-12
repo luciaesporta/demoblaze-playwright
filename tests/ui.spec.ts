@@ -105,7 +105,9 @@ test.describe('UI — Navigation', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
-  test('navbar logo is not clickable while Place Order modal is open', async ({ cartWithOneProduct }) => {
+  test('navbar logo is not clickable while Place Order modal is open', async ({
+    cartWithOneProduct,
+  }) => {
     const { page } = cartWithOneProduct;
     const homePage = new HomePage(page);
     const cartPage = new CartPage(page);
@@ -115,7 +117,10 @@ test.describe('UI — Navigation', () => {
     await expect(cartPage.orderModal).toBeVisible();
 
     await expect(homePage.navbarBrand).toBeVisible();
-    const navResult = await homePage.navbarBrand.click({ timeout: 2_000, trial: true }).then(() => true).catch(() => false);
+    const navResult = await homePage.navbarBrand
+      .click({ timeout: 2_000, trial: true })
+      .then(() => true)
+      .catch(() => false);
     expect(navResult).toBe(false);
 
     await expect(page).toHaveURL(CART_PAGE_URL);
@@ -289,7 +294,10 @@ test.describe('UI — Direct URL access', () => {
 });
 
 test.describe('UI — Category filters', () => {
-  for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [CategoryName, readonly string[]][]) {
+  for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [
+    CategoryName,
+    readonly string[],
+  ][]) {
     test(`filter "${category}" returns only expected products`, async ({ page }) => {
       const homePage = new HomePage(page);
       await homePage.goto();
@@ -308,7 +316,10 @@ test.describe('UI — Category filters', () => {
 });
 
 test.describe('UI — Category product count', () => {
-  for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [CategoryName, readonly string[]][]) {
+  for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [
+    CategoryName,
+    readonly string[],
+  ][]) {
     test(`"${category}" shows exactly ${expected.length} products`, async ({ page }) => {
       const homePage = new HomePage(page);
       await homePage.goto();

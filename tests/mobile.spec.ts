@@ -159,9 +159,7 @@ test.describe('Mobile', () => {
       const rows = document.querySelectorAll('#tbodyid tr');
       return Array.from(rows).every((row) => {
         const cells = row.querySelectorAll('td');
-        return Array.from(cells).every(
-          (cell) => (cell as HTMLElement).offsetWidth > 0,
-        );
+        return Array.from(cells).every((cell) => (cell as HTMLElement).offsetWidth > 0);
       });
     });
     expect(allColumnsVisible).toBe(true);

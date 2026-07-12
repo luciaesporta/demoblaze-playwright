@@ -164,14 +164,10 @@ test.describe('A11y — Semantics', () => {
 
     const hierarchy = await page.evaluate(() => {
       const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const visible = Array.from(headings).filter(
-        (h) => (h as HTMLElement).offsetParent !== null,
-      );
+      const visible = Array.from(headings).filter((h) => (h as HTMLElement).offsetParent !== null);
       const levels = visible.map((h) => parseInt(h.tagName.charAt(1), 10));
       const hasH1 = levels.includes(1);
-      const noSkips = levels.every(
-        (level, i) => i === 0 || level <= (levels[i - 1] ?? 0) + 1,
-      );
+      const noSkips = levels.every((level, i) => i === 0 || level <= (levels[i - 1] ?? 0) + 1);
       return { hasH1, noSkips };
     });
 
@@ -234,7 +230,7 @@ test.describe('A11y — Error visibility and contrast', () => {
         const parent = card.closest('.card-body');
         const bg = parent
           ? parseColor(window.getComputedStyle(parent).backgroundColor)
-          : [255, 255, 255] as [number, number, number];
+          : ([255, 255, 255] as [number, number, number]);
         const fgLum = luminance(...fg);
         const bgLum = luminance(...bg);
         return contrastRatio(fgLum, bgLum) >= WCAG_AA_NORMAL;

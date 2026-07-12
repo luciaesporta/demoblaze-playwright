@@ -23,10 +23,7 @@ export const CATEGORY_PRODUCTS = {
     '2017 Dell 15.6 Inch',
     'MacBook Pro',
   ],
-  Monitors: [
-    'Apple monitor 24',
-    'ASUS Full HD',
-  ],
+  Monitors: ['Apple monitor 24', 'ASUS Full HD'],
 } as const;
 
 export type CategoryName = keyof typeof CATEGORY_PRODUCTS;

@@ -51,9 +51,7 @@ test.describe('API — Delete from cart', () => {
     const requestPromise = page.waitForRequest(
       (req) => req.url().includes('deleteitem') && req.method() === 'POST',
     );
-    const responsePromise = page.waitForResponse(
-      (res) => res.url().includes('deleteitem'),
-    );
+    const responsePromise = page.waitForResponse((res) => res.url().includes('deleteitem'));
     await cartPage.deleteRow(0);
 
     const request = await requestPromise;

@@ -16,9 +16,7 @@ export class CartPage {
     this._cartTotal = page.locator('#totalp');
     this._placeOrderButton = page.getByRole('button', { name: 'Place Order' });
     this._orderModal = page.locator('#orderModal');
-    this._orderModalCloseButton = this._orderModal
-      .getByRole('button')
-      .filter({ hasText: 'Close' });
+    this._orderModalCloseButton = this._orderModal.getByRole('button').filter({ hasText: 'Close' });
     this._orderModalCloseX = this._orderModal.locator('.close');
   }
 
@@ -55,15 +53,15 @@ export class CartPage {
   }
 
   async getItemName(rowIndex: number): Promise<string> {
-    return (await this.getRowCell(rowIndex, 1).textContent() ?? '').trim();
+    return ((await this.getRowCell(rowIndex, 1).textContent()) ?? '').trim();
   }
 
   async getItemPrice(rowIndex: number): Promise<string> {
-    return (await this.getRowCell(rowIndex, 2).textContent() ?? '').trim();
+    return ((await this.getRowCell(rowIndex, 2).textContent()) ?? '').trim();
   }
 
   async getTotal(): Promise<string> {
-    return (await this._cartTotal.textContent() ?? '').trim();
+    return ((await this._cartTotal.textContent()) ?? '').trim();
   }
 
   async getFaviconHref(): Promise<string> {
