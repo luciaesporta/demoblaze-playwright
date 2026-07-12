@@ -1,6 +1,7 @@
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import playwright from 'eslint-plugin-playwright';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   {
@@ -31,4 +32,5 @@ export default [
       ...playwright.configs['flat/recommended'].rules,
     },
   },
+  prettierConfig,
 ];
