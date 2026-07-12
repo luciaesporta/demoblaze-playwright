@@ -150,8 +150,8 @@ export class HomePage {
   }
 
   async areCardImagesLoaded(): Promise<boolean> {
-    return this._productCardImages.evaluateAll(
-      (imgs) => imgs.every((img) => (img as HTMLImageElement).naturalWidth > 0),
+    return this._productCardImages.evaluateAll((imgs) =>
+      imgs.every((img) => (img as HTMLImageElement).naturalWidth > 0),
     );
   }
 
@@ -246,7 +246,7 @@ export class HomePage {
   async getProductNameAt(index: number): Promise<string> {
     const link = this._productCards.nth(index);
     await link.waitFor({ state: 'visible' });
-    return (await link.textContent() ?? '').trim();
+    return ((await link.textContent()) ?? '').trim();
   }
 
   async getProductNames(): Promise<string[]> {
@@ -273,27 +273,21 @@ export class HomePage {
     if (autoAdvanced) seen.add(autoAdvanced);
 
     await this.clickCarouselNext();
-    await this.page.waitForFunction(
-      (previousSrc) => {
-        const img = document.querySelector('.carousel-item.active img');
-        const currentSrc = img?.getAttribute('src') ?? null;
-        return currentSrc !== null && currentSrc !== previousSrc;
-      },
-      autoAdvanced,
-    );
+    await this.page.waitForFunction((previousSrc) => {
+      const img = document.querySelector('.carousel-item.active img');
+      const currentSrc = img?.getAttribute('src') ?? null;
+      return currentSrc !== null && currentSrc !== previousSrc;
+    }, autoAdvanced);
     const afterNext = await this.getActiveCarouselSrc();
     if (afterNext) seen.add(afterNext);
 
     if (seen.size < minDistinct) {
       await this.clickCarouselPrev();
-      await this.page.waitForFunction(
-        (previousSrc) => {
-          const img = document.querySelector('.carousel-item.active img');
-          const currentSrc = img?.getAttribute('src') ?? null;
-          return currentSrc !== null && currentSrc !== previousSrc;
-        },
-        afterNext,
-      );
+      await this.page.waitForFunction((previousSrc) => {
+        const img = document.querySelector('.carousel-item.active img');
+        const currentSrc = img?.getAttribute('src') ?? null;
+        return currentSrc !== null && currentSrc !== previousSrc;
+      }, afterNext);
       const afterPrev = await this.getActiveCarouselSrc();
       if (afterPrev) seen.add(afterPrev);
     }

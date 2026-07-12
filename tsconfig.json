@@ -14,5 +14,11 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["pages/**/*.ts", "fixtures/**/*.ts", "tests/**/*.ts", "utils/**/*.ts", "playwright.config.ts"]
+  "include": [
+    "pages/**/*.ts",
+    "fixtures/**/*.ts",
+    "tests/**/*.ts",
+    "utils/**/*.ts",
+    "playwright.config.ts"
+  ]
 }

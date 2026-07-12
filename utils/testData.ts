@@ -43,7 +43,11 @@ export const INVALID_LOGIN_SCENARIOS: readonly InvalidLoginScenario[] = [
 ];
 
 export const INVALID_SIGNUP_SCENARIOS: readonly InvalidSignUpScenario[] = [
-  { description: 'only username (missing password)', username: 'lucia_partial_signup', password: '' },
+  {
+    description: 'only username (missing password)',
+    username: 'lucia_partial_signup',
+    password: '',
+  },
   { description: 'only password (missing username)', username: '', password: 'Test1234!' },
 ];
 
@@ -62,23 +66,38 @@ export const DEFAULT_ORDER: OrderDetails = {
   year: '2026',
 };
 
-export const VALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; order: OrderDetails }[] = [
+export const VALIDATED_EMPTY_FIELD_SCENARIOS: readonly {
+  description: string;
+  order: OrderDetails;
+}[] = [
   { description: 'name empty', order: { ...DEFAULT_ORDER, name: '' } },
   { description: 'credit card empty', order: { ...DEFAULT_ORDER, creditCard: '' } },
 ];
 
-export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly { description: string; order: OrderDetails }[] = [
+export const UNVALIDATED_EMPTY_FIELD_SCENARIOS: readonly {
+  description: string;
+  order: OrderDetails;
+}[] = [
   { description: 'country empty', order: { ...DEFAULT_ORDER, country: '' } },
   { description: 'city empty', order: { ...DEFAULT_ORDER, city: '' } },
   { description: 'month empty', order: { ...DEFAULT_ORDER, month: '' } },
   { description: 'year empty', order: { ...DEFAULT_ORDER, year: '' } },
   { description: 'name contains only numbers', order: { ...DEFAULT_ORDER, name: '12345' } },
   { description: 'country contains only numbers', order: { ...DEFAULT_ORDER, country: '12345' } },
-  { description: 'city contains special characters', order: { ...DEFAULT_ORDER, city: '!@#$%^&*' } },
+  {
+    description: 'city contains special characters',
+    order: { ...DEFAULT_ORDER, city: '!@#$%^&*' },
+  },
   { description: 'month out of range (13)', order: { ...DEFAULT_ORDER, month: '13' } },
   { description: 'year in the past (2020)', order: { ...DEFAULT_ORDER, year: '2020' } },
-  { description: 'credit card with spaces', order: { ...DEFAULT_ORDER, creditCard: '4111 1111 1111 1111' } },
-  { description: 'credit card with dashes', order: { ...DEFAULT_ORDER, creditCard: '4111-1111-1111-1111' } },
+  {
+    description: 'credit card with spaces',
+    order: { ...DEFAULT_ORDER, creditCard: '4111 1111 1111 1111' },
+  },
+  {
+    description: 'credit card with dashes',
+    order: { ...DEFAULT_ORDER, creditCard: '4111-1111-1111-1111' },
+  },
 ];
 
 export const SHORT_CREDIT_CARD = '1234';

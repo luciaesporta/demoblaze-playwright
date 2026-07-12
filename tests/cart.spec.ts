@@ -48,7 +48,9 @@ test.describe('Cart', () => {
     await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
   });
 
-  test('cart displays full list when multiple products are added', async ({ cartWithTwoProducts }) => {
+  test('cart displays full list when multiple products are added', async ({
+    cartWithTwoProducts,
+  }) => {
     const {
       page,
       first: { name: firstName, price: firstPrice },
@@ -71,7 +73,11 @@ test.describe('Cart', () => {
   });
 
   test('total reflects all added items', async ({ cartWithTwoProducts }) => {
-    const { page, first: { price: firstPrice }, second: { price: secondPrice } } = cartWithTwoProducts;
+    const {
+      page,
+      first: { price: firstPrice },
+      second: { price: secondPrice },
+    } = cartWithTwoProducts;
     const cartPage = new CartPage(page);
 
     await cartPage.goto();
@@ -82,7 +88,11 @@ test.describe('Cart', () => {
   });
 
   test('deleting an item updates the cart correctly', async ({ cartWithTwoProducts }) => {
-    const { page, first: { name: firstName }, second: { name: secondName, price: secondPrice } } = cartWithTwoProducts;
+    const {
+      page,
+      first: { name: firstName },
+      second: { name: secondName, price: secondPrice },
+    } = cartWithTwoProducts;
     const cartPage = new CartPage(page);
 
     await cartPage.goto();
@@ -97,7 +107,9 @@ test.describe('Cart', () => {
     await expect(cartPage.cartTotal).toHaveText(secondPrice);
   });
 
-  test('cart state is preserved after interrupting the purchase flow', async ({ cartWithOneProduct }) => {
+  test('cart state is preserved after interrupting the purchase flow', async ({
+    cartWithOneProduct,
+  }) => {
     const { page, name: expectedName, price: expectedPrice } = cartWithOneProduct;
     const cartPage = new CartPage(page);
 
@@ -196,7 +208,11 @@ test.describe('Cart — advanced operations', () => {
   });
 
   test('deleting first item keeps second item in place', async ({ cartWithTwoProducts }) => {
-    const { page, first: { name: firstName }, second: { name: secondName, price: secondPrice } } = cartWithTwoProducts;
+    const {
+      page,
+      first: { name: firstName },
+      second: { name: secondName, price: secondPrice },
+    } = cartWithTwoProducts;
     const cartPage = new CartPage(page);
 
     await cartPage.goto();
@@ -210,7 +226,11 @@ test.describe('Cart — advanced operations', () => {
   });
 
   test('deleting last item keeps first item in place', async ({ cartWithTwoProducts }) => {
-    const { page, first: { name: firstName, price: firstPrice }, second: { name: secondName } } = cartWithTwoProducts;
+    const {
+      page,
+      first: { name: firstName, price: firstPrice },
+      second: { name: secondName },
+    } = cartWithTwoProducts;
     const cartPage = new CartPage(page);
 
     await cartPage.goto();

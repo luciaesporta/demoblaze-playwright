@@ -115,12 +115,12 @@ export class CheckoutPage {
     await this.page.waitForFunction(
       () => (document.querySelector('#totalm')?.textContent ?? '').trim() !== '',
     );
-    const text = (await this._modalTotal.textContent() ?? '').trim();
+    const text = ((await this._modalTotal.textContent()) ?? '').trim();
     return text.replace(/\D/g, '');
   }
 
   async getConfirmationText(): Promise<string> {
-    return (await this._confirmationBody.textContent() ?? '').trim();
+    return ((await this._confirmationBody.textContent()) ?? '').trim();
   }
 
   async getConfirmationDetails(): Promise<{ id: string | null; amount: string | null }> {
