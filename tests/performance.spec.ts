@@ -3,7 +3,7 @@ import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 
-test.describe('Visual regression', () => {
+test.describe('Visual regression', { tag: '@chromium-only' }, () => {
   test('home page matches screenshot', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();

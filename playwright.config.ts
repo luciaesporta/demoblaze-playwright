@@ -23,5 +23,11 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+      retries: 2,
+      grepInvert: [/@chromium-only/],
+    },
   ],
 });
