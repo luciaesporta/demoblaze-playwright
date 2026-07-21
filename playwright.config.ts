@@ -29,5 +29,11 @@ export default defineConfig({
       retries: 2,
       grepInvert: [/@chromium-only/],
     },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+      retries: 2,
+      grepInvert: [/@chromium-only/],
+    },
   ],
 });
