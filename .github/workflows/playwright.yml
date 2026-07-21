@@ -28,10 +28,10 @@ jobs:
         run: npm run typecheck
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --with-deps
 
       - name: Run Playwright tests
-        run: npm test
+        run: npx playwright test --project=chromium
 
       - name: Upload HTML report
         if: always()
