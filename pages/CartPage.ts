@@ -71,7 +71,12 @@ export class CartPage {
   }
 
   async deleteRow(rowIndex: number): Promise<void> {
-    await this._cartRows.nth(rowIndex).locator('td a').click();
+    const row = this._cartRows.nth(rowIndex);
+    const responsePromise = this.page.waitForResponse(
+      (res) => res.url().includes('deleteitem') && res.status() === 200,
+    );
+    await row.locator('td a').click();
+    await responsePromise;
   }
 
   async deleteRowByName(name: string): Promise<string> {

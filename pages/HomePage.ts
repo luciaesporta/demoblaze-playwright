@@ -97,6 +97,7 @@ export class HomePage {
 
   async goto(): Promise<void> {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+    await this._firstProductLink.waitFor({ state: 'visible' });
   }
 
   async clickNavBrand(): Promise<void> {

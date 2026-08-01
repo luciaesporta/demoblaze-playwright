@@ -163,7 +163,7 @@ test.describe('Cart', () => {
 
 test.describe('Cart — advanced operations', () => {
   test('adding 10+ products sums total correctly', async ({ authenticatedPage }, testInfo) => {
-    testInfo.setTimeout(120_000);
+    testInfo.setTimeout(180_000);
     const { page } = authenticatedPage;
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
