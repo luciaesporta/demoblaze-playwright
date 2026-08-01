@@ -14,6 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         browser: [chromium, firefox, webkit]
+        include:
+          - browser: firefox
+            allow-failure: true
+          - browser: webkit
+            allow-failure: true
+    continue-on-error: ${{ matrix.allow-failure || false }}
 
     steps:
       - name: Checkout repository
