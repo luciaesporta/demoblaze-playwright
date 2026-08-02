@@ -31,7 +31,7 @@ test.describe('Cart', () => {
     expect(total === '' || total === '0').toBeTruthy();
   });
 
-  test('guest user can add a product to cart', async ({ page }) => {
+  test('guest user can add a product to cart', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
     const cartPage = new CartPage(page);

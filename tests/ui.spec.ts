@@ -19,13 +19,13 @@ import {
 const CATEGORY_NAMES = Object.keys(CATEGORY_PRODUCTS) as CategoryName[];
 
 test.describe('UI — Home page', () => {
-  test('displays the store title', async ({ page }) => {
+  test('displays the store title', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
     await expect(page).toHaveTitle(PAGE_TITLE);
   });
 
-  test('loads product cards', async ({ page }) => {
+  test('loads product cards', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
@@ -34,7 +34,7 @@ test.describe('UI — Home page', () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test('filtering by category updates the product list', async ({ page }) => {
+  test('filtering by category updates the product list', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
@@ -80,7 +80,7 @@ test.describe('UI — Home page', () => {
 });
 
 test.describe('UI — Navigation', () => {
-  test('navbar logo returns to home from a product page', async ({ page }) => {
+  test('navbar logo returns to home from a product page', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
     await homePage.openProduct(0);
@@ -126,7 +126,7 @@ test.describe('UI — Navigation', () => {
     await expect(page).toHaveURL(CART_PAGE_URL);
   });
 
-  test('cart link in navbar navigates to the cart page', async ({ page }) => {
+  test('cart link in navbar navigates to the cart page', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
     await homePage.clickCart();
@@ -237,18 +237,22 @@ test.describe('UI — Navigation', () => {
 });
 
 test.describe('UI — Product detail', () => {
-  test('clicking a product card navigates to its detail page', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    await homePage.goto();
-    await homePage.openProduct(0);
+  test(
+    'clicking a product card navigates to its detail page',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      await homePage.goto();
+      await homePage.openProduct(0);
 
-    await expect(page).toHaveURL(PRODUCT_PAGE_URL);
-    await expect(productPage.productName).toBeVisible();
-    await expect(productPage.productPrice).toBeVisible();
-  });
+      await expect(page).toHaveURL(PRODUCT_PAGE_URL);
+      await expect(productPage.productName).toBeVisible();
+      await expect(productPage.productPrice).toBeVisible();
+    },
+  );
 
-  test('detail page loads correctly from catalog', async ({ page }) => {
+  test('detail page loads correctly from catalog', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
     await homePage.goto();
@@ -498,7 +502,7 @@ test.describe('UI — Modals', () => {
 });
 
 test.describe('UI — Session', () => {
-  test('logged-in user can log out', async ({ authenticatedPage }) => {
+  test('logged-in user can log out', { tag: '@smoke' }, async ({ authenticatedPage }) => {
     const { page } = authenticatedPage;
     const authPage = new AuthPage(page);
 

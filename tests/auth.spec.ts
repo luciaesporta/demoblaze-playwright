@@ -13,7 +13,7 @@ import {
 import { MESSAGES } from '../utils/constants';
 
 test.describe('Auth', () => {
-  test('successful user registration', async ({ page }) => {
+  test('successful user registration', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
@@ -111,7 +111,7 @@ test.describe('Auth', () => {
     await expect(authPage.loggedInUsername).toBeHidden();
   });
 
-  test('successful login after registration', async ({ page }) => {
+  test('successful login after registration', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
