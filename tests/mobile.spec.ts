@@ -18,7 +18,7 @@ const CATEGORY_NAMES = Object.keys(CATEGORY_PRODUCTS) as CategoryName[];
 test.describe('Mobile', () => {
   test.use({ viewport: MOBILE_VIEWPORT });
 
-  test('application is usable on mobile viewport', async ({ page }) => {
+  test('application is usable on mobile viewport', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
     const cartPage = new CartPage(page);
@@ -223,27 +223,31 @@ test.describe('Mobile', () => {
     await expect(homePage.navbarBrand).toBeVisible();
   });
 
-  test('full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
-    const { page } = authenticatedPage;
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
+  test(
+    'full purchase flow completes on mobile viewport',
+    { tag: '@smoke' },
+    async ({ authenticatedPage }) => {
+      const { page } = authenticatedPage;
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
 
-    await homePage.goto();
-    await homePage.openFirstProduct();
-    await productPage.addToCart();
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
 
-    await cartPage.goto();
-    await cartPage.openPlaceOrderModal();
-    await expect(cartPage.orderModal).toBeVisible();
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
 
-    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
-    await checkoutPage.submitPurchase();
+      await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+      await checkoutPage.submitPurchase();
 
-    await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
-    await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+      await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
+      await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
 
-    await checkoutPage.dismissConfirmation();
-  });
+      await checkoutPage.dismissConfirmation();
+    },
+  );
 });

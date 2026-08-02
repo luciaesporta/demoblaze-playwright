@@ -9,28 +9,32 @@ import {
 import { MESSAGES } from '../utils/constants';
 
 test.describe('Checkout', () => {
-  test('successful purchase with all fields completed', async ({ cartWithOneProduct }) => {
-    const { page } = cartWithOneProduct;
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
+  test(
+    'successful purchase with all fields completed',
+    { tag: '@smoke' },
+    async ({ cartWithOneProduct }) => {
+      const { page } = cartWithOneProduct;
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
 
-    await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(1);
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(1);
 
-    await cartPage.openPlaceOrderModal();
-    await expect(cartPage.orderModal).toBeVisible();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
 
-    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
-    await checkoutPage.submitPurchase();
+      await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+      await checkoutPage.submitPurchase();
 
-    await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
-    await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+      await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
+      await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
 
-    await checkoutPage.dismissConfirmation();
+      await checkoutPage.dismissConfirmation();
 
-    await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(0);
-  });
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(0);
+    },
+  );
 
   test('purchase cannot be submitted with mandatory fields empty', async ({
     cartWithOneProduct,
