@@ -237,6 +237,12 @@ test.describe('Mobile', () => {
 
       await page.setViewportSize(MOBILE_VIEWPORT);
 
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+      await expect(homePage.navbarBrand).toBeVisible();
+    },
+  );
+
   test(
     'full purchase flow completes on mobile viewport',
     { tag: '@smoke' },
