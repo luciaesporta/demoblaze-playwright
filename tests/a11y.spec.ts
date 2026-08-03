@@ -4,7 +4,7 @@ import { AuthPage } from '../pages/AuthPage';
 import { generateUser } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
 
-test.describe('A11y — Login modal', () => {
+test.describe('A11y — Login modal', { tag: '@regression' }, () => {
   test('tab navigation follows logical focus order', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
@@ -46,7 +46,7 @@ test.describe('A11y — Login modal', () => {
   });
 });
 
-test.describe('A11y — Sign up modal', () => {
+test.describe('A11y — Sign up modal', { tag: '@regression' }, () => {
   test('pressing Enter on password field submits sign up', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
@@ -68,7 +68,7 @@ test.describe('A11y — Sign up modal', () => {
   });
 });
 
-test.describe('A11y — Labels', () => {
+test.describe('A11y — Labels', { tag: '@regression' }, () => {
   test('login modal inputs have associated labels', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
@@ -122,7 +122,7 @@ test.describe('A11y — Labels', () => {
   });
 });
 
-test.describe('A11y — Images', () => {
+test.describe('A11y — Images', { tag: '@regression' }, () => {
   test('product card images have alt text', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
@@ -155,7 +155,7 @@ test.describe('A11y — Images', () => {
   });
 });
 
-test.describe('A11y — Semantics', () => {
+test.describe('A11y — Semantics', { tag: '@regression' }, () => {
   test('home page has correct heading hierarchy', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
@@ -176,7 +176,7 @@ test.describe('A11y — Semantics', () => {
   });
 });
 
-test.describe('A11y — Error visibility and contrast', () => {
+test.describe('A11y — Error visibility and contrast', { tag: '@regression' }, () => {
   test('login error displays inline feedback, not just alert', async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);

@@ -3,7 +3,7 @@ import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 
-test.describe('Visual regression', { tag: '@chromium-only' }, () => {
+test.describe('Visual regression', { tag: ['@chromium-only', '@regression'] }, () => {
   test('home page matches screenshot', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
@@ -42,7 +42,7 @@ test.describe('Visual regression', { tag: '@chromium-only' }, () => {
   });
 });
 
-test.describe('Performance — Image size', () => {
+test.describe('Performance — Image size', { tag: '@regression' }, () => {
   const MAX_IMAGE_SIZE_KB = 500;
 
   test('product card images do not exceed size limit', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('Performance — Image size', () => {
   });
 });
 
-test.describe('Performance', () => {
+test.describe('Performance', { tag: '@regression' }, () => {
   test('home page loads in under 3 seconds', async ({ page }) => {
     const start = Date.now();
     await page.goto('https://www.demoblaze.com', { waitUntil: 'domcontentloaded' });

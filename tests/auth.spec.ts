@@ -24,7 +24,7 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpSuccess);
   });
 
-  test('sign up rejects duplicate username', async ({ page }) => {
+  test('sign up rejects duplicate username', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
@@ -36,56 +36,68 @@ test.describe('Auth', () => {
     expect(message).toContain(MESSAGES.signUpExists);
   });
 
-  test('sign up safely handles XSS payload in username (no script execution)', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
-    const { password } = generateUser();
-    const uniqueSuffix = Date.now().toString(36);
-    const xssUsername = `<script>alert(1)</script>_${uniqueSuffix}`;
+  test(
+    'sign up safely handles XSS payload in username (no script execution)',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const { password } = generateUser();
+      const uniqueSuffix = Date.now().toString(36);
+      const xssUsername = `<script>alert(1)</script>_${uniqueSuffix}`;
 
-    await homePage.goto();
-    await authPage.register(xssUsername, password);
+      await homePage.goto();
+      await authPage.register(xssUsername, password);
 
-    const unexpectedDialogs: string[] = [];
-    page.on('dialog', async (dialog) => {
-      unexpectedDialogs.push(dialog.message());
-      await dialog.dismiss();
-    });
+      const unexpectedDialogs: string[] = [];
+      page.on('dialog', async (dialog) => {
+        unexpectedDialogs.push(dialog.message());
+        await dialog.dismiss();
+      });
 
-    await authPage.login(xssUsername, password);
+      await authPage.login(xssUsername, password);
 
-    expect(unexpectedDialogs).toEqual([]);
-    expect(await authPage.loggedInUsernameInnerHTML()).toContain('&lt;script&gt;');
-    await expect(authPage.loggedInUsername).toContainText(xssUsername);
-  });
+      expect(unexpectedDialogs).toEqual([]);
+      expect(await authPage.loggedInUsernameInnerHTML()).toContain('&lt;script&gt;');
+      await expect(authPage.loggedInUsername).toContainText(xssUsername);
+    },
+  );
 
-  test('sign up safely handles basic SQL injection payload in username', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
-    const { password } = generateUser();
-    const uniqueSuffix = Date.now().toString(36);
-    const sqlInjectionUsername = `' OR '1'='1_${uniqueSuffix}`;
+  test(
+    'sign up safely handles basic SQL injection payload in username',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const { password } = generateUser();
+      const uniqueSuffix = Date.now().toString(36);
+      const sqlInjectionUsername = `' OR '1'='1_${uniqueSuffix}`;
 
-    await homePage.goto();
-    const message = await authPage.register(sqlInjectionUsername, password);
+      await homePage.goto();
+      const message = await authPage.register(sqlInjectionUsername, password);
 
-    expect(message).toContain(MESSAGES.signUpSuccess);
-  });
+      expect(message).toContain(MESSAGES.signUpSuccess);
+    },
+  );
 
-  test('sign up accepts username longer than 100 characters', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
-    const { password } = generateUser();
-    const uniqueSuffix = Date.now().toString(36);
-    const longUsername = `${'qa'.repeat(100)}_${uniqueSuffix}`;
+  test(
+    'sign up accepts username longer than 100 characters',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const { password } = generateUser();
+      const uniqueSuffix = Date.now().toString(36);
+      const longUsername = `${'qa'.repeat(100)}_${uniqueSuffix}`;
 
-    await homePage.goto();
-    const message = await authPage.register(longUsername, password);
+      await homePage.goto();
+      const message = await authPage.register(longUsername, password);
 
-    expect(message).toContain(MESSAGES.signUpSuccess);
-  });
+      expect(message).toContain(MESSAGES.signUpSuccess);
+    },
+  );
 
-  test('login username is case-sensitive', async ({ page }) => {
+  test('login username is case-sensitive', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
@@ -98,18 +110,22 @@ test.describe('Auth', () => {
     await expect(authPage.loggedInUsername).toBeHidden();
   });
 
-  test('login does not trim leading or trailing whitespace from username', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
-    const { username, password } = generateUser();
+  test(
+    'login does not trim leading or trailing whitespace from username',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      const { username, password } = generateUser();
 
-    await homePage.goto();
-    await authPage.register(username, password);
-    const message = await authPage.loginExpectingError(`  ${username}  `, password);
+      await homePage.goto();
+      await authPage.register(username, password);
+      const message = await authPage.loginExpectingError(`  ${username}  `, password);
 
-    expect(message).toContain(MESSAGES.loginUserNotFound);
-    await expect(authPage.loggedInUsername).toBeHidden();
-  });
+      expect(message).toContain(MESSAGES.loginUserNotFound);
+      await expect(authPage.loggedInUsername).toBeHidden();
+    },
+  );
 
   test('successful login after registration', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
@@ -124,37 +140,45 @@ test.describe('Auth', () => {
     await expect(authPage.loggedInUsername).toContainText(username);
   });
 
-  test('login and sign up forms reject empty submission', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
+  test(
+    'login and sign up forms reject empty submission',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
 
-    await homePage.goto();
+      await homePage.goto();
 
-    await authPage.openLoginModal();
-    await authPage.submitEmptyLogin();
-    await expect(authPage.logInModal).toBeVisible();
-    await expect(authPage.loggedInUsername).toBeHidden();
+      await authPage.openLoginModal();
+      await authPage.submitEmptyLogin();
+      await expect(authPage.logInModal).toBeVisible();
+      await expect(authPage.loggedInUsername).toBeHidden();
 
-    await homePage.goto();
+      await homePage.goto();
 
-    await authPage.openSignUpModal();
-    await authPage.submitEmptySignUp();
-    await expect(authPage.signUpModal).toBeVisible();
-  });
+      await authPage.openSignUpModal();
+      await authPage.submitEmptySignUp();
+      await expect(authPage.signUpModal).toBeVisible();
+    },
+  );
 
-  test('login modal fields are cleared after closing with X and reopening', async ({ page }) => {
-    test.fail();
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
+  test(
+    'login modal fields are cleared after closing with X and reopening',
+    { tag: '@regression' },
+    async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
 
-    await homePage.goto();
-    await authPage.fillLoginAndCloseWithX('testuser', 'testpass');
-    await authPage.openLoginModal();
+      await homePage.goto();
+      await authPage.fillLoginAndCloseWithX('testuser', 'testpass');
+      await authPage.openLoginModal();
 
-    expect(await authPage.loginFieldValues()).toEqual({ username: '', password: '' });
-  });
+      expect(await authPage.loginFieldValues()).toEqual({ username: '', password: '' });
+    },
+  );
 
-  test('ESC key closes login modal', async ({ page }) => {
+  test('ESC key closes login modal', { tag: '@regression' }, async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -166,7 +190,7 @@ test.describe('Auth', () => {
     await expect(authPage.logInModal).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('ESC key closes sign up modal', async ({ page }) => {
+  test('ESC key closes sign up modal', { tag: '@regression' }, async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -178,7 +202,7 @@ test.describe('Auth', () => {
     await expect(authPage.signUpModal).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('clicking outside closes login modal', async ({ page }) => {
+  test('clicking outside closes login modal', { tag: '@regression' }, async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -190,7 +214,7 @@ test.describe('Auth', () => {
     await expect(authPage.logInModal).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('clicking outside closes sign up modal', async ({ page }) => {
+  test('clicking outside closes sign up modal', { tag: '@regression' }, async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -202,7 +226,7 @@ test.describe('Auth', () => {
     await expect(authPage.signUpModal).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('password fields mask their input', async ({ page }) => {
+  test('password fields mask their input', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
 
@@ -213,7 +237,7 @@ test.describe('Auth', () => {
   });
 });
 
-test.describe('Auth — login with invalid credentials', () => {
+test.describe('Auth — login with invalid credentials', { tag: '@regression' }, () => {
   let registeredUser: TestUser;
 
   test.beforeAll(async ({ browser }) => {
@@ -241,7 +265,7 @@ test.describe('Auth — login with invalid credentials', () => {
   }
 });
 
-test.describe('Auth — session persistence', () => {
+test.describe('Auth — session persistence', { tag: '@regression' }, () => {
   test('session persists after page refresh', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -324,7 +348,7 @@ test.describe('Auth — session persistence', () => {
   });
 });
 
-test.describe('Auth — sign up field validation', () => {
+test.describe('Auth — sign up field validation', { tag: '@regression' }, () => {
   for (const scenario of INVALID_SIGNUP_SCENARIOS) {
     test(`sign up fails with ${scenario.description}`, async ({ page }) => {
       const homePage = new HomePage(page);
@@ -343,7 +367,7 @@ test.describe('Auth — sign up field validation', () => {
   }
 });
 
-test.describe('Auth — sign up with special characters in username', () => {
+test.describe('Auth — sign up with special characters in username', { tag: '@regression' }, () => {
   for (const scenario of SPECIAL_CHAR_SIGNUP_SCENARIOS) {
     test(`accepts username with ${scenario.description}`, async ({ page }) => {
       const homePage = new HomePage(page);

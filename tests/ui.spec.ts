@@ -45,7 +45,7 @@ test.describe('UI — Home page', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
-  test('products load correctly after page refresh', async ({ page }) => {
+  test('products load correctly after page refresh', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
@@ -59,24 +59,28 @@ test.describe('UI — Home page', () => {
     expect(afterRefresh).toEqual(initialProducts);
   });
 
-  test('page title and favicon are present and correct', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    const cartPage = new CartPage(page);
+  test(
+    'page title and favicon are present and correct',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
 
-    await homePage.goto();
-    await expect(page).toHaveTitle(PAGE_TITLE);
-    expect(await homePage.getFaviconHref()).toMatch(FAVICON_HREF);
+      await homePage.goto();
+      await expect(page).toHaveTitle(PAGE_TITLE);
+      expect(await homePage.getFaviconHref()).toMatch(FAVICON_HREF);
 
-    await homePage.openProduct(0);
-    await expect(productPage.productName).toBeVisible();
-    await expect(page).toHaveTitle(PAGE_TITLE);
-    expect(await productPage.getFaviconHref()).toMatch(FAVICON_HREF);
+      await homePage.openProduct(0);
+      await expect(productPage.productName).toBeVisible();
+      await expect(page).toHaveTitle(PAGE_TITLE);
+      expect(await productPage.getFaviconHref()).toMatch(FAVICON_HREF);
 
-    await cartPage.goto();
-    await expect(page).toHaveTitle(PAGE_TITLE);
-    expect(await cartPage.getFaviconHref()).toMatch(FAVICON_HREF);
-  });
+      await cartPage.goto();
+      await expect(page).toHaveTitle(PAGE_TITLE);
+      expect(await cartPage.getFaviconHref()).toMatch(FAVICON_HREF);
+    },
+  );
 });
 
 test.describe('UI — Navigation', () => {
@@ -92,39 +96,45 @@ test.describe('UI — Navigation', () => {
     await expect(homePage.firstProductLink).toBeVisible();
   });
 
-  test('navbar logo returns to home from the cart page', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const cartPage = new CartPage(page);
+  test(
+    'navbar logo returns to home from the cart page',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const cartPage = new CartPage(page);
 
-    await cartPage.goto();
-    await expect(page).toHaveURL(CART_PAGE_URL);
+      await cartPage.goto();
+      await expect(page).toHaveURL(CART_PAGE_URL);
 
-    await homePage.clickNavBrand();
+      await homePage.clickNavBrand();
 
-    await expect(page).toHaveTitle(PAGE_TITLE);
-    await expect(homePage.firstProductLink).toBeVisible();
-  });
+      await expect(page).toHaveTitle(PAGE_TITLE);
+      await expect(homePage.firstProductLink).toBeVisible();
+    },
+  );
 
-  test('navbar logo is not clickable while Place Order modal is open', async ({
-    cartWithOneProduct,
-  }) => {
-    const { page } = cartWithOneProduct;
-    const homePage = new HomePage(page);
-    const cartPage = new CartPage(page);
+  test(
+    'navbar logo is not clickable while Place Order modal is open',
+    { tag: '@regression' },
+    async ({ cartWithOneProduct }) => {
+      const { page } = cartWithOneProduct;
+      const homePage = new HomePage(page);
+      const cartPage = new CartPage(page);
 
-    await cartPage.goto();
-    await cartPage.openPlaceOrderModal();
-    await expect(cartPage.orderModal).toBeVisible();
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
 
-    await expect(homePage.navbarBrand).toBeVisible();
-    const navResult = await homePage.navbarBrand
-      .click({ timeout: 2_000, trial: true })
-      .then(() => true)
-      .catch(() => false);
-    expect(navResult).toBe(false);
+      await expect(homePage.navbarBrand).toBeVisible();
+      const navResult = await homePage.navbarBrand
+        .click({ timeout: 2_000, trial: true })
+        .then(() => true)
+        .catch(() => false);
+      expect(navResult).toBe(false);
 
-    await expect(page).toHaveURL(CART_PAGE_URL);
-  });
+      await expect(page).toHaveURL(CART_PAGE_URL);
+    },
+  );
 
   test('cart link in navbar navigates to the cart page', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
@@ -133,7 +143,7 @@ test.describe('UI — Navigation', () => {
     await expect(page).toHaveURL(CART_PAGE_URL);
   });
 
-  test('pagination navigates between product pages', async ({ page }) => {
+  test('pagination navigates between product pages', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
@@ -155,85 +165,101 @@ test.describe('UI — Navigation', () => {
     }).toPass();
   });
 
-  test('Previous button on first page does not change product list', async ({ page }) => {
-    test.fail();
-    const homePage = new HomePage(page);
-    await homePage.goto();
+  test(
+    'Previous button on first page does not change product list',
+    { tag: '@regression' },
+    async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      await homePage.goto();
 
-    await expect(homePage.firstProductLink).toBeVisible();
-    const initialProducts = await homePage.getProductNames();
+      await expect(homePage.firstProductLink).toBeVisible();
+      const initialProducts = await homePage.getProductNames();
 
-    await homePage.clickPrev();
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+      await homePage.clickPrev();
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(1000);
 
-    const afterPrev = await homePage.getProductNames();
-    expect(afterPrev).toEqual(initialProducts);
-  });
+      const afterPrev = await homePage.getProductNames();
+      expect(afterPrev).toEqual(initialProducts);
+    },
+  );
 
-  test('Next button on last page does not change product list', async ({ page }) => {
-    test.fail();
-    const homePage = new HomePage(page);
-    await homePage.goto();
+  test(
+    'Next button on last page does not change product list',
+    { tag: '@regression' },
+    async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      await homePage.goto();
 
-    await expect(homePage.firstProductLink).toBeVisible();
+      await expect(homePage.firstProductLink).toBeVisible();
 
-    await homePage.clickNext();
-    await expect(async () => {
-      const products = await homePage.getProductNames();
-      expect(products.length).toBeGreaterThan(0);
-    }).toPass();
-    const lastPageProducts = await homePage.getProductNames();
+      await homePage.clickNext();
+      await expect(async () => {
+        const products = await homePage.getProductNames();
+        expect(products.length).toBeGreaterThan(0);
+      }).toPass();
+      const lastPageProducts = await homePage.getProductNames();
 
-    await homePage.clickNext({ timeout: 5_000 });
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+      await homePage.clickNext({ timeout: 5_000 });
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(1000);
 
-    const afterNext = await homePage.getProductNames();
-    expect(afterNext).toEqual(lastPageProducts);
-  });
+      const afterNext = await homePage.getProductNames();
+      expect(afterNext).toEqual(lastPageProducts);
+    },
+  );
 
-  test('switching category resets pagination to first page', async ({ page }) => {
-    const homePage = new HomePage(page);
-    await homePage.goto();
+  test(
+    'switching category resets pagination to first page',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      await homePage.goto();
 
-    await expect(homePage.firstProductLink).toBeVisible();
-    const firstPageProducts = await homePage.getProductNames();
+      await expect(homePage.firstProductLink).toBeVisible();
+      const firstPageProducts = await homePage.getProductNames();
 
-    await homePage.clickNext();
-    await expect(async () => {
-      const products = await homePage.getProductNames();
-      expect(products).not.toEqual(firstPageProducts);
-    }).toPass();
+      await homePage.clickNext();
+      await expect(async () => {
+        const products = await homePage.getProductNames();
+        expect(products).not.toEqual(firstPageProducts);
+      }).toPass();
 
-    await homePage.openCategory('Phones');
+      await homePage.openCategory('Phones');
 
-    const phonesProducts = await homePage.getProductNames();
-    expect(phonesProducts[0]).toBe(CATEGORY_PRODUCTS.Phones[0]);
-  });
+      const phonesProducts = await homePage.getProductNames();
+      expect(phonesProducts[0]).toBe(CATEGORY_PRODUCTS.Phones[0]);
+    },
+  );
 
-  test('browser back/forward after category filter preserves navigation', async ({ page }) => {
-    test.fail();
-    const homePage = new HomePage(page);
-    await homePage.goto();
+  test(
+    'browser back/forward after category filter preserves navigation',
+    { tag: '@regression' },
+    async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      await homePage.goto();
 
-    await expect(homePage.firstProductLink).toBeVisible();
-    const allProducts = await homePage.getProductNames();
+      await expect(homePage.firstProductLink).toBeVisible();
+      const allProducts = await homePage.getProductNames();
 
-    await homePage.openCategory('Phones');
-    const phonesProducts = await homePage.getProductNames();
-    expect(phonesProducts).toHaveLength(CATEGORY_PRODUCTS.Phones.length);
+      await homePage.openCategory('Phones');
+      const phonesProducts = await homePage.getProductNames();
+      expect(phonesProducts).toHaveLength(CATEGORY_PRODUCTS.Phones.length);
 
-    await page.goBack({ waitUntil: 'domcontentloaded' });
-    await expect(homePage.firstProductLink).toBeVisible();
-    const afterBack = await homePage.getProductNames();
-    expect(afterBack).toEqual(allProducts);
+      await page.goBack({ waitUntil: 'domcontentloaded' });
+      await expect(homePage.firstProductLink).toBeVisible();
+      const afterBack = await homePage.getProductNames();
+      expect(afterBack).toEqual(allProducts);
 
-    await page.goForward({ waitUntil: 'domcontentloaded' });
-    await expect(homePage.firstProductLink).toBeVisible();
-    const afterForward = await homePage.getProductNames();
-    expect(afterForward).toEqual(phonesProducts);
-  });
+      await page.goForward({ waitUntil: 'domcontentloaded' });
+      await expect(homePage.firstProductLink).toBeVisible();
+      const afterForward = await homePage.getProductNames();
+      expect(afterForward).toEqual(phonesProducts);
+    },
+  );
 });
 
 test.describe('UI — Product detail', () => {
@@ -275,17 +301,21 @@ test.describe('UI — Product detail', () => {
     expect((await productPage.getProductDescription()).length).toBeGreaterThan(0);
   });
 
-  test('non-existent product URL shows empty detail page', async ({ page }) => {
-    const productPage = new ProductPage(page);
+  test(
+    'non-existent product URL shows empty detail page',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const productPage = new ProductPage(page);
 
-    await page.goto('/prod.html?idp_=99999', { waitUntil: 'domcontentloaded' });
+      await page.goto('/prod.html?idp_=99999', { waitUntil: 'domcontentloaded' });
 
-    await expect(productPage.productName).not.toBeVisible({ timeout: 3_000 });
-    await expect(productPage.productPrice).not.toBeVisible({ timeout: 3_000 });
-  });
+      await expect(productPage.productName).not.toBeVisible({ timeout: 3_000 });
+      await expect(productPage.productPrice).not.toBeVisible({ timeout: 3_000 });
+    },
+  );
 });
 
-test.describe('UI — Direct URL access', () => {
+test.describe('UI — Direct URL access', { tag: '@regression' }, () => {
   test('direct URL to cart without products renders correctly', async ({ page }) => {
     const cartPage = new CartPage(page);
 
@@ -297,7 +327,7 @@ test.describe('UI — Direct URL access', () => {
   });
 });
 
-test.describe('UI — Category filters', () => {
+test.describe('UI — Category filters', { tag: '@regression' }, () => {
   for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [
     CategoryName,
     readonly string[],
@@ -319,7 +349,7 @@ test.describe('UI — Category filters', () => {
   }
 });
 
-test.describe('UI — Category product count', () => {
+test.describe('UI — Category product count', { tag: '@regression' }, () => {
   for (const [category, expected] of Object.entries(CATEGORY_PRODUCTS) as [
     CategoryName,
     readonly string[],
@@ -337,7 +367,7 @@ test.describe('UI — Category product count', () => {
   }
 });
 
-test.describe('UI — Images', () => {
+test.describe('UI — Images', { tag: '@regression' }, () => {
   test('home page product card images all load', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
@@ -374,7 +404,7 @@ test.describe('UI — Images', () => {
   }
 });
 
-test.describe('UI — Hero carousel', () => {
+test.describe('UI — Hero carousel', { tag: '@regression' }, () => {
   test('auto-advances and responds to manual controls', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
@@ -388,7 +418,7 @@ test.describe('UI — Hero carousel', () => {
   });
 });
 
-test.describe('UI — Modals', () => {
+test.describe('UI — Modals', { tag: '@regression' }, () => {
   test('About us modal loads video content', async ({ page }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
@@ -514,20 +544,24 @@ test.describe('UI — Session', () => {
     await expect(authPage.logInNavButton).toBeVisible();
   });
 
-  test('log out link visible regardless of session state (bug verification)', async ({ page }) => {
-    // BUG: demoblaze is known to expose the "Log out" link in unauthenticated
-    // sessions. Correct behavior is that it should only appear when logged in.
-    // Marked as expected to fail so that test.fail() is satisfied while the bug
-    // is present; if the bug is fixed, this test starts "failing" (passing) and
-    // should be removed.
-    test.fail();
+  test(
+    'log out link visible regardless of session state (bug verification)',
+    { tag: '@regression' },
+    async ({ page }) => {
+      // BUG: demoblaze is known to expose the "Log out" link in unauthenticated
+      // sessions. Correct behavior is that it should only appear when logged in.
+      // Marked as expected to fail so that test.fail() is satisfied while the bug
+      // is present; if the bug is fixed, this test starts "failing" (passing) and
+      // should be removed.
+      test.fail();
 
-    const homePage = new HomePage(page);
-    const authPage = new AuthPage(page);
-    await homePage.goto();
+      const homePage = new HomePage(page);
+      const authPage = new AuthPage(page);
+      await homePage.goto();
 
-    await expect(authPage.logInNavButton).toBeVisible();
-    await expect(authPage.signUpNavButton).toBeVisible();
-    await expect(authPage.logoutButton).toBeVisible();
-  });
+      await expect(authPage.logInNavButton).toBeVisible();
+      await expect(authPage.signUpNavButton).toBeVisible();
+      await expect(authPage.logoutButton).toBeVisible();
+    },
+  );
 });

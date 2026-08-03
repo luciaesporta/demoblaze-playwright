@@ -6,7 +6,7 @@ import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import { generateUser, DEFAULT_ORDER } from '../utils/testData';
 
-test.describe('API — Add to cart', () => {
+test.describe('API — Add to cart', { tag: '@regression' }, () => {
   test('addtocart request contains valid payload', async ({ page }) => {
     const homePage = new HomePage(page);
 
@@ -35,7 +35,7 @@ test.describe('API — Add to cart', () => {
   });
 });
 
-test.describe('API — Delete from cart', () => {
+test.describe('API — Delete from cart', { tag: '@regression' }, () => {
   test('deleteitem request sends valid payload and returns 200', async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
@@ -65,7 +65,7 @@ test.describe('API — Delete from cart', () => {
   });
 });
 
-test.describe('API — Network failure', () => {
+test.describe('API — Network failure', { tag: '@regression' }, () => {
   test('mocked login network failure does not break the UI', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -89,7 +89,7 @@ test.describe('API — Network failure', () => {
   });
 });
 
-test.describe('API — Login check', () => {
+test.describe('API — Login check', { tag: '@regression' }, () => {
   test('login triggers /check request with 200 status', async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
@@ -109,7 +109,7 @@ test.describe('API — Login check', () => {
   });
 });
 
-test.describe('API — Slow response', () => {
+test.describe('API — Slow response', { tag: '@regression' }, () => {
   test('delayed catalog response does not break the UI', async ({ page }) => {
     const homePage = new HomePage(page);
 
@@ -129,7 +129,7 @@ test.describe('API — Slow response', () => {
   });
 });
 
-test.describe('API — Happy path network audit', () => {
+test.describe('API — Happy path network audit', { tag: '@regression' }, () => {
   test('no 4xx/5xx responses during full purchase flow', async ({ page }) => {
     const errors: { url: string; status: number }[] = [];
     page.on('response', (response) => {
@@ -165,7 +165,7 @@ test.describe('API — Happy path network audit', () => {
   });
 });
 
-test.describe('API — Console errors smoke', () => {
+test.describe('API — Console errors smoke', { tag: '@regression' }, () => {
   test('no console errors during navigation', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', (msg) => {
