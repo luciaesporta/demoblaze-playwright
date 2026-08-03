@@ -18,7 +18,7 @@ const CATEGORY_NAMES = Object.keys(CATEGORY_PRODUCTS) as CategoryName[];
 test.describe('Mobile', () => {
   test.use({ viewport: MOBILE_VIEWPORT });
 
-  test('application is usable on mobile viewport', async ({ page }) => {
+  test('application is usable on mobile viewport', { tag: '@smoke' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const productPage = new ProductPage(page);
     const cartPage = new CartPage(page);
@@ -45,7 +45,7 @@ test.describe('Mobile', () => {
     await cartPage.closePlaceOrderModal();
   });
 
-  test('login and sign up modals are usable', async ({ page }) => {
+  test('login and sign up modals are usable', { tag: '@regression' }, async ({ page }) => {
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
@@ -61,43 +61,51 @@ test.describe('Mobile', () => {
   });
 
   for (const category of CATEGORY_NAMES) {
-    test(`"${category}" category filter works through collapsed navbar`, async ({ page }) => {
+    test(
+      `"${category}" category filter works through collapsed navbar`,
+      { tag: '@regression' },
+      async ({ page }) => {
+        const homePage = new HomePage(page);
+
+        await homePage.goto();
+        await expect(homePage.firstProductLink).toBeVisible();
+        await homePage.openCategory(category);
+        await expect(homePage.firstProductLink).toBeVisible();
+      },
+    );
+  }
+
+  test(
+    'category list expands and collapses with tap on mobile',
+    { tag: '@regression' },
+    async ({ page }) => {
       const homePage = new HomePage(page);
 
       await homePage.goto();
       await expect(homePage.firstProductLink).toBeVisible();
-      await homePage.openCategory(category);
+
+      const categoriesVisible = await page.evaluate(() => {
+        const catList = document.querySelector('#itemc');
+        if (!catList) return false;
+        const rect = catList.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      expect(categoriesVisible).toBe(true);
+
+      for (const category of CATEGORY_NAMES) {
+        const categoryLink = page.locator('#itemc').getByText(category, { exact: true });
+        await expect(categoryLink).toBeVisible();
+      }
+
+      await homePage.openCategory('Phones');
       await expect(homePage.firstProductLink).toBeVisible();
-    });
-  }
 
-  test('category list expands and collapses with tap on mobile', async ({ page }) => {
-    const homePage = new HomePage(page);
+      const productCount = await homePage.getProductCardCount();
+      expect(productCount).toBe(CATEGORY_PRODUCTS.Phones.length);
+    },
+  );
 
-    await homePage.goto();
-    await expect(homePage.firstProductLink).toBeVisible();
-
-    const categoriesVisible = await page.evaluate(() => {
-      const catList = document.querySelector('#itemc');
-      if (!catList) return false;
-      const rect = catList.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    });
-    expect(categoriesVisible).toBe(true);
-
-    for (const category of CATEGORY_NAMES) {
-      const categoryLink = page.locator('#itemc').getByText(category, { exact: true });
-      await expect(categoryLink).toBeVisible();
-    }
-
-    await homePage.openCategory('Phones');
-    await expect(homePage.firstProductLink).toBeVisible();
-
-    const productCount = await homePage.getProductCardCount();
-    expect(productCount).toBe(CATEGORY_PRODUCTS.Phones.length);
-  });
-
-  test('carousel responds to swipe gestures', async ({ page }) => {
+  test('carousel responds to swipe gestures', { tag: '@regression' }, async ({ page }) => {
     test.fail();
     const homePage = new HomePage(page);
     await homePage.goto();
@@ -130,120 +138,136 @@ test.describe('Mobile', () => {
     expect(afterSwipeRight).not.toBe(afterSwipeLeft);
   });
 
-  test('cart layout does not overflow on mobile viewport', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    const cartPage = new CartPage(page);
+  test(
+    'cart layout does not overflow on mobile viewport',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
 
-    await homePage.goto();
-    await homePage.openFirstProduct();
-    await productPage.addToCart();
-    await homePage.goto();
-    await homePage.openProduct(1);
-    await productPage.addToCart();
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
+      await homePage.goto();
+      await homePage.openProduct(1);
+      await productPage.addToCart();
 
-    await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(2);
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(2);
 
-    const hasOverflow = await page.evaluate(() => {
-      const table = document.querySelector('#tbodyid')?.closest('table');
-      if (!table) return true;
-      return table.scrollWidth > table.clientWidth;
-    });
-    expect(hasOverflow).toBe(false);
-
-    await expect(cartPage.cartTotal).toBeVisible();
-    await expect(cartPage.placeOrderButton).toBeVisible();
-
-    const allColumnsVisible = await page.evaluate(() => {
-      const rows = document.querySelectorAll('#tbodyid tr');
-      return Array.from(rows).every((row) => {
-        const cells = row.querySelectorAll('td');
-        return Array.from(cells).every((cell) => (cell as HTMLElement).offsetWidth > 0);
+      const hasOverflow = await page.evaluate(() => {
+        const table = document.querySelector('#tbodyid')?.closest('table');
+        if (!table) return true;
+        return table.scrollWidth > table.clientWidth;
       });
-    });
-    expect(allColumnsVisible).toBe(true);
-  });
+      expect(hasOverflow).toBe(false);
 
-  test('Place Order modal fields are visible without horizontal scroll', async ({ page }) => {
-    test.fail();
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
+      await expect(cartPage.cartTotal).toBeVisible();
+      await expect(cartPage.placeOrderButton).toBeVisible();
 
-    await homePage.goto();
-    await homePage.openFirstProduct();
-    await productPage.addToCart();
+      const allColumnsVisible = await page.evaluate(() => {
+        const rows = document.querySelectorAll('#tbodyid tr');
+        return Array.from(rows).every((row) => {
+          const cells = row.querySelectorAll('td');
+          return Array.from(cells).every((cell) => (cell as HTMLElement).offsetWidth > 0);
+        });
+      });
+      expect(allColumnsVisible).toBe(true);
+    },
+  );
 
-    await cartPage.goto();
-    await cartPage.openPlaceOrderModal();
-    await expect(cartPage.orderModal).toBeVisible();
+  test(
+    'Place Order modal fields are visible without horizontal scroll',
+    { tag: '@regression' },
+    async ({ page }) => {
+      test.fail();
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
 
-    await expect(checkoutPage.nameInput).toBeVisible();
-    await expect(checkoutPage.countryInput).toBeVisible();
-    await expect(checkoutPage.cityInput).toBeVisible();
-    await expect(checkoutPage.creditCardInput).toBeVisible();
-    await expect(checkoutPage.monthInput).toBeVisible();
-    await expect(checkoutPage.yearInput).toBeVisible();
-    await expect(checkoutPage.purchaseButton).toBeVisible();
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
 
-    const hasOverflow = await page.evaluate(() => {
-      const modal = document.querySelector('#orderModal .modal-dialog');
-      if (!modal) return true;
-      return modal.scrollWidth > modal.clientWidth;
-    });
-    expect(hasOverflow).toBe(false);
-  });
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
 
-  test('orientation change from portrait to landscape does not break layout', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const cartPage = new CartPage(page);
+      await expect(checkoutPage.nameInput).toBeVisible();
+      await expect(checkoutPage.countryInput).toBeVisible();
+      await expect(checkoutPage.cityInput).toBeVisible();
+      await expect(checkoutPage.creditCardInput).toBeVisible();
+      await expect(checkoutPage.monthInput).toBeVisible();
+      await expect(checkoutPage.yearInput).toBeVisible();
+      await expect(checkoutPage.purchaseButton).toBeVisible();
 
-    await homePage.goto();
-    await expect(homePage.firstProductLink).toBeVisible();
+      const hasOverflow = await page.evaluate(() => {
+        const modal = document.querySelector('#orderModal .modal-dialog');
+        if (!modal) return true;
+        return modal.scrollWidth > modal.clientWidth;
+      });
+      expect(hasOverflow).toBe(false);
+    },
+  );
 
-    await page.setViewportSize(MOBILE_LANDSCAPE_VIEWPORT);
+  test(
+    'orientation change from portrait to landscape does not break layout',
+    { tag: '@regression' },
+    async ({ page }) => {
+      const homePage = new HomePage(page);
+      const cartPage = new CartPage(page);
 
-    await expect(homePage.firstProductLink).toBeVisible();
-    await expect(homePage.navbarBrand).toBeVisible();
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
 
-    const hasOverflow = await page.evaluate(() => {
-      return document.documentElement.scrollWidth > document.documentElement.clientWidth;
-    });
-    expect(hasOverflow).toBe(false);
+      await page.setViewportSize(MOBILE_LANDSCAPE_VIEWPORT);
 
-    await cartPage.goto();
-    await expect(cartPage.placeOrderButton).toBeVisible();
+      await expect(homePage.firstProductLink).toBeVisible();
+      await expect(homePage.navbarBrand).toBeVisible();
 
-    await page.setViewportSize(MOBILE_VIEWPORT);
+      const hasOverflow = await page.evaluate(() => {
+        return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+      });
+      expect(hasOverflow).toBe(false);
 
-    await homePage.goto();
-    await expect(homePage.firstProductLink).toBeVisible();
-    await expect(homePage.navbarBrand).toBeVisible();
-  });
+      await cartPage.goto();
+      await expect(cartPage.placeOrderButton).toBeVisible();
 
-  test('full purchase flow completes on mobile viewport', async ({ authenticatedPage }) => {
-    const { page } = authenticatedPage;
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
+      await page.setViewportSize(MOBILE_VIEWPORT);
 
-    await homePage.goto();
-    await homePage.openFirstProduct();
-    await productPage.addToCart();
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+      await expect(homePage.navbarBrand).toBeVisible();
+    },
+  );
 
-    await cartPage.goto();
-    await cartPage.openPlaceOrderModal();
-    await expect(cartPage.orderModal).toBeVisible();
+  test(
+    'full purchase flow completes on mobile viewport',
+    { tag: '@smoke' },
+    async ({ authenticatedPage }) => {
+      const { page } = authenticatedPage;
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
+      const checkoutPage = new CheckoutPage(page);
 
-    await checkoutPage.fillOrderForm(DEFAULT_ORDER);
-    await checkoutPage.submitPurchase();
+      await homePage.goto();
+      await homePage.openFirstProduct();
+      await productPage.addToCart();
 
-    await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
-    await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+      await cartPage.goto();
+      await cartPage.openPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeVisible();
 
-    await checkoutPage.dismissConfirmation();
-  });
+      await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+      await checkoutPage.submitPurchase();
+
+      await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
+      await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+
+      await checkoutPage.dismissConfirmation();
+    },
+  );
 });
