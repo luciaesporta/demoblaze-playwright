@@ -157,12 +157,58 @@ Supporting features include user authentication (sign up and log in), which enab
 | Perf     | Product detail image does not exceed 500 KB                                                           |
 | Perf     | Home page loads in under 3 seconds                                                                    |
 
+## Test tags
+
+Tests are organized with Playwright tags so you can run specific subsets of the suite.
+
+### Available tags
+
+| Tag           | Purpose                                  | Count |
+| ------------- | ---------------------------------------- | ----- |
+| `@smoke`      | Core happy-path tests (login, cart, checkout, mobile) | 14    |
+| `@regression` | Validation, edge cases, modals, a11y, API, visual    | 135   |
+
+### Running by tag
+
+```bash
+# Smoke tests only (fast feedback loop)
+npm run test:smoke
+
+# Full regression suite
+npm run test:regression
+
+# Combine tags
+npx playwright test --grep "@smoke|@regression"
+
+# Exclude a tag
+npx playwright test --grep-invert @regression
+```
+
+### Adding tags to new tests
+
+Use the `tag` option as a string literal in the test or describe block:
+
+```ts
+// Single test
+test('should work', { tag: '@smoke' }, async ({ page }) => { ... });
+
+// Entire describe block
+test.describe('Feature', { tag: '@regression' }, () => { ... });
+```
+
+### When to use each tag
+
+- **@smoke** — Tests that cover the most critical user flows. If any of these fail, the application is fundamentally broken. Keep this set small and fast.
+- **@regression** — Everything else: validation rules, edge cases, modal behavior, accessibility, API checks, visual regression, performance. Run these before merging to main.
+
 ## Run locally
 
 ```bash
 npm install
 npx playwright install chromium
-npm test
+npm test                  # all tests
+npm run test:smoke        # smoke tests only
+npm run test:regression   # regression suite
 npm run test:headed
 npm run test:report
 npm run typecheck
