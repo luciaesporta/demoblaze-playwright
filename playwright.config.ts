@@ -1,18 +1,21 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60_000,
-  retries: 2,
+  timeout: Number(process.env.TEST_TIMEOUT) || 60_000,
+  retries: Number(process.env.RETRIES) || 2,
   expect: {
-    timeout: 15_000,
+    timeout: Number(process.env.EXPECT_TIMEOUT) || 15_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
   snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
   reporter: [['html', { open: 'never', outputFolder: 'playwright-report' }], ['list']],
   use: {
-    baseURL: 'https://www.demoblaze.com',
-    headless: true,
+    baseURL: process.env.BASE_URL || 'https://www.demoblaze.com',
+    headless: process.env.HEADLESS !== 'false',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
