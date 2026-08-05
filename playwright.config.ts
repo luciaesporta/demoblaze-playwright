@@ -2,8 +2,11 @@ import path from 'path';
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
-const envFile = process.env.NODE_ENV === 'ci' ? '.env.ci' : '.env.local';
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+const envMap: Record<string, string> = { ci: '.env.ci', local: '.env.local' };
+const envFile = envMap[process.env.NODE_ENV ?? ''];
+if (envFile) {
+  dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+}
 dotenv.config();
 
 export default defineConfig({
