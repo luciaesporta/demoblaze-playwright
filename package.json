@@ -4,6 +4,8 @@
   "description": "Playwright tests for demoblaze.com",
   "scripts": {
     "test": "npx playwright test",
+    "test:local": "NODE_ENV=local npx playwright test",
+    "test:ci": "NODE_ENV=ci npx playwright test",
     "test:headed": "npx playwright test --headed",
     "test:report": "npx playwright show-report",
     "typecheck": "tsc --noEmit",
