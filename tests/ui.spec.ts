@@ -188,7 +188,6 @@ test.describe('UI — Navigation', () => {
     'Next button on last page does not change product list',
     { tag: '@regression' },
     async ({ page }) => {
-      test.fail();
       const homePage = new HomePage(page);
       await homePage.goto();
 
