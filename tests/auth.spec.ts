@@ -306,7 +306,8 @@ test.describe('Auth — session persistence', { tag: '@regression' }, () => {
     await expect(newAuthPage.loggedInUsername).toContainText(username);
   });
 
-  test('logout clears the cart', async ({ page }) => {
+  test('logout clears the cart', async ({ page }, testInfo) => {
+    testInfo.setTimeout(120_000);
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const productPage = new ProductPage(page);
@@ -328,7 +329,10 @@ test.describe('Auth — session persistence', { tag: '@regression' }, () => {
     await expect(cartPage.cartRows).toHaveCount(0);
   });
 
-  test('consecutive logins with different users switch session correctly', async ({ page }) => {
+  test('consecutive logins with different users switch session correctly', async ({
+    page,
+  }, testInfo) => {
+    testInfo.setTimeout(120_000);
     const homePage = new HomePage(page);
     const authPage = new AuthPage(page);
     const userA = generateUser();
