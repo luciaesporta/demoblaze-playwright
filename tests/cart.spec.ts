@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/authFixtures';
+import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
@@ -44,16 +45,27 @@ test.describe('Cart', () => {
     const productPage = new ProductPage(page);
     const cartPage = new CartPage(page);
 
-    await homePage.goto();
-    await expect(page).toHaveTitle(PAGE_TITLE);
+    await step('Open home page', async () => {
+      await homePage.goto();
+      await expect(page).toHaveTitle(PAGE_TITLE);
+    });
 
-    await homePage.openFirstProduct();
-    await expect(page).toHaveURL(PRODUCT_PAGE_URL);
+    await step('Select first product and add to cart', async () => {
+      await homePage.openFirstProduct();
+      await expect(page).toHaveURL(PRODUCT_PAGE_URL);
+      const screenshot = await page.screenshot();
+      await attachment('Product detail page', screenshot, 'image/png');
+    });
+
     const { name: expectedName } = await productPage.addToCartAndCapture();
 
-    await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(1);
-    await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
+    await step('Verify product appears in cart', async () => {
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(1);
+      await expect(cartPage.getRowTitleCell(0)).toContainText(expectedName);
+      const screenshot = await page.screenshot();
+      await attachment('Cart with product', screenshot, 'image/png');
+    });
   });
 
   test(

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { step } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { ProductPage } from '../pages/ProductPage';
@@ -18,10 +19,14 @@ test.describe('Auth', () => {
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
 
-    await homePage.goto();
-    const message = await authPage.register(username, password);
+    await step('Open home page', async () => {
+      await homePage.goto();
+    });
 
-    expect(message).toContain(MESSAGES.signUpSuccess);
+    await step('Register new user', async () => {
+      const message = await authPage.register(username, password);
+      expect(message).toContain(MESSAGES.signUpSuccess);
+    });
   });
 
   test('sign up rejects duplicate username', { tag: '@regression' }, async ({ page }) => {
@@ -132,12 +137,19 @@ test.describe('Auth', () => {
     const authPage = new AuthPage(page);
     const { username, password } = generateUser();
 
-    await homePage.goto();
-    await authPage.register(username, password);
-    await authPage.login(username, password);
+    await step('Register new user', async () => {
+      await homePage.goto();
+      await authPage.register(username, password);
+    });
 
-    await expect(authPage.loggedInUsername).toBeVisible();
-    await expect(authPage.loggedInUsername).toContainText(username);
+    await step('Login with registered user', async () => {
+      await authPage.login(username, password);
+    });
+
+    await step('Verify logged in', async () => {
+      await expect(authPage.loggedInUsername).toBeVisible();
+      await expect(authPage.loggedInUsername).toContainText(username);
+    });
   });
 
   test(

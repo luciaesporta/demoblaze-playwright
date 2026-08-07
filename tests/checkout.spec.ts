@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/authFixtures';
+import { step, attachment } from 'allure-js-commons';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import {
@@ -17,22 +18,37 @@ test.describe('Checkout', () => {
       const cartPage = new CartPage(page);
       const checkoutPage = new CheckoutPage(page);
 
-      await cartPage.goto();
-      await expect(cartPage.cartRows).toHaveCount(1);
+      await step('Navigate to cart and verify product', async () => {
+        await cartPage.goto();
+        await expect(cartPage.cartRows).toHaveCount(1);
+      });
 
-      await cartPage.openPlaceOrderModal();
-      await expect(cartPage.orderModal).toBeVisible();
+      await step('Open Place Order modal', async () => {
+        await cartPage.openPlaceOrderModal();
+        await expect(cartPage.orderModal).toBeVisible();
+        const screenshot = await page.screenshot();
+        await attachment('Order modal opened', screenshot, 'image/png');
+      });
 
-      await checkoutPage.fillOrderForm(DEFAULT_ORDER);
-      await checkoutPage.submitPurchase();
+      await step('Fill order form and submit', async () => {
+        await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+        const screenshot = await page.screenshot();
+        await attachment('Order form filled', screenshot, 'image/png');
+        await checkoutPage.submitPurchase();
+      });
 
-      await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
-      await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+      await step('Verify purchase confirmation', async () => {
+        await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
+        await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+        const screenshot = await page.screenshot();
+        await attachment('Purchase confirmation', screenshot, 'image/png');
+        await checkoutPage.dismissConfirmation();
+      });
 
-      await checkoutPage.dismissConfirmation();
-
-      await cartPage.goto();
-      await expect(cartPage.cartRows).toHaveCount(0);
+      await step('Verify cart is empty after purchase', async () => {
+        await cartPage.goto();
+        await expect(cartPage.cartRows).toHaveCount(0);
+      });
     },
   );
 

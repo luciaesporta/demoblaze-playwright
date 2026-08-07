@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/authFixtures';
+import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { AuthPage } from '../pages/AuthPage';
@@ -253,21 +254,32 @@ test.describe('Mobile', () => {
       const cartPage = new CartPage(page);
       const checkoutPage = new CheckoutPage(page);
 
-      await homePage.goto();
-      await homePage.openFirstProduct();
-      await productPage.addToCart();
+      await step('Add product to cart on mobile', async () => {
+        await homePage.goto();
+        await homePage.openFirstProduct();
+        await productPage.addToCart();
+      });
 
-      await cartPage.goto();
-      await cartPage.openPlaceOrderModal();
-      await expect(cartPage.orderModal).toBeVisible();
+      await step('Open Place Order modal', async () => {
+        await cartPage.goto();
+        await cartPage.openPlaceOrderModal();
+        await expect(cartPage.orderModal).toBeVisible();
+        const screenshot = await page.screenshot();
+        await attachment('Mobile order modal', screenshot, 'image/png');
+      });
 
-      await checkoutPage.fillOrderForm(DEFAULT_ORDER);
-      await checkoutPage.submitPurchase();
+      await step('Fill and submit order', async () => {
+        await checkoutPage.fillOrderForm(DEFAULT_ORDER);
+        await checkoutPage.submitPurchase();
+      });
 
-      await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
-      await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
-
-      await checkoutPage.dismissConfirmation();
+      await step('Verify purchase confirmation', async () => {
+        await expect(checkoutPage.confirmationTitle).toHaveText(MESSAGES.purchaseConfirmation);
+        await expect(checkoutPage.confirmationBody).toContainText(DEFAULT_ORDER.creditCard);
+        const screenshot = await page.screenshot();
+        await attachment('Mobile purchase confirmation', screenshot, 'image/png');
+        await checkoutPage.dismissConfirmation();
+      });
     },
   );
 });
