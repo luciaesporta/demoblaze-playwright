@@ -1,3 +1,10 @@
+# Environment variables can be overridden via GitHub repository secrets:
+#   BASE_URL       — Application URL (default: https://www.demoblaze.com)
+#   TEST_TIMEOUT   — Test timeout in ms (default: 60000)
+#   EXPECT_TIMEOUT — Assertion timeout in ms (default: 15000)
+#   RETRIES        — Number of retries on failure (default: 2)
+#   HEADLESS       — Always true in CI
+
 name: Playwright Tests
 
 on:
@@ -43,6 +50,12 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test --project=${{ matrix.browser }}
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || 'https://www.demoblaze.com' }}
+          TEST_TIMEOUT: ${{ secrets.TEST_TIMEOUT || '60000' }}
+          EXPECT_TIMEOUT: ${{ secrets.EXPECT_TIMEOUT || '15000' }}
+          RETRIES: ${{ secrets.RETRIES || '2' }}
+          HEADLESS: 'true'
 
       - name: Upload HTML report
         if: always()
