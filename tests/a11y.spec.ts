@@ -1,8 +1,37 @@
 import { test, expect } from '@playwright/test';
+import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { generateUser } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
+import { checkA11y, formatViolations } from '../utils/a11y';
+
+test.describe('A11y — Axe scan (home page)', { tag: '@regression' }, () => {
+  test('home page passes axe WCAG 2.1 AA scan', async ({ page }) => {
+    // Known defects: the navbar brand and carousel images ship without alt text
+    // (critical `image-alt`), and the site also violates `link-name` and
+    // `color-contrast`. Expected to fail until those are fixed upstream.
+    test.fail();
+    const homePage = new HomePage(page);
+
+    await step('Load home page', async () => {
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+    });
+
+    const violations = await step('Run axe scan against WCAG 2.1 AA', () => checkA11y(page));
+    await attachment('Axe scan — all violations', formatViolations(violations), 'text/plain');
+
+    // Soft assertions first so the full list of broken rules is reported in a
+    // single run instead of stopping at the first one.
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    const critical = violations.filter((violation) => violation.impact === 'critical');
+    expect(critical, formatViolations(critical)).toEqual([]);
+  });
+});
 
 test.describe('A11y — Login modal', { tag: '@regression' }, () => {
   test('tab navigation follows logical focus order', async ({ page }) => {
