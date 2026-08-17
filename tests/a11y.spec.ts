@@ -7,7 +7,7 @@ import { AuthPage } from '../pages/AuthPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import { generateUser } from '../utils/testData';
-import { MESSAGES } from '../utils/constants';
+import { MESSAGES, MOBILE_VIEWPORT } from '../utils/constants';
 import { checkA11y, formatViolations } from '../utils/a11y';
 
 /** Axe rules that fail when an interactive element has no accessible name. */
@@ -27,6 +27,45 @@ async function scanAndAttach(page: Page, label: string): Promise<Result[]> {
   );
   await attachment(`Axe scan — ${label}`, formatViolations(violations), 'text/plain');
   return violations;
+}
+
+interface UndersizedTarget {
+  tag: string;
+  label: string;
+  width: number;
+  height: number;
+}
+
+/** Lists visible interactive elements whose hit area is smaller than `minSize` px. */
+async function findUndersizedTargets(page: Page, minSize: number): Promise<UndersizedTarget[]> {
+  return page.evaluate((min) => {
+    const selector = 'a[href], button, input, select, textarea, [role="button"]';
+    return (Array.from(document.querySelectorAll(selector)) as HTMLElement[])
+      .filter((element) => element.offsetParent !== null)
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName,
+          label: (element.getAttribute('aria-label') ?? element.textContent ?? '')
+            .trim()
+            .slice(0, 40),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        };
+      })
+      .filter((target) => target.width > 0 && (target.width < min || target.height < min));
+  }, minSize);
+}
+
+/** Renders undersized targets for assertion messages and Allure attachments. */
+function formatTargets(targets: UndersizedTarget[]): string {
+  if (targets.length === 0) {
+    return 'No undersized targets found.';
+  }
+  const rows = targets
+    .map((target) => `  ${target.tag} "${target.label}" — ${target.width}x${target.height}px`)
+    .join('\n');
+  return `${targets.length} undersized target(s):\n${rows}`;
 }
 
 test.describe('A11y — Axe scan (home page)', { tag: '@regression' }, () => {
@@ -235,6 +274,134 @@ test.describe('A11y — Place Order modal', { tag: '@regression' }, () => {
       await expect(cartPage.orderModal).toBeHidden();
       await expect(cartPage.placeOrderButton).toBeFocused();
     });
+  });
+});
+
+test.describe('A11y — Mobile viewport (home page)', { tag: '@regression' }, () => {
+  test.use({ viewport: MOBILE_VIEWPORT });
+
+  /** WCAG 2.2 AA, 2.5.8 Target Size (Minimum). */
+  const MIN_TARGET_SIZE = 24;
+  /** WCAG 2.1 AAA, 2.5.5 Target Size — also the common mobile design guideline. */
+  const COMFORTABLE_TARGET_SIZE = 44;
+
+  async function loadMobileHome(page: Page): Promise<HomePage> {
+    const homePage = new HomePage(page);
+    await step('Load home page on a mobile viewport', async () => {
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+    });
+    return homePage;
+  }
+
+  /**
+   * Opens the collapsed navigation and waits for the transition to finish.
+   * Bootstrap marks the panel `collapsing` while it animates and only swaps to
+   * `collapse show` once it settles — measuring or scanning before that point
+   * reads half-open element sizes.
+   */
+  async function expandMenu(homePage: HomePage): Promise<void> {
+    await step('Expand the navigation menu', async () => {
+      await homePage.clickHamburger();
+      await expect(homePage.navbarCollapsible).toHaveClass(/\bshow\b/);
+      await expect(homePage.navbarCollapsible).toBeVisible();
+    });
+  }
+
+  test('mobile home page passes axe WCAG 2.1 AA scan', async ({ page }) => {
+    // Same upstream defects as the desktop home page: image-alt (critical),
+    // link-name and color-contrast. Scanned separately because the mobile
+    // layout collapses the navigation and re-flows the product grid.
+    test.fail();
+    await loadMobileHome(page);
+
+    const violations = await scanAndAttach(page, 'mobile home page');
+
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    const critical = violations.filter((violation) => violation.impact === 'critical');
+    expect(critical, formatViolations(critical)).toEqual([]);
+  });
+
+  test('expanded navigation menu passes axe WCAG 2.1 AA scan', async ({ page }) => {
+    // Mobile-only defect: opening the menu adds a critical `aria-allowed-attr`
+    // violation on #navbarExample, on top of the page-wide ones. It is invisible
+    // to the collapsed scan above, which is why this runs as its own test.
+    test.fail();
+    const homePage = await loadMobileHome(page);
+
+    await expandMenu(homePage);
+
+    const violations = await scanAndAttach(page, 'mobile home page — menu expanded');
+
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    const critical = violations.filter((violation) => violation.impact === 'critical');
+    expect(critical, formatViolations(critical)).toEqual([]);
+  });
+
+  test('hamburger exposes an accessible name and its expanded state', async ({ page }) => {
+    const homePage = await loadMobileHome(page);
+
+    await step('Verify the collapsed state', async () => {
+      // The locator resolves by role and name, so a passing assertion proves
+      // the button exposes "Toggle navigation" as its accessible name.
+      await expect(homePage.hamburger).toBeVisible();
+      await expect(homePage.hamburger).toHaveAttribute('aria-controls', 'navbarExample');
+      await expect(homePage.hamburger).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    await expandMenu(homePage);
+
+    await step('Verify the state flips when the menu opens', async () => {
+      await expect(homePage.hamburger).toHaveAttribute('aria-expanded', 'true');
+    });
+  });
+
+  test('interactive targets meet the WCAG 2.2 minimum size', async ({ page }) => {
+    const homePage = await loadMobileHome(page);
+
+    await expandMenu(homePage);
+
+    const undersized = await findUndersizedTargets(page, MIN_TARGET_SIZE);
+    await attachment(`Targets below ${MIN_TARGET_SIZE}px`, formatTargets(undersized), 'text/plain');
+
+    expect(undersized, formatTargets(undersized)).toEqual([]);
+  });
+
+  test('interactive targets meet the comfortable mobile target size', async ({ page }) => {
+    // Known gap: product links render 29px tall and the carousel controls 36px,
+    // below the 44px AAA/mobile guideline. They still clear the AA minimum
+    // asserted above, so this is a usability gap rather than an AA failure.
+    test.fail();
+    const homePage = await loadMobileHome(page);
+
+    await expandMenu(homePage);
+
+    const undersized = await findUndersizedTargets(page, COMFORTABLE_TARGET_SIZE);
+    await attachment(
+      `Targets below ${COMFORTABLE_TARGET_SIZE}px`,
+      formatTargets(undersized),
+      'text/plain',
+    );
+
+    expect(undersized, formatTargets(undersized)).toEqual([]);
+  });
+
+  test('mobile home page has no colour contrast violations', async ({ page }) => {
+    // Known defect: the product card titles and prices fail contrast against
+    // the card background at every viewport.
+    test.fail();
+    await loadMobileHome(page);
+
+    const violations = await scanAndAttach(page, 'mobile home page — contrast');
+    const contrast = violations.filter((violation) => violation.id === 'color-contrast');
+
+    expect(contrast, formatViolations(contrast)).toEqual([]);
   });
 });
 
