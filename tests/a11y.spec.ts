@@ -1,10 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/authFixtures';
 import { step, attachment } from 'allure-js-commons';
+import type { Page } from '@playwright/test';
+import type { Result } from 'axe-core';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
+import { CartPage } from '../pages/CartPage';
 import { generateUser } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
 import { checkA11y, formatViolations } from '../utils/a11y';
+
+/** Axe rules that fail when an interactive element has no accessible name. */
+const INTERACTIVE_NAME_RULES = [
+  'button-name',
+  'link-name',
+  'input-button-name',
+  'aria-command-name',
+  'aria-input-field-name',
+  'label',
+];
+
+/** Runs a scan and attaches the formatted report to Allure under a labelled step. */
+async function scanAndAttach(page: Page, label: string): Promise<Result[]> {
+  const violations = await step(`Run axe scan against WCAG 2.1 AA — ${label}`, () =>
+    checkA11y(page),
+  );
+  await attachment(`Axe scan — ${label}`, formatViolations(violations), 'text/plain');
+  return violations;
+}
 
 test.describe('A11y — Axe scan (home page)', { tag: '@regression' }, () => {
   test('home page passes axe WCAG 2.1 AA scan', async ({ page }) => {
@@ -19,8 +41,7 @@ test.describe('A11y — Axe scan (home page)', { tag: '@regression' }, () => {
       await expect(homePage.firstProductLink).toBeVisible();
     });
 
-    const violations = await step('Run axe scan against WCAG 2.1 AA', () => checkA11y(page));
-    await attachment('Axe scan — all violations', formatViolations(violations), 'text/plain');
+    const violations = await scanAndAttach(page, 'home page');
 
     // Soft assertions first so the full list of broken rules is reported in a
     // single run instead of stopping at the first one.
@@ -30,6 +51,76 @@ test.describe('A11y — Axe scan (home page)', { tag: '@regression' }, () => {
 
     const critical = violations.filter((violation) => violation.impact === 'critical');
     expect(critical, formatViolations(critical)).toEqual([]);
+  });
+});
+
+test.describe('A11y — Axe scan (cart page)', { tag: '@regression' }, () => {
+  test('empty cart passes axe WCAG 2.1 AA scan', async ({ page }) => {
+    // Known defects: navbar and footer images ship without alt text (critical
+    // `image-alt`), plus `color-contrast`. Expected to fail until fixed upstream.
+    test.fail();
+    const cartPage = new CartPage(page);
+
+    await step('Open empty cart', async () => {
+      await cartPage.goto();
+      // The total is an empty node on an empty cart, so it is never "visible".
+      // Anchor on Place Order, which is always rendered.
+      await expect(cartPage.placeOrderButton).toBeVisible();
+      await expect(cartPage.cartRows).toHaveCount(0);
+    });
+
+    const violations = await scanAndAttach(page, 'empty cart');
+
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    const critical = violations.filter((violation) => violation.impact === 'critical');
+    expect(critical, formatViolations(critical)).toEqual([]);
+  });
+
+  test('cart with a product passes axe WCAG 2.1 AA scan', async ({ cartWithOneProduct }) => {
+    // Same upstream defects as the empty cart; the product row adds no new rules
+    // but is scanned separately because it renders the table and Delete links.
+    test.fail();
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await step('Open cart holding one product', async () => {
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(1);
+    });
+
+    const violations = await scanAndAttach(page, 'cart with one product');
+
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    const critical = violations.filter((violation) => violation.impact === 'critical');
+    expect(critical, formatViolations(critical)).toEqual([]);
+  });
+
+  test('cart interactive elements expose accessible names', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    const cartPage = new CartPage(page);
+
+    await step('Open cart holding one product', async () => {
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(1);
+    });
+
+    await step('Verify controls are reachable by their accessible name', async () => {
+      await expect(cartPage.placeOrderButton).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Delete' })).toBeVisible();
+    });
+
+    const violations = await scanAndAttach(page, 'cart with one product');
+    const nameViolations = violations.filter((violation) =>
+      INTERACTIVE_NAME_RULES.includes(violation.id),
+    );
+
+    expect(nameViolations, formatViolations(nameViolations)).toEqual([]);
   });
 });
 
