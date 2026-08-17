@@ -5,6 +5,7 @@ import type { Result } from 'axe-core';
 import { HomePage } from '../pages/HomePage';
 import { AuthPage } from '../pages/AuthPage';
 import { CartPage } from '../pages/CartPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
 import { generateUser } from '../utils/testData';
 import { MESSAGES } from '../utils/constants';
 import { checkA11y, formatViolations } from '../utils/a11y';
@@ -121,6 +122,119 @@ test.describe('A11y — Axe scan (cart page)', { tag: '@regression' }, () => {
     );
 
     expect(nameViolations, formatViolations(nameViolations)).toEqual([]);
+  });
+});
+
+test.describe('A11y — Place Order modal', { tag: '@regression' }, () => {
+  /** Number of Tab presses used to prove the modal traps keyboard focus. */
+  const TAB_PRESSES = 12;
+
+  async function openOrderModal(page: Page): Promise<CartPage> {
+    const cartPage = new CartPage(page);
+    await step('Open Place Order modal from a cart holding one product', async () => {
+      await cartPage.goto();
+      await expect(cartPage.cartRows).toHaveCount(1);
+      await cartPage.openPlaceOrderModal();
+    });
+    return cartPage;
+  }
+
+  test('open Place Order modal passes axe WCAG 2.1 AA scan', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    await openOrderModal(page);
+
+    const violations = await step('Run axe scan scoped to the open modal', () =>
+      checkA11y(page, { include: '#orderModal' }),
+    );
+    await attachment('Axe scan — Place Order modal', formatViolations(violations), 'text/plain');
+
+    for (const violation of violations) {
+      expect.soft(violation.nodes, formatViolations([violation])).toHaveLength(0);
+    }
+
+    expect(violations, formatViolations(violations)).toEqual([]);
+  });
+
+  test('order form inputs have associated labels', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    await openOrderModal(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    // Each locator resolves by label text, so a passing assertion proves the
+    // input exposes that label as its accessible name.
+    await step('Verify every field is reachable by its label', async () => {
+      await expect(checkoutPage.nameInput).toBeEditable();
+      await expect(checkoutPage.countryInput).toBeEditable();
+      await expect(checkoutPage.cityInput).toBeEditable();
+      await expect(checkoutPage.creditCardInput).toBeEditable();
+      await expect(checkoutPage.monthInput).toBeEditable();
+      await expect(checkoutPage.yearInput).toBeEditable();
+    });
+  });
+
+  test('modal exposes dialog semantics and named buttons', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    await openOrderModal(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await step('Verify dialog role and accessible name', async () => {
+      await expect(checkoutPage.orderModal).toHaveAttribute('role', 'dialog');
+      await expect(checkoutPage.orderModal).toHaveAttribute('aria-labelledby', 'orderModalLabel');
+    });
+
+    await step('Verify controls are reachable by role and name', async () => {
+      await expect(checkoutPage.purchaseButton).toBeVisible();
+
+      // Two dismiss controls carry the name "Close": the footer button by its
+      // text, and the "×" icon button by aria-label.
+      const closeControls = checkoutPage.orderModal.getByRole('button', { name: 'Close' });
+      await expect(closeControls).toHaveCount(2);
+      await expect(closeControls.first()).toBeVisible();
+      await expect(closeControls.last()).toBeVisible();
+    });
+  });
+
+  test('focus moves into the modal and stays trapped', async ({ cartWithOneProduct }) => {
+    const { page } = cartWithOneProduct;
+    await openOrderModal(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await step('Verify focus lands inside the modal on open', async () => {
+      await expect(checkoutPage.orderModal).toBeFocused();
+    });
+
+    await step(`Verify focus never escapes across ${TAB_PRESSES} Tab presses`, async () => {
+      for (let i = 0; i < TAB_PRESSES; i++) {
+        await page.keyboard.press('Tab');
+        const focusInsideModal = await page.evaluate(() =>
+          document.querySelector('#orderModal')!.contains(document.activeElement),
+        );
+        expect(focusInsideModal, `focus escaped the modal after Tab press ${i + 1}`).toBe(true);
+      }
+    });
+  });
+
+  test('closing the modal returns focus to the Place Order trigger', async ({
+    cartWithOneProduct,
+  }) => {
+    const { page } = cartWithOneProduct;
+    const cartPage = await openOrderModal(page);
+
+    await step('Close via the Close button', async () => {
+      await cartPage.closePlaceOrderModal();
+      await expect(cartPage.placeOrderButton).toBeFocused();
+    });
+
+    await step('Reopen and close with Escape', async () => {
+      await cartPage.openPlaceOrderModal();
+      // Escape is handled by a listener on the modal, so it only works once
+      // focus has moved there. Waiting for that also avoids racing the fade-in.
+      await expect(cartPage.orderModal).toBeFocused();
+
+      await cartPage.pressEscOnPlaceOrderModal();
+      await expect(cartPage.orderModal).toBeHidden();
+      await expect(cartPage.placeOrderButton).toBeFocused();
+    });
   });
 });
 
