@@ -202,6 +202,14 @@ test.describe('Cart', () => {
 });
 
 test.describe('Cart — advanced operations', { tag: '@regression' }, () => {
+  /**
+   * Cart rows are fetched and rendered after cart.html finishes loading, so the
+   * table is briefly empty and then fills in. The wait scales with the number of
+   * rows, and a loaded CI runner is far slower than a local one, so the bulk
+   * test below needs more room than the global expect timeout gives it.
+   */
+  const BULK_CART_RENDER_TIMEOUT_MS = 60_000;
+
   test('adding 10+ products sums total correctly', async ({ authenticatedPage }, testInfo) => {
     testInfo.setTimeout(180_000);
     const { page } = authenticatedPage;
@@ -225,10 +233,14 @@ test.describe('Cart — advanced operations', { tag: '@regression' }, () => {
     }
 
     await cartPage.goto();
-    await expect(cartPage.cartRows).toHaveCount(itemCount);
+    await expect(cartPage.cartRows).toHaveCount(itemCount, {
+      timeout: BULK_CART_RENDER_TIMEOUT_MS,
+    });
 
     const expectedTotal = String(Number(price) * itemCount);
-    await expect(cartPage.cartTotal).toHaveText(expectedTotal);
+    await expect(cartPage.cartTotal).toHaveText(expectedTotal, {
+      timeout: BULK_CART_RENDER_TIMEOUT_MS,
+    });
   });
 
   test('deleting all items one by one empties the cart', async ({
