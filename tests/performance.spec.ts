@@ -3,7 +3,7 @@ import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
-import { getFCP } from '../utils/webVitals';
+import { getFCP, getLCP } from '../utils/webVitals';
 
 test.describe('Visual regression', { tag: ['@chromium-only', '@regression'] }, () => {
   test('home page matches screenshot', async ({ page }) => {
@@ -95,6 +95,20 @@ test.describe('Performance — Image size', { tag: '@regression' }, () => {
 test.describe('Performance', { tag: '@regression' }, () => {
   /** Budget for First Contentful Paint on the home page. */
   const FCP_BUDGET_MS = 2_000;
+  /** Budget for Largest Contentful Paint on the home page. */
+  const LCP_BUDGET_MS = 3_000;
+
+  /**
+   * Records a measured metric in both reports so a regression shows the number
+   * rather than a bare pass/fail: Allure gets an attachment, the HTML report an
+   * annotation. Returns the string for reuse in the assertion message.
+   */
+  async function recordMetric(label: string, value: number, budgetMs: number): Promise<string> {
+    const measured = `${Math.round(value)} ms (budget ${budgetMs} ms)`;
+    await attachment(label, measured, 'text/plain');
+    test.info().annotations.push({ type: label, description: measured });
+    return measured;
+  }
 
   test('home page loads in under 3 seconds', async ({ page }) => {
     const start = Date.now();
@@ -116,13 +130,24 @@ test.describe('Performance', { tag: '@regression' }, () => {
     });
 
     const fcp = await step('Measure First Contentful Paint', () => getFCP(page));
-    const measured = `${Math.round(fcp)} ms (budget ${FCP_BUDGET_MS} ms)`;
-
-    // Recorded in both reports so a regression shows the number, not just a
-    // pass/fail: Allure gets an attachment, the HTML report an annotation.
-    await attachment('First Contentful Paint', measured, 'text/plain');
-    test.info().annotations.push({ type: 'FCP', description: measured });
+    const measured = await recordMetric('FCP', fcp, FCP_BUDGET_MS);
 
     expect(fcp, `FCP was ${measured}`).toBeLessThan(FCP_BUDGET_MS);
+  });
+
+  test('home page paints largest content within budget', async ({ page }) => {
+    const homePage = new HomePage(page);
+
+    await step('Load home page', async () => {
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+    });
+
+    // LCP keeps being reported as larger elements paint, so getLCP() waits out
+    // a quiet window before reading the final buffered entry.
+    const lcp = await step('Measure Largest Contentful Paint', () => getLCP(page));
+    const measured = await recordMetric('LCP', lcp, LCP_BUDGET_MS);
+
+    expect(lcp, `LCP was ${measured}`).toBeLessThan(LCP_BUDGET_MS);
   });
 });
