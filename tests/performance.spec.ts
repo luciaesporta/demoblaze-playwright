@@ -3,7 +3,7 @@ import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
-import { getFCP, getLCP } from '../utils/webVitals';
+import { getCLS, getFCP, getLCP } from '../utils/webVitals';
 
 test.describe('Visual regression', { tag: ['@chromium-only', '@regression'] }, () => {
   test('home page matches screenshot', async ({ page }) => {
@@ -97,6 +97,8 @@ test.describe('Performance', { tag: '@regression' }, () => {
   const FCP_BUDGET_MS = 2_000;
   /** Budget for Largest Contentful Paint on the home page. */
   const LCP_BUDGET_MS = 3_000;
+  /** Budget for Cumulative Layout Shift — a unitless score, not a duration. */
+  const CLS_BUDGET = 0.1;
 
   /**
    * Records a measured metric in both reports so a regression shows the number
@@ -150,4 +152,52 @@ test.describe('Performance', { tag: '@regression' }, () => {
 
     expect(lcp, `LCP was ${measured}`).toBeLessThan(LCP_BUDGET_MS);
   });
+
+  test(
+    'browsing from home to cart stays within the layout shift budget',
+    // CLS needs the layout-shift entry type, which only Chromium implements.
+    { tag: '@chromium-only' },
+    async ({ page }) => {
+      // Known defect: the home page alone shifts by ~0.09-0.10, and the three
+      // pages together total ~0.18-0.19, well past the 0.1 budget.
+      test.fail();
+      const homePage = new HomePage(page);
+      const productPage = new ProductPage(page);
+      const cartPage = new CartPage(page);
+
+      // Each navigation starts a new document, so the layout-shift buffer is
+      // reset and getCLS() only ever reports the current page. Read the score
+      // before leaving each page and add the pieces up to get the journey total.
+      const perPage: Record<string, number> = {};
+
+      await step('Measure home page', async () => {
+        await homePage.goto();
+        await expect(homePage.firstProductLink).toBeVisible();
+        perPage.home = await getCLS(page);
+      });
+
+      await step('Measure product page', async () => {
+        await homePage.openFirstProduct();
+        await productPage.addToCart();
+        perPage.product = await getCLS(page);
+      });
+
+      await step('Measure cart page', async () => {
+        await cartPage.goto();
+        await expect(cartPage.cartRows).toHaveCount(1);
+        perPage.cart = await getCLS(page);
+      });
+
+      const total = Object.values(perPage).reduce((sum, score) => sum + score, 0);
+      const breakdown = Object.entries(perPage)
+        .map(([name, score]) => `  ${name}: ${score.toFixed(4)}`)
+        .join('\n');
+      const measured = `${total.toFixed(4)} (budget ${CLS_BUDGET})`;
+
+      await attachment('CLS', `total: ${measured}\n${breakdown}`, 'text/plain');
+      test.info().annotations.push({ type: 'CLS', description: measured });
+
+      expect(total, `Cumulative CLS was ${measured}\n${breakdown}`).toBeLessThan(CLS_BUDGET);
+    },
+  );
 });
