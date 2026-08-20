@@ -3,7 +3,7 @@ import { step, attachment } from 'allure-js-commons';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
-import { getCLS, getFCP, getLCP } from '../utils/webVitals';
+import { getCLS, getFCP, getLCP, getTTI } from '../utils/webVitals';
 
 test.describe('Visual regression', { tag: ['@chromium-only', '@regression'] }, () => {
   test('home page matches screenshot', async ({ page }) => {
@@ -99,6 +99,8 @@ test.describe('Performance', { tag: '@regression' }, () => {
   const LCP_BUDGET_MS = 3_000;
   /** Budget for Cumulative Layout Shift — a unitless score, not a duration. */
   const CLS_BUDGET = 0.1;
+  /** Budget for Time to Interactive on the home page. */
+  const TTI_BUDGET_MS = 4_000;
 
   /**
    * Records a measured metric in both reports so a regression shows the number
@@ -151,6 +153,23 @@ test.describe('Performance', { tag: '@regression' }, () => {
     const measured = await recordMetric('LCP', lcp, LCP_BUDGET_MS);
 
     expect(lcp, `LCP was ${measured}`).toBeLessThan(LCP_BUDGET_MS);
+  });
+
+  test('home page becomes interactive within budget', async ({ page }) => {
+    const homePage = new HomePage(page);
+
+    await step('Load home page', async () => {
+      await homePage.goto();
+      await expect(homePage.firstProductLink).toBeVisible();
+    });
+
+    // getTTI() waits for the page to paint and then stay quiet — no resource
+    // finishing and no long task — and reports the end of the last busy moment,
+    // so the wait itself is not billed to the metric.
+    const tti = await step('Measure Time to Interactive', () => getTTI(page));
+    const measured = await recordMetric('TTI', tti, TTI_BUDGET_MS);
+
+    expect(tti, `TTI was ${measured}`).toBeLessThan(TTI_BUDGET_MS);
   });
 
   test(

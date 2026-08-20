@@ -148,6 +148,96 @@ export async function getCLS(page: Page, options: VitalsOptions = {}): Promise<n
   return cls;
 }
 
+export interface TTIOptions {
+  /** How long the page must stay quiet before it counts as interactive. */
+  quietWindowMs?: number;
+  /** Give up waiting for a quiet window after this long. */
+  timeoutMs?: number;
+}
+
+/** Default quiet window used to decide the page has settled. */
+export const DEFAULT_QUIET_WINDOW_MS = 2_000;
+
+/**
+ * Time to Interactive, in ms, measured heuristically.
+ *
+ * Real TTI needs a full long-task trace. demoblaze reports zero long tasks on
+ * every page, so a long-task-only definition would collapse to FCP and measure
+ * nothing. This uses the wider heuristic instead: the page is interactive once
+ * it has painted and then stayed quiet — no resource finishing loading and no
+ * long task running — for `quietWindowMs`.
+ *
+ * The returned value is the end of the last busy moment, not the end of the
+ * quiet window, so the wait itself is not counted.
+ *
+ * Long tasks are only observed on Chromium; elsewhere the network signal and
+ * FCP carry the measurement, which is why this works in all three browsers.
+ *
+ * Media downloads are ignored. demoblaze preloads the About-us video, and
+ * WebKit fetches the whole thing, so counting those segments would keep the
+ * page "busy" for 20s while it was in fact interactive within 3s. A video
+ * streaming in the background does not stop a user from clicking.
+ *
+ * If the page never goes quiet (a poll, a media stream), this returns the last
+ * busy timestamp seen before `timeoutMs` rather than throwing — a page that
+ * never settles has no meaningful TTI, and the caller's budget will catch it.
+ */
+export async function getTTI(page: Page, options: TTIOptions = {}): Promise<number> {
+  const { quietWindowMs = DEFAULT_QUIET_WINDOW_MS, timeoutMs = 30_000 } = options;
+
+  const tti = await page.evaluate(
+    ({ quietWindow, timeout }) =>
+      new Promise<number | null>((resolve) => {
+        const paint = performance
+          .getEntriesByType('paint')
+          .find((entry) => entry.name === 'first-contentful-paint');
+        if (!paint) {
+          resolve(null);
+          return;
+        }
+
+        // The page cannot be interactive before it has painted, so FCP is the
+        // floor; every later signal can only push the busy mark forward.
+        let lastBusy = paint.startTime;
+
+        const observers: PerformanceObserver[] = [];
+        const observe = (type: string, toEnd: (entry: PerformanceEntry) => number) => {
+          if (!PerformanceObserver.supportedEntryTypes.includes(type)) return;
+          const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              lastBusy = Math.max(lastBusy, toEnd(entry));
+            }
+          });
+          observer.observe({ type, buffered: true });
+          observers.push(observer);
+        };
+
+        const MEDIA_INITIATORS = ['video', 'audio', 'track'];
+        observe('resource', (entry) => {
+          const resource = entry as PerformanceResourceTiming;
+          if (MEDIA_INITIATORS.includes(resource.initiatorType)) return 0;
+          return resource.responseEnd;
+        });
+        observe('longtask', (entry) => entry.startTime + entry.duration);
+
+        const startedAt = performance.now();
+        const poll = setInterval(() => {
+          const now = performance.now();
+          const quietFor = now - lastBusy;
+          if (quietFor >= quietWindow || now - startedAt >= timeout) {
+            clearInterval(poll);
+            observers.forEach((observer) => observer.disconnect());
+            resolve(lastBusy);
+          }
+        }, 100);
+      }),
+    { quietWindow: quietWindowMs, timeout: timeoutMs },
+  );
+
+  if (tti === null) throw unavailable('TTI', 'the page has not painted any content yet.');
+  return tti;
+}
+
 /** Collects all four metrics, waiting out the settle window only once. */
 export async function collectWebVitals(
   page: Page,
