@@ -1,0 +1,25 @@
+# Host node_modules holds platform-specific binaries. Copying it over the ones
+# npm ci just installed inside the image breaks the run.
+node_modules/
+
+# Build and run output — regenerated inside the container.
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+.playwright/
+
+# Secrets must not be baked into an image layer. Pass them with
+# docker run --env-file or -e instead.
+.env
+.env.local
+.env.ci
+
+.git/
+.github/
+.husky/
+.claude/
+.vscode/
+.idea/
+*.log
+.DS_Store
