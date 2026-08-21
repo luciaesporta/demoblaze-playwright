@@ -29,11 +29,18 @@ export default defineConfig({
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
   snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
-  reporter: [
-    ['html', { open: 'never', outputFolder: 'playwright-report' }],
-    ['list'],
-    ['allure-playwright'],
-  ],
+  // A sharded run produces one partial report per shard, which only becomes a
+  // whole report once merged. The blob reporter is the format `playwright
+  // merge-reports` consumes, so the sharded CI jobs opt into it and the merge
+  // job turns the pieces back into HTML. Everything else — local runs, the
+  // container job — keeps writing HTML directly.
+  reporter: process.env.PW_BLOB_REPORT
+    ? [['blob'], ['list'], ['allure-playwright']]
+    : [
+        ['html', { open: 'never', outputFolder: 'playwright-report' }],
+        ['list'],
+        ['allure-playwright'],
+      ],
   use: {
     baseURL: process.env.BASE_URL || 'https://www.demoblaze.com',
     headless: process.env.HEADLESS !== 'false',
