@@ -13,6 +13,17 @@ export default defineConfig({
   testDir: './tests',
   timeout: Number(process.env.TEST_TIMEOUT) || 60_000,
   retries: Number(process.env.RETRIES) || 2,
+
+  // Run every test in parallel, not just one file at a time. The suite is
+  // stateless per test — each one registers its own user or starts from a
+  // clean page — so tests inside a file are safe to interleave.
+  fullyParallel: true,
+
+  // demoblaze is a shared public site that degrades under load, so the worker
+  // count is a throughput/stability trade-off rather than a pure speed dial.
+  // Two workers on CI keeps the pressure close to what the runner already
+  // produced; locally, Playwright's default (half the cores) applies.
+  workers: process.env.CI ? 2 : undefined,
   expect: {
     timeout: Number(process.env.EXPECT_TIMEOUT) || 15_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
