@@ -1,0 +1,44 @@
+# Run the suite in a container:
+#   docker compose run --rm tests
+#
+# Override the command to narrow the run:
+#   docker compose run --rm tests npx playwright test --project=chromium
+#   docker compose run --rm tests npx playwright test --grep @smoke
+#
+# Every value below can be overridden from the shell or from a .env file next
+# to this one, e.g. BASE_URL=http://localhost:3000 docker compose run --rm tests
+
+services:
+  tests:
+    build: .
+    image: demoblaze-playwright:local
+
+    # Chromium exhausts the 64MB /dev/shm that Docker gives a container by
+    # default and crashes mid-run. Sharing the host IPC namespace is what the
+    # Playwright docs recommend over raising shm_size.
+    ipc: host
+
+    # Reap the browser processes Playwright leaves behind, so a cancelled run
+    # does not accumulate zombies.
+    init: true
+
+    # Defaults match .env.example, so `docker compose run --rm tests` works
+    # with no configuration at all.
+    #
+    # NODE_ENV is deliberately not passed through. playwright.config.ts uses it
+    # to load .env.local / .env.ci, and .dockerignore keeps those files out of
+    # the image, so setting it here would silently do nothing. Override the
+    # values below instead.
+    environment:
+      BASE_URL: ${BASE_URL:-https://www.demoblaze.com}
+      TEST_TIMEOUT: ${TEST_TIMEOUT:-60000}
+      EXPECT_TIMEOUT: ${EXPECT_TIMEOUT:-15000}
+      RETRIES: ${RETRIES:-2}
+      HEADLESS: ${HEADLESS:-true}
+
+    # Reports are written inside the container, so bind them back out to the
+    # host — otherwise they vanish with the container.
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+      - ./allure-results:/app/allure-results
