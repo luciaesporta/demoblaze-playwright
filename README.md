@@ -163,10 +163,10 @@ Tests are organized with Playwright tags so you can run specific subsets of the 
 
 ### Available tags
 
-| Tag           | Purpose                                  | Count |
-| ------------- | ---------------------------------------- | ----- |
+| Tag           | Purpose                                               | Count |
+| ------------- | ----------------------------------------------------- | ----- |
 | `@smoke`      | Core happy-path tests (login, cart, checkout, mobile) | 14    |
-| `@regression` | Validation, edge cases, modals, a11y, API, visual    | 135   |
+| `@regression` | Validation, edge cases, modals, a11y, API, visual     | 135   |
 
 ### Running by tag
 
@@ -212,6 +212,48 @@ npm run test:regression   # regression suite
 npm run test:headed
 npm run test:report
 npm run typecheck
+```
+
+## Parallel execution
+
+`fullyParallel: true` runs every test in parallel, not just one spec file at a
+time. This is safe here because no test depends on another: each one registers
+its own user or starts from a clean page, so tests within a file can interleave
+freely.
+
+Worker count is set in `playwright.config.ts`:
+
+```ts
+workers: process.env.CI ? 2 : undefined,
+```
+
+- **Locally** — `undefined` hands the decision to Playwright, which uses half
+  the available cores.
+- **On CI** — pinned to 2. This is not a speed dial: demoblaze is a shared
+  public site that degrades under load, and pushing more concurrent sessions
+  at it produces failures that look like test bugs but are not. Two keeps CI
+  close to the pressure it already applied before this setting existed.
+
+Measured on `cart.spec.ts` + `checkout.spec.ts` (43 tests, chromium, no retries):
+
+| configuration                        | time    |
+| ------------------------------------ | ------- |
+| before (file-level parallelism only) | 5.7 min |
+| `fullyParallel`, 2 workers (CI)      | 3.6 min |
+| `fullyParallel`, local default       | 1.6 min |
+
+Override the worker count per run when needed:
+
+```bash
+npx playwright test --workers=1   # serial, for debugging a race
+npx playwright test --workers=4   # faster locally, harder on the site
+```
+
+If a test ever does need to run in order with its neighbours, opt that file out
+rather than turning off `fullyParallel` globally:
+
+```ts
+test.describe.configure({ mode: 'serial' });
 ```
 
 ## Project structure
