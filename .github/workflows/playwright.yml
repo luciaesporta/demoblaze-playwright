@@ -4,6 +4,10 @@
 #   EXPECT_TIMEOUT — Assertion timeout in ms (default: 15000)
 #   RETRIES        — Number of retries on failure (default: 2)
 #   HEADLESS       — Always true in CI
+#
+# push and pull_request always run the suite natively on the runner. A manual
+# run (workflow_dispatch) can pick "docker" instead, which builds the
+# repository's own image and runs the same suite inside the container.
 
 name: Playwright Tests
 
@@ -13,9 +17,20 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'How to run the suite'
+        type: choice
+        default: native
+        options:
+          - native
+          - docker
 
 jobs:
+  # Installs Node and the browsers directly on the runner. This is the path
+  # push and pull_request always take, and the default for a manual run.
   test:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.mode == 'native' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -82,5 +97,73 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 7
+
+  # Runs the same suite through the repository's own Dockerfile and compose
+  # service, so a manual run can verify the container image still works.
+  # Opt in with the "docker" mode on workflow_dispatch.
+  test-docker:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'docker' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+        include:
+          - browser: firefox
+            allow-failure: true
+          - browser: webkit
+            allow-failure: true
+    continue-on-error: ${{ matrix.allow-failure || false }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # The image carries the browsers, so there is no separate browser
+      # install step, and the build runs npm run typecheck for us.
+      - name: Build test image
+        run: docker compose build tests
+
+      - name: Run Playwright tests in container
+        run: docker compose run --rm tests npx playwright test --project=${{ matrix.browser }}
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || 'https://www.demoblaze.com' }}
+          TEST_TIMEOUT: ${{ secrets.TEST_TIMEOUT || '60000' }}
+          EXPECT_TIMEOUT: ${{ secrets.EXPECT_TIMEOUT || '15000' }}
+          RETRIES: ${{ secrets.RETRIES || '2' }}
+          HEADLESS: 'true'
+
+      # The container writes to the mounted directories as root, which leaves
+      # the runner unable to read them when uploading artifacts.
+      - name: Take ownership of report files
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" playwright-report test-results allure-results || true
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-docker-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 7
+
+      # Allure lives in the image, not on the runner, so upload the raw
+      # results and generate the HTML from them when needed.
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-docker-${{ matrix.browser }}
+          path: allure-results/
+          retention-days: 7
+
+      - name: Upload test traces and videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-docker-${{ matrix.browser }}
           path: test-results/
           retention-days: 7
