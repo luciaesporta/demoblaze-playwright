@@ -97,6 +97,70 @@ export async function createUserViaAPI(
   }
 }
 
+/** Name of the cookie demoblaze reads to decide who is signed in. */
+export const AUTH_COOKIE_NAME = 'tokenp_';
+
+/** Prefix wrapping the token in a successful login response. */
+const AUTH_TOKEN_PREFIX = 'Auth_token: ';
+
+/**
+ * Logs in through POST /login and returns the auth token.
+ *
+ * The token is the value demoblaze stores in the `tokenp_` cookie, so setting
+ * that cookie on a browser context is enough to make the UI treat the session
+ * as signed in — see the `authenticatedPage` fixture.
+ */
+export async function loginViaAPI(
+  username: string,
+  password: string,
+  options: ApiCallOptions = {},
+): Promise<string> {
+  const { ok, status, statusText, body } = await withContext(options, async (context) => {
+    const response = await context.post(`${API_BASE_URL}/login`, {
+      data: { username, password: encodePassword(password) },
+    });
+    return {
+      ok: response.ok(),
+      status: response.status(),
+      statusText: response.statusText(),
+      body: await response.text(),
+    };
+  });
+
+  if (!ok) {
+    throw new Error(`Login failed for "${username}": HTTP ${status} ${statusText} — ${body}`);
+  }
+
+  // Wrong credentials also come back as 200, with the reason in the body.
+  const errorMessage = parseErrorMessage(body);
+  if (errorMessage) {
+    throw new Error(`Login failed for "${username}": ${errorMessage}`);
+  }
+
+  const token = parseAuthToken(body);
+  if (!token) {
+    throw new Error(`Login for "${username}" returned no auth token. Body was: ${body}`);
+  }
+  return token;
+}
+
+/**
+ * Pulls the token out of a login response.
+ *
+ * The body is a JSON string of the form "Auth_token: <token>".
+ */
+function parseAuthToken(body: string): string | null {
+  try {
+    const parsed: unknown = JSON.parse(body.trim());
+    if (typeof parsed !== 'string' || !parsed.startsWith(AUTH_TOKEN_PREFIX)) {
+      return null;
+    }
+    return parsed.slice(AUTH_TOKEN_PREFIX.length).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Returns the API's error message, or null when the body carries none.
  *
