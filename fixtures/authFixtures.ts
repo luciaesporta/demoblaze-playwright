@@ -1,8 +1,10 @@
 import { test as base, type Page } from '@playwright/test';
-import { AuthPage } from '../pages/AuthPage';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { generateUser } from '../utils/testData';
+import { AUTH_COOKIE_NAME, createUserViaAPI, loginViaAPI } from '../utils/apiHelpers';
+
+const BASE_URL = process.env.BASE_URL || 'https://www.demoblaze.com';
 
 export interface AuthenticatedSession {
   page: Page;
@@ -27,11 +29,35 @@ interface Fixtures {
   cartWithTwoProducts: CartWithTwoProducts;
 }
 
+/**
+ * Creates a signed-in session without touching the UI.
+ *
+ * Registering and logging in through the modals costs two page interactions
+ * and two dialogs. Both calls have plain API equivalents, and demoblaze decides
+ * who is signed in purely from the `tokenp_` cookie, so seeding that cookie is
+ * enough for the browser to come up authenticated.
+ *
+ * Leaves the page on the home page, matching what the UI flow used to do, so
+ * tests that assume they start there keep working.
+ */
 async function registerAndLogin(page: Page): Promise<string> {
-  const authPage = new AuthPage(page);
   const { username, password } = generateUser();
-  await authPage.register(username, password);
-  await authPage.login(username, password);
+  const request = page.request;
+
+  await createUserViaAPI(username, password, { request });
+  const token = await loginViaAPI(username, password, { request });
+
+  await page.context().addCookies([
+    {
+      name: AUTH_COOKIE_NAME,
+      value: token,
+      url: BASE_URL,
+    },
+  ]);
+
+  // The cookie is only read on load, so the page has to be (re)loaded for the
+  // session to take effect.
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   return username;
 }
 
