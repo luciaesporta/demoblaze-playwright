@@ -4,6 +4,8 @@
   "description": "Playwright tests for demoblaze.com",
   "scripts": {
     "test": "npx playwright test",
+    "test:smoke": "npx playwright test --grep @smoke",
+    "test:regression": "npx playwright test --grep @regression",
     "test:local": "NODE_ENV=local npx playwright test",
     "test:ci": "NODE_ENV=ci npx playwright test",
     "test:headed": "npx playwright test --headed",

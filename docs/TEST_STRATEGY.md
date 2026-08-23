@@ -109,10 +109,12 @@ stands.
 | **Full**       | no filter            | 168   | ~3 min             | Everything, including untagged tests     |
 
 ```bash
-npx playwright test --grep @smoke          # smoke
-npx playwright test --grep @regression     # regression
-npx playwright test                        # full
+npm run test:smoke        # smoke
+npm run test:regression   # regression
+npm test                  # full
 ```
+
+Extra flags pass through: `npm run test:smoke -- --project=chromium`.
 
 ### Smoke
 
