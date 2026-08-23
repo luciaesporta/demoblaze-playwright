@@ -1,4 +1,9 @@
-import { request as playwrightRequest, type APIRequestContext } from '@playwright/test';
+import { randomUUID } from 'crypto';
+import {
+  request as playwrightRequest,
+  type APIRequestContext,
+  type BrowserContext,
+} from '@playwright/test';
 
 /**
  * Direct calls to the demoblaze API, for setting up state without driving the
@@ -181,4 +186,108 @@ function parseErrorMessage(body: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** Name of the cookie demoblaze keys a cart on. */
+export const CART_COOKIE_NAME = 'user';
+
+/**
+ * Reads the cart cookie from a browser context, waiting for it to appear.
+ *
+ * The site creates this cookie in client-side script, so it does not exist the
+ * moment a navigation resolves — measured at roughly 260ms after
+ * domcontentloaded on the home page. Reading it immediately after goto() finds
+ * nothing, so this polls rather than looking once.
+ */
+export async function getCartCookie(
+  context: BrowserContext,
+  options: { timeoutMs?: number } = {},
+): Promise<string> {
+  const { timeoutMs = 10_000 } = options;
+  const deadline = Date.now() + timeoutMs;
+
+  do {
+    const cookies = await context.cookies();
+    const cartCookie = cookies.find((cookie) => cookie.name === CART_COOKIE_NAME);
+    if (cartCookie?.value) {
+      return cartCookie.value;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } while (Date.now() < deadline);
+
+  throw new Error(
+    `No "${CART_COOKIE_NAME}" cookie after ${timeoutMs}ms. The page creates it in script, ` +
+      `so make sure a page has been loaded before calling this.`,
+  );
+}
+
+export interface AddToCartOptions extends ApiCallOptions {
+  /**
+   * Id for the new cart line. Each row carries its own, so adding the same
+   * product twice needs two different ids. Defaults to a fresh UUID.
+   */
+  id?: string;
+}
+
+/**
+ * Normalises a cart cookie into the `user=<uuid>` form the API expects.
+ *
+ * The API takes the cookie as a string in that exact shape, not as the bare
+ * UUID. Passing just the UUID silently keys the cart under a value the browser
+ * will never send back, so the items would exist but never show up in the UI.
+ * Accepting both forms removes that trap.
+ */
+function normaliseCartCookie(cookie: string): string {
+  const value = cookie.trim();
+  if (!value) {
+    throw new Error('A cart cookie is required to add an item.');
+  }
+  return value.startsWith(`${CART_COOKIE_NAME}=`) ? value : `${CART_COOKIE_NAME}=${value}`;
+}
+
+/**
+ * Adds a product to a cart through POST /addtocart, and returns the id of the
+ * line it created.
+ *
+ * `cookie` is the browser's cart cookie — either the raw UUID or the full
+ * `user=<uuid>` string. Read it from a context with:
+ *   const [{ value }] = await context.cookies().then(c =>
+ *     c.filter(x => x.name === CART_COOKIE_NAME));
+ *
+ * `productId` is the site's numeric product id, the `idp_` query parameter on
+ * a product page (`/prod.html?idp_=1`).
+ */
+export async function addToCartViaAPI(
+  cookie: string,
+  productId: number,
+  options: AddToCartOptions = {},
+): Promise<string> {
+  const { id = randomUUID(), ...callOptions } = options;
+  const cartCookie = normaliseCartCookie(cookie);
+
+  const { ok, status, statusText, body } = await withContext(callOptions, async (context) => {
+    const response = await context.post(`${API_BASE_URL}/addtocart`, {
+      data: { id, cookie: cartCookie, prod_id: productId, flag: false },
+    });
+    return {
+      ok: response.ok(),
+      status: response.status(),
+      statusText: response.statusText(),
+      body: await response.text(),
+    };
+  });
+
+  if (!ok) {
+    throw new Error(
+      `Add to cart failed for product ${productId}: HTTP ${status} ${statusText} — ${body}`,
+    );
+  }
+
+  // As everywhere else in this API, a refusal arrives as 200 with a message.
+  const errorMessage = parseErrorMessage(body);
+  if (errorMessage) {
+    throw new Error(`Add to cart failed for product ${productId}: ${errorMessage}`);
+  }
+
+  return id;
 }
