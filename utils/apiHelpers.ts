@@ -227,6 +227,13 @@ export interface AddToCartOptions extends ApiCallOptions {
    * product twice needs two different ids. Defaults to a fresh UUID.
    */
   id?: string;
+  /**
+   * Set when `cookie` is an auth token from loginViaAPI rather than a guest
+   * cart cookie. The API keys a signed-in cart on the token and expects
+   * `flag: true`; a guest cart is keyed on `user=<uuid>` with `flag: false`.
+   * Sending the wrong pair puts the items somewhere the UI will never read.
+   */
+  authenticated?: boolean;
 }
 
 /**
@@ -262,12 +269,18 @@ export async function addToCartViaAPI(
   productId: number,
   options: AddToCartOptions = {},
 ): Promise<string> {
-  const { id = randomUUID(), ...callOptions } = options;
-  const cartCookie = normaliseCartCookie(cookie);
+  const { id = randomUUID(), authenticated = false, ...callOptions } = options;
+
+  // A signed-in cart is keyed on the raw auth token; a guest cart on the
+  // `user=<uuid>` cookie. The flag tells the API which one it is looking at.
+  const cartCookie = authenticated ? cookie.trim() : normaliseCartCookie(cookie);
+  if (!cartCookie) {
+    throw new Error('A cart cookie or auth token is required to add an item.');
+  }
 
   const { ok, status, statusText, body } = await withContext(callOptions, async (context) => {
     const response = await context.post(`${API_BASE_URL}/addtocart`, {
-      data: { id, cookie: cartCookie, prod_id: productId, flag: false },
+      data: { id, cookie: cartCookie, prod_id: productId, flag: authenticated },
     });
     return {
       ok: response.ok(),
@@ -290,4 +303,53 @@ export async function addToCartViaAPI(
   }
 
   return id;
+}
+
+/** A product as the API describes it. */
+export interface ApiProduct {
+  id: number;
+  title: string;
+  price: number;
+  cat: string;
+  desc: string;
+  img: string;
+}
+
+/**
+ * Reads a product through POST /view.
+ *
+ * `title` and `price` match what the product page renders — `String(price)`
+ * equals the digits the UI shows — so a fixture can report the same name and
+ * price it used to scrape from the DOM.
+ */
+export async function getProductViaAPI(
+  productId: number,
+  options: ApiCallOptions = {},
+): Promise<ApiProduct> {
+  const { ok, status, statusText, body } = await withContext(options, async (context) => {
+    const response = await context.post(`${API_BASE_URL}/view`, {
+      data: { id: productId },
+    });
+    return {
+      ok: response.ok(),
+      status: response.status(),
+      statusText: response.statusText(),
+      body: await response.text(),
+    };
+  });
+
+  if (!ok) {
+    throw new Error(`Reading product ${productId} failed: HTTP ${status} ${statusText} — ${body}`);
+  }
+
+  const errorMessage = parseErrorMessage(body);
+  if (errorMessage) {
+    throw new Error(`Reading product ${productId} failed: ${errorMessage}`);
+  }
+
+  const product = JSON.parse(body) as ApiProduct;
+  if (typeof product?.title !== 'string' || typeof product?.price !== 'number') {
+    throw new Error(`Product ${productId} came back without a title and price: ${body}`);
+  }
+  return product;
 }

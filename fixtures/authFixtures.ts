@@ -1,8 +1,12 @@
 import { test as base, type Page } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { ProductPage } from '../pages/ProductPage';
 import { generateUser } from '../utils/testData';
-import { AUTH_COOKIE_NAME, createUserViaAPI, loginViaAPI } from '../utils/apiHelpers';
+import {
+  addToCartViaAPI,
+  AUTH_COOKIE_NAME,
+  createUserViaAPI,
+  getProductViaAPI,
+  loginViaAPI,
+} from '../utils/apiHelpers';
 
 const BASE_URL = process.env.BASE_URL || 'https://www.demoblaze.com';
 
@@ -40,7 +44,11 @@ interface Fixtures {
  * Leaves the page on the home page, matching what the UI flow used to do, so
  * tests that assume they start there keep working.
  */
-async function registerAndLogin(page: Page): Promise<string> {
+async function registerAndLogin(
+  page: Page,
+  options: { navigate?: boolean } = {},
+): Promise<{ username: string; token: string }> {
+  const { navigate = true } = options;
   const { username, password } = generateUser();
   const request = page.request;
 
@@ -55,44 +63,68 @@ async function registerAndLogin(page: Page): Promise<string> {
     },
   ]);
 
-  // The cookie is only read on load, so the page has to be (re)loaded for the
-  // session to take effect.
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  return username;
+  // The cookie is only read on load, so a page has to be loaded before the UI
+  // reflects the session. Callers that navigate somewhere specific first can
+  // skip this and save a round trip.
+  if (navigate) {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+  }
+  return { username, token };
+}
+
+/**
+ * The home grid lists products in id order, so the nth card is product n + 1.
+ * Verified against the grid's own links: index 0 is `prod.html?idp_=1`.
+ */
+function productIdForGridIndex(index: number): number {
+  return index + 1;
+}
+
+/**
+ * Fills the cart over HTTP and reports each product's name and price.
+ *
+ * Replaces a navigate-open-add-dialog cycle per item with two requests. The
+ * values come from the API rather than the DOM, and match it exactly: `title`
+ * is the rendered name and `String(price)` the rendered digits.
+ *
+ * Assumes the page has already been loaded, since the cart cookie the API keys
+ * on is created by client-side script.
+ */
+async function seedCartViaAPI(
+  page: Page,
+  token: string,
+  gridIndexes: number[],
+): Promise<{ name: string; price: string }[]> {
+  const request = page.request;
+
+  const items: { name: string; price: string }[] = [];
+  for (const index of gridIndexes) {
+    const productId = productIdForGridIndex(index);
+    const product = await getProductViaAPI(productId, { request });
+    await addToCartViaAPI(token, productId, { request, authenticated: true });
+    items.push({ name: product.title, price: String(product.price) });
+  }
+  return items;
 }
 
 export const test = base.extend<Fixtures>({
   authenticatedPage: async ({ page }, use) => {
-    const username = await registerAndLogin(page);
+    const { username } = await registerAndLogin(page);
     await use({ page, username });
   },
 
   cartWithOneProduct: async ({ page }, use) => {
-    await registerAndLogin(page);
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
+    const { token } = await registerAndLogin(page);
+    const [item] = await seedCartViaAPI(page, token, [0]);
 
-    await homePage.goto();
-    await homePage.openFirstProduct();
-    const { name, price } = await productPage.addToCartAndCapture();
-
-    await use({ page, name, price });
+    await use({ page, name: item!.name, price: item!.price });
   },
 
   cartWithTwoProducts: async ({ page }, use) => {
-    await registerAndLogin(page);
-    const homePage = new HomePage(page);
-    const productPage = new ProductPage(page);
+    const { token } = await registerAndLogin(page);
+    const [first, second] = await seedCartViaAPI(page, token, [0, 1]);
 
-    await homePage.goto();
-    await homePage.openProduct(0);
-    const first = await productPage.addToCartAndCapture();
-
-    await homePage.goto();
-    await homePage.openProduct(1);
-    const second = await productPage.addToCartAndCapture();
-
-    await use({ page, first, second });
+    await use({ page, first: first!, second: second! });
   },
 });
 
