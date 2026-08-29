@@ -114,16 +114,14 @@ export const test = base.extend<Fixtures>({
   },
 
   cartWithOneProduct: async ({ page }, use) => {
-    // No navigation here: every consumer opens the page it needs, so landing
-    // on the home page first would just be a wasted load.
-    const { token } = await registerAndLogin(page, { navigate: false });
+    const { token } = await registerAndLogin(page);
     const [item] = await seedCartViaAPI(page, token, [0]);
 
     await use({ page, name: item!.name, price: item!.price });
   },
 
   cartWithTwoProducts: async ({ page }, use) => {
-    const { token } = await registerAndLogin(page, { navigate: false });
+    const { token } = await registerAndLogin(page);
     const [first, second] = await seedCartViaAPI(page, token, [0, 1]);
 
     await use({ page, first: first!, second: second! });
