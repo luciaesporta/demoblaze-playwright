@@ -1,6 +1,42 @@
 # demoblaze-playwright
 
+[![Playwright Tests](https://github.com/luciaesporta/demoblaze-playwright/actions/workflows/playwright.yml/badge.svg)](https://github.com/luciaesporta/demoblaze-playwright/actions/workflows/playwright.yml)
+![Playwright](https://img.shields.io/badge/Playwright-1.59-2EAD33?logo=playwright&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Browsers](https://img.shields.io/badge/browsers-chromium%20%7C%20firefox%20%7C%20webkit-informational)
+![Tests](https://img.shields.io/badge/tests-168-blue)
+
 End-to-end test suite for [Product Store](https://www.demoblaze.com), built with Playwright and TypeScript.
+
+<p align="center">
+  <img src="docs/media/purchase-flow.gif" alt="The purchase flow test running: catalog, product page, cart, order form, confirmation" width="620">
+</p>
+
+<p align="center">
+  <em>The critical path under test — catalog to confirmed order.<br>
+  Look closely at the confirmation date: that is <a href="docs/KNOWN_BUGS.md">B-22</a>, caught on camera.</em>
+</p>
+
+## Contents
+
+- [About the application](#about-the-application)
+- [Tech stack](#tech-stack)
+- [Documentation](#documentation)
+- [Test coverage](#test-coverage)
+- [Test tags](#test-tags)
+- [Run locally](#run-locally)
+- [Parallel execution](#parallel-execution)
+- [Project structure](#project-structure)
+- [CI](#ci)
+- [What I learned](#what-i-learned)
+
+## Documentation
+
+| Document                                  | What it covers                                                        |
+| ----------------------------------------- | --------------------------------------------------------------------- |
+| [TEST_STRATEGY.md](docs/TEST_STRATEGY.md) | Scope, risk analysis, test levels, entry/exit criteria, environments  |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md)   | Layer diagram, data flow, and why POM / fixtures / separate constants |
+| [KNOWN_BUGS.md](docs/KNOWN_BUGS.md)       | The 24 application defects pinned by `test.fail()`, with repro steps  |
 
 ## About the application
 
@@ -306,3 +342,44 @@ Tests run automatically on every push and pull request to `main`:
 7. On failure, `test-results/` is additionally uploaded as `playwright-traces` for trace/video inspection
 
 Configured at `.github/workflows/playwright.yml`.
+
+## What I learned
+
+Things this project taught me that I would not have got from a tutorial.
+
+**A green suite can be lying to you.** An early accessibility test waited on
+`expect(cartTotal).toBeVisible()` for an empty cart. That element renders as an
+empty node with no box, so it is never visible — the assertion burned its full
+timeout, and `test.fail()` swallowed the failure. The test reported green while
+the axe scan it existed to run never executed. `test.fail()` masks setup
+failures, not just the assertion you meant to mark.
+
+**Measure before choosing an approach.** The TTI test was going to use a
+long-task observer, which is the textbook answer. Measured, demoblaze reports
+**zero** long tasks — that implementation would have collapsed to FCP and
+measured nothing. The same habit caught WebKit reporting a 22-second TTI, which
+turned out to be the About-us video preloading rather than a slow page.
+
+**Status codes are not the contract.** demoblaze answers **200** even when it
+refuses a request — a duplicate signup, a wrong password, a rejected add-to-cart
+all come back 200 with the reason in the body. Every API helper here reads the
+body, because a status-only check would report success for a user that was never
+created.
+
+**Speeding something up can expose a defect that was always there.** Moving cart
+setup to the API made it fast enough that writes landed close together, and a
+pre-existing persistence bug started showing. Separately, skipping a page load
+"because the test does not need it" broke checkout in a way that took a
+same-session A/B against `main` to attribute correctly.
+
+**Measure against the right baseline.** I twice reported a wrong performance
+number because I compared using `git stash`, which only reverts _uncommitted_
+work — so my baseline was a broken intermediate state, not `main`. One claim was
+inflated by 2x, the next reversed the sign entirely. Restoring files from git
+explicitly fixed both.
+
+**The application under test shapes the strategy.** demoblaze is a shared public
+site that degrades under concurrency. That single fact is why worker count is
+pinned as a stability setting rather than a speed dial, why load testing is out
+of scope, and why setup moved to the API — fewer page loads, less pressure on
+someone else's server.
